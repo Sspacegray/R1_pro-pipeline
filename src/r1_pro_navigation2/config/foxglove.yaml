@@ -1,0 +1,5 @@
+foxglove_bridge:
+  ros__parameters:
+    # R1 Pro's installed mesh files use an upper-case .STL extension.
+    asset_uri_allowlist:
+      - '^package://(?:[-\w%]+/)*[-\w%.]+\.(?:dae|fbx|glb|gltf|jpeg|jpg|mtl|obj|png|stl|STL|tif|tiff|urdf|webp|xacro)$'

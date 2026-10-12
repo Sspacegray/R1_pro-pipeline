@@ -1,0 +1,25 @@
+cloud_topic: /fastlio2/body_cloud
+
+odom_topic: /fastlio2/lio_odom
+
+map_frame: odom
+
+local_frame: base_link
+
+key_pose_delta_deg: 10.0            # 关键帧角度变化阈值（单位：度），超过此角度变化会生成新的关键帧
+
+key_pose_delta_trans: 3.0           # 关键帧平移变化阈值（单位：米），超过此距离变化会生成新的关键帧
+
+loop_search_radius: 30.0            # 回环检测时的搜索半径（单位：米），只在该半径内查找可能的回环候选帧
+
+loop_time_tresh: 10.0               # 回环检测的时间间隔阈值（单位：秒），只有当前帧与候选帧时间差大于该值才进行检测，避免连续回环检测
+
+loop_score_tresh: 0.15              # 回环匹配得分阈值（越小匹配越好），用于判断是否接受某次回环匹配结果
+
+loop_submap_half_range: 15          # 回环子图半径（单位：米），构建匹配用子图时，以关键帧为中心取 5 米范围内的点云
+
+submap_resolution: 0.1              # 子图匹配时的体素滤波分辨率（单位：米），用于回环匹配中的点云降采样
+
+min_loop_detect_duration: 3.0       # 每次回环检测中允许的最小处理时间（单位：秒），用来过滤过快的、可能不可靠的检测结果
+
+loop_m_key_poses: 10                # 回环检测时，关键帧数量阈值

@@ -1,0 +1,320 @@
+{
+  "configById": {
+    "3D!navigation": {
+      "cameraState": {
+        "perspective": false,
+        "distance": 16,
+        "phi": 55,
+        "thetaOffset": 0,
+        "targetOffset": [0, 0, 0],
+        "target": [0, 0, 0],
+        "targetOrientation": [0, 0, 0, 1],
+        "fovy": 45,
+        "near": 0.1,
+        "far": 5000
+      },
+      "followMode": "follow-pose",
+      "followTf": "body",
+      "frameId": "map",
+      "scene": {
+        "enableStats": false,
+        "backgroundColor": "#0b1220"
+      },
+      "transforms": {
+        "frame:map": { "visible": true },
+        "frame:odom": { "visible": true },
+        "frame:body": { "visible": true },
+        "frame:base_footprint": { "visible": true },
+        "frame:base_link": { "visible": false },
+        "frame:livox_frame": { "visible": false },
+        "frame:imu_chassis": { "visible": false }
+      },
+      "topics": {
+        "/map": {
+          "visible": true,
+          "frameLocked": true,
+          "colorMode": "map"
+        },
+        "/global_costmap/costmap": {
+          "visible": true,
+          "frameLocked": true,
+          "colorMode": "map"
+        },
+        "/local_costmap/costmap": {
+          "visible": true,
+          "frameLocked": true,
+          "colorMode": "map"
+        },
+        "/scan": {
+          "visible": true,
+          "pointSize": 4,
+          "pointShape": "circle",
+          "decayTime": 0.35,
+          "colorMode": "flat",
+          "flatColor": "#22d3eeff"
+        },
+        "/cartographer_scan": {
+          "visible": false,
+          "pointSize": 4,
+          "pointShape": "circle",
+          "decayTime": 0.35,
+          "colorMode": "flat",
+          "flatColor": "#34d399ff"
+        },
+        "/particle_cloud": {
+          "visible": true,
+          "pointSize": 2,
+          "pointShape": "circle",
+          "colorMode": "flat",
+          "flatColor": "#f472b6aa"
+        },
+        "/amcl_pose": {
+          "visible": true,
+          "axisScale": 0.36
+        },
+        "/odom": {
+          "visible": true,
+          "type": "Arrow",
+          "arrowScale": [0.32, 0.06, 0.06],
+          "color": "#fb923cff"
+        },
+        "/plan": {
+          "visible": true,
+          "color": "#fde047ff",
+          "lineWidth": 3
+        },
+        "/local_plan": {
+          "visible": true,
+          "color": "#60a5faff",
+          "lineWidth": 3
+        },
+        "/goal_pose": {
+          "visible": true,
+          "axisScale": 0.32
+        }
+      },
+      "layers": {
+        "grid": {
+          "visible": true,
+          "label": "Navigation Grid",
+          "instanceId": "grid",
+          "layerId": "foxglove.Grid",
+          "frameId": "map",
+          "size": 30,
+          "divisions": 30,
+          "lineWidth": 1,
+          "color": "#94a3b833",
+          "position": [0, 0, 0],
+          "rotation": [0, 0, 0],
+          "order": 1
+        }
+      },
+      "publish": {
+        "type": "pose",
+        "poseTopic": "/goal_pose",
+        "pointTopic": "/clicked_point",
+        "poseEstimateTopic": "/initialpose",
+        "poseEstimateXDeviation": 0.5,
+        "poseEstimateYDeviation": 0.5,
+        "poseEstimateThetaDeviation": 0.26179939
+      },
+      "imageMode": {}
+    },
+    "3D!local": {
+      "cameraState": {
+        "perspective": true,
+        "distance": 5.5,
+        "phi": 62,
+        "thetaOffset": 24,
+        "targetOffset": [0, 0, 0.7],
+        "target": [0, 0, 0],
+        "targetOrientation": [0, 0, 0, 1],
+        "fovy": 45,
+        "near": 0.05,
+        "far": 500
+      },
+      "followMode": "follow-pose",
+      "followTf": "body",
+      "frameId": "map",
+      "scene": {
+        "enableStats": false,
+        "backgroundColor": "#101826"
+      },
+      "transforms": {
+        "frame:map": { "visible": false },
+        "frame:odom": { "visible": false },
+        "frame:body": { "visible": true },
+        "frame:base_footprint": { "visible": false },
+        "frame:base_link": { "visible": false },
+        "frame:livox_frame": { "visible": false },
+        "frame:imu_chassis": { "visible": false }
+      },
+      "topics": {
+        "/map": {
+          "visible": true,
+          "frameLocked": true,
+          "colorMode": "map"
+        },
+        "/local_costmap/costmap": {
+          "visible": true,
+          "frameLocked": true,
+          "colorMode": "map"
+        },
+        "/scan": {
+          "visible": true,
+          "pointSize": 4,
+          "pointShape": "circle",
+          "decayTime": 0.35,
+          "colorMode": "flat",
+          "flatColor": "#38bdf8ff"
+        },
+        "/particle_cloud": {
+          "visible": true,
+          "pointSize": 2,
+          "pointShape": "circle",
+          "colorMode": "flat",
+          "flatColor": "#ec4899aa"
+        },
+        "/plan": {
+          "visible": true,
+          "color": "#facc15ff",
+          "lineWidth": 4
+        },
+        "/local_plan": {
+          "visible": true,
+          "color": "#22d3eeff",
+          "lineWidth": 4
+        },
+        "/goal_pose": {
+          "visible": true,
+          "axisScale": 0.32
+        }
+      },
+      "layers": {
+        "grid": {
+          "visible": true,
+          "label": "Local Grid",
+          "instanceId": "grid",
+          "layerId": "foxglove.Grid",
+          "frameId": "map",
+          "size": 8,
+          "divisions": 16,
+          "lineWidth": 1,
+          "color": "#1e293b66",
+          "position": [0, 0, 0],
+          "rotation": [0, 0, 0],
+          "order": 1
+        }
+      },
+      "publish": {
+        "type": "pose",
+        "poseTopic": "/goal_pose",
+        "pointTopic": "/clicked_point",
+        "poseEstimateTopic": "/initialpose",
+        "poseEstimateXDeviation": 0.5,
+        "poseEstimateYDeviation": 0.5,
+        "poseEstimateThetaDeviation": 0.26179939
+      },
+      "imageMode": {}
+    },
+    "RawMessages!pose": {
+      "topicPath": "/amcl_pose",
+      "diffEnabled": false,
+      "diffMethod": "custom",
+      "diffTopicPath": "",
+      "showFullMessageForDiff": false,
+      "fontSize": 12
+    },
+    "RawMessages!goal": {
+      "topicPath": "/goal_pose",
+      "diffEnabled": false,
+      "diffMethod": "custom",
+      "diffTopicPath": "",
+      "showFullMessageForDiff": false,
+      "fontSize": 12
+    },
+    "Plot!command": {
+      "paths": [
+        {
+          "value": "/cmd_vel.linear.x",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "color": "#a78bfa"
+        },
+        {
+          "value": "/cmd_vel.angular.z",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "color": "#f43f5e"
+        },
+        {
+          "value": "/motion_target/target_speed_chassis.twist.linear.x",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "color": "#22c55e"
+        },
+        {
+          "value": "/motion_target/target_speed_chassis.twist.angular.z",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "color": "#06b6d4"
+        }
+      ],
+      "title": "Nav Command",
+      "minYValue": "",
+      "maxYValue": "",
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "showLegend": true,
+      "legendDisplay": "floating",
+      "showPlotValuesInLegend": false,
+      "isSynced": true,
+      "xAxisVal": "timestamp",
+      "sidebarDimension": 220
+    },
+    "DiagnosticSummary!diag": {
+      "minLevel": 0,
+      "pinnedIds": [],
+      "hardwareIdFilter": "",
+      "topicToRender": "/diagnostics",
+      "sortByLevel": true
+    },
+    "Topic!list": {}
+  },
+  "globalVariables": {},
+  "userNodes": {},
+  "playbackConfig": {
+    "speed": 1
+  },
+  "layout": {
+    "first": {
+      "first": {
+        "first": "3D!navigation",
+        "second": "3D!local",
+        "direction": "column",
+        "splitPercentage": 62
+      },
+      "second": {
+        "first": {
+          "first": {
+            "first": "RawMessages!pose",
+            "second": "RawMessages!goal",
+            "direction": "column",
+            "splitPercentage": 50
+          },
+          "second": "Plot!command",
+          "direction": "column",
+          "splitPercentage": 48
+        },
+        "second": "DiagnosticSummary!diag",
+        "direction": "column",
+        "splitPercentage": 78
+      },
+      "direction": "row",
+      "splitPercentage": 74
+    },
+    "second": "Topic!list",
+    "direction": "row",
+    "splitPercentage": 86
+  }
+}

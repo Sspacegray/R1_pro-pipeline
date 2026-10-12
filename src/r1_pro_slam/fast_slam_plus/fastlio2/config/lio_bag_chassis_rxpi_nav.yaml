@@ -1,0 +1,29 @@
+# FAST-LIO2 bag configuration for the origin_nav frame contract.
+# Keep the calibrated chassis-IMU adapter and use odom as the local frame:
+#   FAST-LIO2: odom -> body
+#   Localizer: map -> odom
+imu_topic: /hdas/imu_chassis_rxpi
+lidar_topic: /hdas/lidar_chassis_left
+body_frame: body
+world_frame: odom
+print_time_cost: false
+lidar_filter_num: 3
+lidar_min_range: 0.5
+lidar_max_range: 40.0
+scan_resolution: 0.15
+map_resolution: 0.3
+cube_len: 300
+det_range: 60
+move_thresh: 1.5
+na: 0.01
+ng: 0.01
+nba: 0.0001
+nbg: 0.0001
+imu_init_num: 20
+near_search_num: 5
+ieskf_max_iter: 5
+gravity_align: false
+esti_il: false
+r_il: [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
+t_il: [0.0, 0.0, 0.0]
+lidar_cov_inv: 1000.0

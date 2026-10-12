@@ -1,0 +1,60 @@
+# R1 Pro 底盘 Mid360 导航用配置 (实机, 非 rosbag)
+# 雷达: 底盘左侧 Mid360, 话题 /hdas/lidar_chassis_left (PointXYZRTL PointCloud2)
+# IMU: /hdas/imu_chassis_cov (imu_to_imu_with_cov 转换后的 sensor_msgs/Imu)
+imu_topic: /livox/imu
+lidar_topic: /hdas/lidar_chassis_left
+
+# 发布 odom -> base_link TF 和 /odom
+body_frame: base_link
+world_frame: odom
+lidar_type: livox
+print_time_cost: false
+
+lidar_filter_num: 3
+lidar_min_range: 0.5
+lidar_max_range: 40.0
+lidar_z_min: -1.6165   # 相对雷达的高度过滤(雷达安装高 ~1.53m)
+lidar_z_max: 5.0
+scan_down_sampling_rate: 0.1
+map_resolution: 0.1
+
+cube_len: 30
+move_thresh: 0.8
+det_range: 5
+
+na: 0.01
+ng: 0.01
+nba: 0.0001
+nbg: 0.0001
+
+near_search_radius: 60
+effect_feat_num: 5
+imu_init_num: 20
+near_search_num: 5
+plane_fitting_tolerance: 0.2
+point2plane_dist: 0.3
+similarity_score: 0.8
+ieskf_max_iter: 15
+ieskf_rotation_threshold_deg: 0.1
+ieskf_translation_threshold_cm: 1
+
+gravity_align: false
+esti_il: false          # 外参已知(HDAS 标定), 不在线估计
+
+# IMU->LiDAR 外参: robot_calibration.json imu_chassis 旋转/平移
+# R_IL = Rx(-pi) applied per-axis; t = [0.147, 0, -0.2567] (IMU原点在LiDAR系)
+r_il: [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
+t_il: [-0.011, -0.02329, 0.04412]  # MID360 内置IMU->雷达 出厂外参(与qr100配置一致)
+
+imu_to_baselink_r_il: [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
+imu_to_baselink_t_il: [0.0, 0.0, 0.0]
+laser_to_baselink_r_il: [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
+laser_to_baselink_t_il: [0.0, 0.0, 0.0]
+
+lidar_cov_inv: 1000.0
+
+enable_debug_logs: false
+imu_log_interval: 100
+lidar_log_interval: 15
+system_log_interval: 25
+feature_log_interval: 10

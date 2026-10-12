@@ -1,0 +1,35 @@
+# EKF 配置：只融合轮式里程计速度，不融合 IMU
+#
+# 输入：
+#   /motion_control/chassis_speed_cov (TwistWithCovarianceStamped, 由 twist_to_twist_with_cov 提供)
+#
+# 输出：
+#   /odom (nav_msgs/Odometry)
+#   /tf  (odom → body)
+
+ekf_filter_node:
+  ros__parameters:
+    frequency: 20.0
+    two_d_mode: true
+    publish_tf: true
+
+    twist0: /motion_control/chassis_speed_cov
+    twist0_config: [false, false, false,
+                    false, false, false,
+                    true,  true,  false,
+                    false, false, true,
+                    false, false, false]
+    twist0_queue_size: 10
+    twist0_rejection_threshold: 5.0
+    twist0_nodelay: true
+
+    map_frame: map
+    odom_frame: odom
+    base_link_frame: body
+    world_frame: odom
+
+    initial_state: [0.0, 0.0, 0.0,
+                    0.0, 0.0, 0.0,
+                    0.0, 0.0, 0.0,
+                    0.0, 0.0, 0.0,
+                    0.0, 0.0, 0.0]

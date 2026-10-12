@@ -1,0 +1,123 @@
+{
+  "configById": {
+    "3D!loc": {
+      "cameraState": {
+        "perspective": false,
+        "distance": 25,
+        "phi": 60,
+        "thetaOffset": 0,
+        "targetOffset": [0, 0, 0],
+        "target": [0, 0, 0],
+        "targetOrientation": [0, 0, 0, 1],
+        "fovy": 45,
+        "near": 0.1,
+        "far": 5000
+      },
+      "followMode": "follow-pose",
+      "followTf": "base_link",
+      "frameId": "map",
+      "scene": {
+        "enableStats": false,
+        "backgroundColor": "#0b1220"
+      },
+      "transforms": {
+        "frame:map": { "visible": true },
+        "frame:base_link": { "visible": true },
+        "frame:livox_frame": { "visible": true }
+      },
+      "topics": {
+        "/pcd_map": {
+          "visible": true,
+          "pointSize": 1,
+          "pointShape": "square",
+          "colorMode": "flat",
+          "flatColor": "#6c757d"
+        },
+        "/deskew_cloud": {
+          "visible": true,
+          "pointSize": 2,
+          "pointShape": "circle",
+          "decayTime": 0.2,
+          "colorMode": "flat",
+          "flatColor": "#4cc9f0"
+        },
+        "/agv_pose": {
+          "visible": true,
+          "type": "pose",
+          "color": "#ffd60a"
+        }
+      },
+      "publish": {
+        "type": "pose",
+        "topic": "/initialpose",
+        "frameId": "map"
+      }
+    },
+    "Indicator!fitness": {
+      "fields": ["/agv_pose.pose.position.x"],
+      "foxgloveChartTitle": "重定位状态 (发布 /agv_pose = 已收敛)",
+      "path": "",
+      "style": "bulb",
+      "fontSize": 30,
+      "fallbackColor": "#a0a0a0",
+      "fallbackLabel": "重定位中",
+      "rules": [
+        {
+          "operator": "!=",
+          "rawValue": "",
+          "color": "#68e24a",
+          "label": "已定位"
+        }
+      ]
+    },
+    "Plot!xyz": {
+      "paths": [
+        {
+          "value": "/agv_pose.pose.position.x",
+          "timestampMethod": "receiveTime",
+          "label": "x"
+        },
+        {
+          "value": "/agv_pose.pose.position.y",
+          "timestampMethod": "receiveTime",
+          "label": "y"
+        },
+        {
+          "value": "/agv_pose.pose.position.z",
+          "timestampMethod": "receiveTime",
+          "label": "z"
+        }
+      ],
+      "minValue": "auto",
+      "maxValue": "auto",
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "showLegend": true,
+      "legendDisplay": "floating",
+      "foxgloveChartTitle": "位姿 (map 系)"
+    },
+    "Topic!list": {
+      "showScanRate": true,
+      "sortBy": "name"
+    }
+  },
+  "globalVariables": {},
+  "userNodes": {},
+  "playbackConfig": { "speed": 1.0 },
+  "layout": {
+    "first": "3D!loc",
+    "second": {
+      "first": "Indicator!fitness",
+      "second": {
+        "first": "Plot!xyz",
+        "second": "Topic!list",
+        "direction": "column",
+        "splitPercentage": [50, 50]
+      },
+      "direction": "column",
+      "splitPercentage": [25, 75]
+    },
+    "direction": "row",
+    "splitPercentage": [70, 30]
+  }
+}

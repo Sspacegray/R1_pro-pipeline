@@ -1,0 +1,66 @@
+imu_topic: /imu
+lidar_topic: /livox/lidar/pointcloud
+
+body_frame: base_link
+world_frame: odom
+lidar_type: livox
+print_time_cost: false
+
+lidar_filter_num: 3
+lidar_min_range: 0.5
+lidar_max_range: 40.0
+lidar_z_min: -1.6165
+lidar_z_max: 5.0
+scan_down_sampling_rate: 0.1
+map_resolution: 0.1
+
+cube_len: 30
+move_thresh: 0.8
+det_range: 5
+
+na: 0.01
+ng: 0.01
+nba: 0.0001
+nbg: 0.0001
+
+near_search_radius: 60
+effect_feat_num: 5
+imu_init_num: 20
+near_search_num: 5
+
+plane_fitting_tolerance: 0.2
+point2plane_dist: 0.3
+similarity_score: 0.8
+
+ieskf_max_iter: 15
+ieskf_rotation_threshold_deg: 0.1
+ieskf_translation_threshold_cm: 1
+
+gravity_align: false
+esti_il: true
+
+# LiDAR -> IMU (use URDF base_link->livox_frame inverse; verify with tf2_echo)
+r_il: [1.0, 0.0, 0.0,
+       0.0, 0.999488, -0.031999,
+       0.0, 0.031999, 0.999488]
+t_il: [-0.34, 0.0112, -0.349821]
+
+# LiDAR -> base_link
+laser_to_baselink_r_il: [1.0, 0.0, 0.0,
+                         0.0, 0.999488, -0.031999,
+                         0.0, 0.031999, 0.999488]
+laser_to_baselink_t_il: [-0.34, 0.0112, -0.349821]
+
+# IMU -> base_link (IMU is mounted at base_link origin in URDF)
+imu_to_baselink_r_il: [1.0, 0.0, 0.0,
+                       0.0, 1.0, 0.0,
+                       0.0, 0.0, 1.0]
+imu_to_baselink_t_il: [0.0, 0.0, 0.0]
+
+lidar_cov_inv: 1000.0
+
+enable_debug_logs: false
+imu_log_interval: 100
+lidar_log_interval: 15
+system_log_interval: 25
+feature_log_interval: 10

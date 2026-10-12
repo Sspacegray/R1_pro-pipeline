@@ -1,0 +1,139 @@
+###############cloud preprocess############
+# RS16 参数传感器：
+# 测距：40cm 至 150 米（目标反射率 20%）
+# 精度：±2cm（典型值）
+# 视角（垂直）：±15°（共 30°）
+# 角分辨率（垂直）：2°
+# TOF 测距 16 通道 (不就是30/2=15)
+# 视角（水平）：360°
+# 角分辨率（水平/方位角）：0.1°（5Hz）至 0.4°（20Hz）
+# 转速：300/600/1200rpm（5/10/20Hz）
+
+lidar_type: "rs16"         #雷达类型: "livox" 或 "rs16"
+filter_leaf_size: 0.8      #输入定位系统的点云体素滤波体素大小（减小提高精度）
+min_range: 0.6             #建图盲区blind用的就是0.6，相当于球面过滤的半径0.6米
+max_range: 80.0            #减小范围提高处理效率
+
+N_SCANS: 16    #激光线束
+Horizon_SCAN: 1800 #平面激光线束的分辨率（减半提高处理速度）
+
+lidar_angle_res_x: 0.2  # 激光线之间的水平角度分辨率（例如 RS16 是 0.2°）
+lidar_angle_res_y: 2.0  #激光线之间的垂直角度分辨率（例如 RS16 是 2°）
+lidar_low_angle: -15.0  #激光雷达最底下一根线的角度（例如 RS16 的 -15°）
+
+limit_angle_min: -180.0 #雷达角度范围
+limit_angle_max: 180.0
+
+#surf_threshold: 0.1
+
+lidar_topic: "/rslidar_points"                   #激光雷达话题
+
+pub_cloud_topic: "/deskew_cloud"              #去畸变点云话题
+
+
+###############cloud preprocess############
+
+###################location################
+use_reloc: true                               #是否使用重定位
+imu_scale: 1.0                                #IMU加速度计比例因子
+reloc_threshold: 0.40                         #重定位阈值（降低阈值提高匹配质量）
+tracking_threshold: 0.20                      #正常跟踪阈值
+use_wheel_odom_prior: true                    #是否使用 odom->base_link 作为匹配初值先验
+enable_pose_restore: true                     #节点启动时先读上次保存位姿；验证失败才退回 BBS 全局重定位
+pose_save_only_when_stable: true              #仅在 TRACKING_OK / TRACKING_WEAK(且 map->odom 有效) 时保存，避免把错误位姿写入恢复文件
+pose_save_interval_sec: 1.0                   #最小保存时间间隔；到这个时间后，只有位姿变化超过阈值才会真正落盘
+pose_save_max_interval_sec: 10.0              #最长强制保存时间；机器人长时间静止也会按这个周期刷新一次恢复位姿
+pose_save_min_translation_m: 0.3              #相对上次保存位姿的最小平移变化阈值；移动不足这个距离则跳过本次保存
+pose_save_min_yaw_deg: 10.0                   #相对上次保存位姿的最小偏航变化阈值；转角不足这个值则跳过本次保存
+pose_persistence_path: "~/.local/state/indoor_location/indoor_location_rs16_last_pose.txt"  #恢复位姿文件路径；建议使用非 /tmp 的持久目录
+status_topic: "/localization_status"          #实时定位状态
+enable_bounded_global_reloc_window: true      #有恢复位姿/人工初值时使用局部 BBS 窗口
+map_filtr_leaf_size: 0.5                      #定位线程使用的全局地图滤波体素大小，使用配p2picp算法不能太大
+enable_undistort: true                        #是否启用点云去畸变功能（使用IMU进行运动补偿）
+
+map_frame    : "map"                          #发布定位系统tf发布所需的坐标系
+base_frame   : "base_link"
+
+lidar2base_x: 0.10                            #lidar2base transform，单位米
+lidar2base_y: 0.0
+lidar2base_z: 0.18
+lidar2base_roll: 0.0                          #单位弧度
+lidar2base_pitch: 0.0
+lidar2base_yaw: 0.0
+
+
+imu2base_x: 0.10                             #imu2base transform，单位米
+imu2base_y: 0.0
+imu2base_z: 0.0
+imu2base_roll: 0.0                           #单位弧度
+imu2base_pitch: 0.0
+imu2base_yaw: 0.0
+
+init_x: 0.0                                   #定位系统输入的初始化位姿
+init_y: 0.0
+init_z: 0.0
+init_roll: 0.0
+init_pitch: 0.0
+init_yaw: 0.0
+
+map_filename: "/home/wz/ros2_test_ws/src/indoor_location/map/map_rs16.pcd"                  #点云地图名称(使用绝对路径)
+map_pub_topic: "/pcd_map"                      #发布全局pcd点云地图话题数据
+
+imu_topic: "/imu"                          #IMU话题
+cmd_topic: "/loc_cmd"                          #定位指令话题
+#init_pose_topic: "/initialpose"
+
+#pub_odom_topic: "/agv_odom"                   #里程计话题
+pose_pub_topic: "/agv_pose"                    #发布定位位姿话题数据,这里的位姿是基于base_link的位姿（注意不是基于laser_link的位姿）
+
+#p2pl_icp location
+plane_threshold: 0.3     #0.3 构建的平面点与当前位姿邻域点的阈值，说白了就是判断当前点是否在平面内
+opt_correspondences_threshold_normal: 0.4 #0.4
+opt_correspondences_threshold_relocation: 2.0
+opt_max_iteration: 3 #匹配迭代次数（减少提高速度）
+thread_num: 4  #增加线程数充分利用多核
+#具体配置如下：性能核（P核）：6个，支持超线程（每个核心2线程），共12线程。能效核（E核）：8个，不支持超线程（每个核心1线程），共8线程。
+
+
+#ndt location
+ndt_max_iteration: 3 #最大迭代次数
+ndt_voxel_size: 1.0 #体素大小 #0.5 好像1.0最优
+ndt_min_effective_pts: 10 #最近邻点数阈值
+ndt_min_pts_in_voxel: 3 #每个栅格中最小点数 default：3
+ndt_eps: 0.01 #收敛判定条件  #0.01
+ndt_res_outlier_th: 20.0 #异常值拒绝阈值
+ndt_remove_centroid: false #是否计算两个点云中心并移除中心？
+ndt_nearby_type: 0 #临近栅格模式 0： 只有本栅格 | 1：附近六个栅格
+ndt_thread_num: 4
+map_grid_resoltion: 30.0
+
+# BBS global relocalization
+bbs_max_range: 25.0                         #BBS 评分时考虑的最大匹配距离；一般与雷达有效观测半径同量级，过大容易引入远处噪声
+bbs_min_tx: -80.0                           #全局搜索 x 最小值，单位米；应覆盖地图有效区域左边界
+bbs_max_tx: 80.0                            #全局搜索 x 最大值，单位米；应覆盖地图有效区域右边界
+bbs_min_ty: -80.0                           #全局搜索 y 最小值，单位米；应覆盖地图有效区域下边界
+bbs_max_ty: 80.0                            #全局搜索 y 最大值，单位米；应覆盖地图有效区域上边界
+bbs_min_theta: -3.14159                     #全局搜索偏航最小值，单位弧度；冷启动通常直接给 [-pi, pi]
+bbs_max_theta: 3.14159                      #全局搜索偏航最大值，单位弧度
+bbs_map_min_z: -0.5                         #从 3D 地图切 2.5D BBS 层时保留的最小高度；太低会混入地面和近地噪声
+bbs_map_max_z: 1.0                          #从 3D 地图切 2.5D BBS 层时保留的最大高度；太高会混入天花板/横梁等弱区分结构
+bbs_scan_min_z: -0.5                        #实时扫描切片的最小高度；建议与 map 切片高度保持同一层语义
+bbs_scan_max_z: 1.0                         #实时扫描切片的最大高度；过窄会丢结构，过宽会混入无效高度层
+bbs_map_resolution: 0.8                     #BBS 栅格分辨率，单位米；稀疏雷达可用更粗分辨率，分辨率越小越精细但计算更重
+bbs_map_width: 512                          #BBS 栅格宽度，配合 resolution 决定可覆盖的物理宽度
+bbs_map_height: 512                         #BBS 栅格高度，配合 resolution 决定可覆盖的物理高度
+bbs_map_pyramid_level: 6                    #BBS 金字塔层数；层数高搜索更快但内存和预处理更重，通常 5~7 比较合适
+bbs_max_points_per_cell: 5                  #每个栅格最多保留多少点；限制局部超密区域对评分的主导
+bbs_bounded_translation_window: 10.0        #有先验位姿时，局部 BBS 窗口的平移半宽，单位米；越小越快，越大越稳
+bbs_bounded_yaw_window_deg: 45.0            #有先验位姿时，局部 BBS 窗口的偏航半宽，单位度；轮式车一般 20~60 度
+###################location################
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,78 @@
+imu_topic: /front_lidar/imu
+lidar_topic: /front_lidar
+body_frame: base_link
+world_frame: odom
+lidar_type: rslidar
+print_time_cost: false
+
+lidar_filter_num: 2
+lidar_min_range: 0.2
+lidar_max_range: 80.0
+lidar_z_min: -100.0
+lidar_z_max: 100.0
+scan_down_sampling_rate: 0.1
+map_resolution: 0.05
+
+cube_len: 60.0
+move_thresh: 0.8
+det_range: 20.0
+
+na: 0.01
+ng: 0.0005
+nba: 0.0005
+nbg: 0.00002
+
+near_search_radius: 60
+effect_feat_num: 5
+imu_init_num: 10
+near_search_num: 5
+
+plane_fitting_tolerance: 0.2
+point2plane_dist: 0.3
+similarity_score: 0.8
+ieskf_max_iter: 15
+ieskf_rotation_threshold_deg: 0.3
+ieskf_translation_threshold_cm: 3
+
+# rslidar_sdk/front_lidar.yaml 已经把 Airy 点云旋转到 ROS FLU:
+# +X 前、+Y 左、+Z 上。当前 IMU 静止重力实测约为 raw (0, -1g, 0)，
+# 这里旋到同一水平雷达/机体系。
+gravity_align: true
+gravity: [0.0, 0.0, -9.81]
+gravity_init: [0.0, 0.0, -9.81]
+start_in_aggressive_motion: false
+
+# r_il: 前端内部的 lidar/body -> IESKF body 外参。
+# 输入点云已经先通过 laser_to_baselink_* 转到 base_link，滤波器内部 body
+# 也定义为 base_link，所以这里保持单位阵，避免重复补偿。
+# esti_il 关掉:初值给对后不让 IESKF 在线再折腾外参,断电重启也不会"飞"。
+esti_il: false
+r_il: [1.0, 0.0, 0.0,
+       0.0, 1.0, 0.0,
+       0.0, 0.0, 1.0]
+t_il: [0.0, 0.0, 0.0]
+
+# imu_to_baselink_r_il: raw Airy IMU -> 当前水平雷达/body系。
+# 实测静止 raw acc 约为 (0,-1g,0)，变换后为 (0,0,+1g)，
+# 初始化中 measured gravity=-acc 对齐到世界 -Z。
+imu_to_baselink_r_il: [0.0, 0.0, -1.0,
+                       1.0, 0.0,  0.0,
+                       0.0, -1.0, 0.0]
+imu_to_baselink_t_il: [0.0, 0.0, 0.0]
+
+# rslidar_sdk/front_lidar.yaml 已经把 /front_lidar 点云旋到 ROS FLU。
+# 这里仅补前雷达原点到导航 base_link 的平移，不再做旧版 pitch=-90deg 旋转。
+# 初值来自历史 rslidar_head->base_link TF: base_link 在 rslidar_head 下 z=-0.36615，
+# 因此 rslidar_head 在 base_link 下 z=+0.36615。若机械实测不同，只改这个平移。
+laser_to_baselink_r_il: [1.0, 0.0, 0.0,
+                         0.0, 1.0, 0.0,
+                         0.0, 0.0, 1.0]
+laser_to_baselink_t_il: [0.0, 0.0, 0.36615]
+
+lidar_cov_inv: 1000.0
+
+enable_debug_logs: false
+imu_log_interval: 100
+lidar_log_interval: 15
+system_log_interval: 25
+feature_log_interval: 10

@@ -1,0 +1,113 @@
+###############cloud preprocess############
+# RS16 参数传感器：
+# 测距：40cm 至 150 米（目标反射率 20%）
+# 精度：±2cm（典型值）
+# 视角（垂直）：±15°（共 30°）
+# 角分辨率（垂直）：2°
+# TOF 测距 16 通道 (不就是30/2=15)
+# 视角（水平）：360°
+# 角分辨率（水平/方位角）：0.1°（5Hz）至 0.4°（20Hz）
+# 转速：300/600/1200rpm（5/10/20Hz）
+
+lidar_type: "rs16"         #雷达类型: "livox" 或 "rs16"
+filter_leaf_size: 0.8      #输入定位系统的点云体素滤波体素大小（减小提高精度）
+min_range: 0.6             #建图盲区blind用的就是0.6，相当于球面过滤的半径0.6米
+max_range: 80.0            #减小范围提高处理效率
+
+N_SCANS: 16    #激光线束
+Horizon_SCAN: 1800 #平面激光线束的分辨率（减半提高处理速度）
+
+lidar_angle_res_x: 0.2  # 激光线之间的水平角度分辨率（例如 RS16 是 0.2°）
+lidar_angle_res_y: 2.0  #激光线之间的垂直角度分辨率（例如 RS16 是 2°）
+lidar_low_angle: -15.0  #激光雷达最底下一根线的角度（例如 RS16 的 -15°）
+
+limit_angle_min: -180.0 #雷达角度范围
+limit_angle_max: 180.0
+
+#surf_threshold: 0.1
+
+lidar_topic: "/rslidar_points"                   #激光雷达话题
+
+pub_cloud_topic: "/deskew_cloud"              #去畸变点云话题
+
+
+###############cloud preprocess############
+
+###################location################
+use_reloc: true                               #是否使用重定位
+imu_scale: 1.0                                #IMU加速度计比例因子
+reloc_threshold: 0.40                         #重定位阈值（降低阈值提高匹配质量）
+map_filtr_leaf_size: 0.5                      #定位线程使用的全局地图滤波体素大小，使用配p2picp算法不能太大
+enable_undistort: true                        #是否启用点云去畸变功能（使用IMU进行运动补偿）
+
+map_frame    : "map"                          #发布定位系统tf发布所需的坐标系
+base_frame   : "base_link"
+
+lidar2base_x: 0.10                            #lidar2base transform，单位米
+lidar2base_y: 0.0
+lidar2base_z: 0.18
+lidar2base_roll: 0.0                          #单位弧度
+lidar2base_pitch: 0.0
+lidar2base_yaw: 0.0
+
+
+imu2base_x: 0.10                             #imu2base transform，单位米
+imu2base_y: 0.0
+imu2base_z: 0.0
+imu2base_roll: 0.0                           #单位弧度
+imu2base_pitch: 0.0
+imu2base_yaw: 0.0
+
+init_x: 0.0                                   #定位系统输入的初始化位姿
+init_y: 0.0
+init_z: 0.0
+init_roll: 0.0
+init_pitch: 0.0
+init_yaw: 0.0
+
+map_filename: "/home/wz/ros2_test_ws/src/indoor_location/map/map_rs16.pcd"                  #点云地图名称(使用绝对路径)
+map_pub_topic: "/pcd_map"                      #发布全局pcd点云地图话题数据
+
+imu_topic: "/imu"                          #IMU话题
+cmd_topic: "/loc_cmd"                          #定位指令话题
+#init_pose_topic: "/initialpose"
+
+#pub_odom_topic: "/agv_odom"                   #里程计话题
+pose_pub_topic: "/agv_pose"                    #发布定位位姿话题数据,这里的位姿是基于base_link的位姿（注意不是基于laser_link的位姿）
+
+#p2pl_icp location
+plane_threshold: 0.3     #0.3 构建的平面点与当前位姿邻域点的阈值，说白了就是判断当前点是否在平面内
+opt_correspondences_threshold_normal: 0.4 #0.4
+opt_correspondences_threshold_relocation: 2.0
+opt_max_iteration: 3 #匹配迭代次数（减少提高速度）
+thread_num: 4  #增加线程数充分利用多核
+#具体配置如下：性能核（P核）：6个，支持超线程（每个核心2线程），共12线程。能效核（E核）：8个，不支持超线程（每个核心1线程），共8线程。
+
+
+#ndt location
+ndt_max_iteration: 3 #最大迭代次数
+ndt_voxel_size: 1.0 #体素大小 #0.5 好像1.0最优
+ndt_min_effective_pts: 10 #最近邻点数阈值
+ndt_min_pts_in_voxel: 3 #每个栅格中最小点数 default：3
+ndt_eps: 0.01 #收敛判定条件  #0.01
+ndt_res_outlier_th: 20.0 #异常值拒绝阈值
+ndt_remove_centroid: false #是否计算两个点云中心并移除中心？
+ndt_nearby_type: 0 #临近栅格模式 0： 只有本栅格 | 1：附近六个栅格
+ndt_thread_num: 4
+map_grid_resoltion: 30.0
+###################location################
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,84 @@
+# R1 Pro 底盘 Mid360 定位配置 (实机)
+# 雷达: /hdas/lidar_chassis_left (frame: livox_frame, 位于底盘左前, 相对 body 平移 [0.2362, 0.2622, 0.2585])
+# IMU: /hdas/imu_chassis_cov (frame: imu_chassis, 相对 body [-0.147, 0, 0.2567])
+###############cloud preprocess############
+lidar_type: "livox"
+filter_leaf_size: 0.2
+min_range: 0.6
+max_range: 30.0
+N_SCANS: 4
+
+limit_angle_min: -180.0
+limit_angle_max: 180.0
+
+lidar_topic: "/hdas/lidar_chassis_left"
+pub_cloud_topic: "/deskew_cloud"
+
+###################location################
+use_reloc: true
+imu_scale: 9.81
+reloc_threshold: 0.9
+tracking_threshold: 0.20
+use_wheel_odom_prior: false              # 用 r1_pro_odom 的 odom->body TF 做先验
+enable_pose_restore: false
+freeze_map_to_odom_after_init: true
+disable_runtime_reloc_after_init: false
+pose_save_only_when_stable: true
+pose_save_interval_sec: 1.0
+pose_save_max_interval_sec: 10.0
+pose_save_min_translation_m: 0.3
+pose_save_min_yaw_deg: 10.0
+pose_persistence_path: "~/.local/state/indoor_location/r1_chassis_last_pose.txt"
+status_topic: "/localization_status"
+enable_bounded_global_reloc_window: true
+map_filtr_leaf_size: 0.2
+enable_undistort: true
+
+map_frame    : "map"
+base_frame   : "body"
+odom_frame   : "odom"                # use_wheel_odom_prior 用
+
+# lidar 相对 body 的安装外参 (机器人标定: lidar_chassis_left 平移[0.2362,0.2622,0.2585] 旋转≈0)
+lidar2base_x: 0.15711
+lidar2base_y: 0.26215
+lidar2base_z: 0.29465
+lidar2base_roll: 0.0
+lidar2base_pitch: 0.0
+lidar2base_yaw: 0.0
+
+# IMU 相对 body (机器人标定 imu_chassis: [-0.147, 0, 0.2567], 旋转 Rx(-pi))
+imu2base_x: 0.15711
+imu2base_y: 0.26215
+imu2base_z: 0.29465
+imu2base_roll: 0.0
+imu2base_pitch: 0.0
+imu2base_yaw: 0.0
+
+init_x: 0.0
+init_y: 0.0
+init_z: 0.0
+init_roll: 0.0
+init_pitch: 0.0
+init_yaw: 0.0
+
+map_filename: /home/nvidia/galaxea/maps/pcd/20260918_171257.pcd
+map_pub_topic: "/pcd_map"
+
+imu_topic: "/livox/imu"
+cmd_topic: "/loc_cmd"
+
+pose_pub_topic: "/agv_pose"
+
+plane_threshold: 0.3
+opt_correspondences_threshold_normal: 0.3
+registration_method: "ndt_gicp"
+gicp_voxel_size: 0.2
+gicp_max_correspondence_distance: 1.0
+gicp_max_iterations: 64
+gicp_min_inlier_ratio: 0.3
+ndt_voxel_size: 0.5
+ndt_max_iteration: 30
+ndt_thread_num: 4
+opt_correspondences_threshold_relocation: 0.5
+opt_max_iteration: 30
+thread_num: 4

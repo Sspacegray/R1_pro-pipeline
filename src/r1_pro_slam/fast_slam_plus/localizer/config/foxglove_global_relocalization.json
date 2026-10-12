@@ -1,0 +1,44 @@
+{
+  "configById": {
+    "3D!global": {
+      "layers": {
+        "grid": {"instanceId":"grid","layerId":"foxglove.Grid","visible":true,"size":50,"divisions":50,"lineWidth":1,"color":"#666666ff","order":1}
+      },
+      "cameraState": {"perspective":true,"distance":35,"phi":40,"thetaOffset":-140,"targetOffset":[0,0,0],"fovy":45,"near":0.1,"far":5000},
+      "followMode":"pose",
+      "scene":{"transforms":{"showLabel":true,"lineWidth":2}},
+      "transforms":{"frame:map":{"visible":true},"frame:lidar":{"visible":true},"frame:body":{"visible":true}},
+      "topics":{
+        "/localizer/map_cloud":{"visible":true,"colorMode":"flat","flatColor":"#4aa3ffff","pointSize":2},
+        "/fastlio2/world_cloud":{"visible":true,"colorMode":"flat","flatColor":"#ff9f43ff","pointSize":2},
+        "/localizer/global_pose":{"visible":true,"color":"#00ff00ff","poseSize":1.5},
+        "/localizer/global_candidate":{"visible":true,"color":"#ff00ffff","poseSize":1.0},
+        "/initialpose":{"visible":true,"color":"#00ffffff","poseSize":1.5},
+        "/fastlio2/lio_path":{"visible":true,"color":"#00ff00ff","lineWidth":0.08,"poseAxisScale":0},
+        "/fastlio2/lio_odom":{"visible":true,"color":"#ffff00ff","keep":1,"showCovariance":false}
+      }
+    },
+    "3D!scan": {
+      "layers": {},
+      "cameraState":{"perspective":false,"distance":8,"phi":0,"thetaOffset":0,"targetOffset":[0,0,0],"fovy":45,"near":0.1,"far":200},
+      "followMode":"follow-tf",
+      "followTf":{"frame":"lidar"},
+      "scene":{"transforms":{"showLabel":false,"lineWidth":1}},
+      "transforms":{"frame:map":{"visible":false}},
+      "topics":{"/fastlio2/body_cloud":{"visible":true,"colorMode":"flat","flatColor":"#ff3333ff","pointSize":3}}
+    },
+    "DiagnosticSummary!eval": {"minLevel":0,"pinnedIds":[],"hardwareIdFilter":"map_eval","topicToRender":"/localizer/diagnostics","sortByLevel":true},
+    "Plot!metrics": {"paths":[{"value":"/localizer/diagnostics.status[0].values[2].value","label":"score"},{"value":"/localizer/diagnostics.status[0].values[0].value","label":"success"}]},
+    "RawMessages!raw": {"topic":"/localizer/diagnostics","title":"Relocalization diagnostics"},
+    "RosOut!logs":{"searchTerms":["localizer"],"minLogLevel":1}
+  },
+  "globalVariables": {},
+  "userNodes": [],
+  "playbackConfig": {},
+  "layout": {
+    "first":"3D!global",
+    "second":{"first":"3D!scan","second":{"first":"DiagnosticSummary!eval","second":"RosOut!logs","direction":"column","splitPercentage":55},"direction":"column","splitPercentage":48},
+    "direction":"row",
+    "splitPercentage":70
+  }
+}

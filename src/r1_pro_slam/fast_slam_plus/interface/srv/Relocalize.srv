@@ -1,0 +1,20 @@
+string pcd_path
+float32 x
+float32 y
+float32 z
+float32 yaw
+float32 pitch
+float32 roll
+bool global_search
+int32 num_candidates
+int64 seed
+---
+bool success
+string message
+string method
+float32 score
+float32 pose_x
+float32 pose_y
+float32 pose_z
+float32 pose_yaw
+float64 stamp

@@ -1,0 +1,85 @@
+# R1 Pro 底盘 Mid360 纯定位配置 (indoor_location, 真机直连)
+# 雷达: MID360 (livox 驱动 /livox/lidar, PointXYZRTL PointCloud2, frame: livox_frame)
+# IMU:  MID360 内置 IMU (/livox/imu, g 单位, 与雷达同装位 -> 外参用出厂内参, rpy=0)
+# 链路: livox 驱动 -> location_node (全局重定位) -> TF map->odom
+# 手动重定位: Foxglove 3D 面板 Publish Pose -> /initialpose
+###############cloud preprocess############
+lidar_type: "livox"        #雷达类型: "livox" 或 "rs16"
+filter_leaf_size: 0.3      #输入定位系统的点云体素滤波体素大小
+min_range: 0.6             #建图盲区,球面过滤半径
+max_range: 30.0
+N_SCANS: 4                 #MID360 线数 (line<4)
+
+limit_angle_min: -180.0
+limit_angle_max: 180.0
+
+lidar_topic: "/hdas/lidar_chassis_left"              #激光雷达话题 (galaxea版livox驱动实际发布话题)
+pub_cloud_topic: "/deskew_cloud"              #去畸变点云话题
+
+###############cloud preprocess############
+
+###################location################
+use_reloc: true                               #启动即从 init_pose 附近全局重定位
+imu_scale: 9.81                               #IMU加速度计比例因子(g->m/s^2)
+reloc_threshold: 0.6                          #重定位成功阈值(实际成功线=reloc_threshold*1.2, 实测fitness稳定0.66-0.70)
+map_filtr_leaf_size: 0.3                      #定位线程使用的全局地图滤波体素大小(p2pl icp 建议<=0.3)
+enable_undistort: true                        #使用内置IMU做点云去畸变
+
+map_frame    : "map"                          #全局地图坐标系
+odom_frame   : "odom"                         #连续里程计坐标系
+base_frame   : "base_link"                    #机器人基座坐标系
+odom_topic   : "/odom"                        #FastLIO 唯一里程计输入
+odom_buffer_duration: 10.0
+odom_match_max_dt: 0.25
+
+# lidar 相对 base_link 安装外参 (机器人标定, 旋转≈0)
+lidar2base_x: 0.15711
+lidar2base_y: 0.26215
+lidar2base_z: 0.29465
+lidar2base_roll: 0.0
+lidar2base_pitch: 0.0
+lidar2base_yaw: 0.0
+
+# MID360 内置 IMU 相对 base_link: lidar2base + 出厂 IMU->lidar 内参 t=[-0.011,-0.02329,0.04412], 旋转恒等
+imu2base_x: 0.14611
+imu2base_y: 0.23886
+imu2base_z: 0.33877
+imu2base_roll: 0.0
+imu2base_pitch: 0.0
+imu2base_yaw: 0.0
+
+# 初始位姿先验 (重定位从此处附近收敛; 地图原点≈起点)
+init_x: 0.0
+init_y: 0.0
+init_z: 0.0
+init_roll: 0.0
+init_pitch: 0.0
+init_yaw: 0.0
+
+map_filename: "/home/nvidia/galaxea/galaxea_overlay/src/r1_pro_slam/indoor_location/map/20260914_0-map.pcd"
+map_pub_topic: "/pcd_map"                      #发布全局pcd点云地图话题数据
+
+imu_topic: "/livox/imu"                        #MID360 内置 IMU 话题
+cmd_topic: "/loc_cmd"                          #定位指令话题
+
+
+#p2pl_icp location
+plane_threshold: 0.3
+opt_correspondences_threshold_normal: 0.3
+opt_correspondences_threshold_relocation: 2.0
+opt_max_iteration: 3
+thread_num: 4
+
+#ndt location
+ndt_max_iteration: 3
+ndt_voxel_size: 0.5
+ndt_min_effective_pts: 10
+ndt_min_pts_in_voxel: 3
+ndt_eps: 0.01
+ndt_res_outlier_th: 20.0
+ndt_remove_centroid: false
+ndt_nearby_type: 0
+ndt_thread_num: 4
+map_grid_resoltion: 30.0
+
+###################location################

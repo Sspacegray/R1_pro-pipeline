@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<profiles xmlns="http://www.eprosima.com/XMLSchemas/fastRTPS_Profiles">
+  <!--
+    Stable R1PROBody + navigation transport profile.
+
+    Stable R1PRO transport policy:
+
+    * Fast DDS' default SHM transport carries same-host ROS traffic.
+    * UDPv4 remains available to the remote web client.
+    * DDS Data Sharing is disabled below.  Data Sharing and the SHM transport
+      are separate mechanisms; disabling the former avoids stale zero-copy
+      segments while retaining bounded local SHM transport queues.
+    * Do not force same-host traffic through wlan0.  That generated tens of GB
+      of Wi-Fi traffic and eventually filled AMCL's UDP receive queue.
+  -->
+  <participant profile_name="r1pro_robot_participant" is_default_profile="true">
+    <rtps>
+      <name>r1pro_robot</name>
+      <useBuiltinTransports>true</useBuiltinTransports>
+      <builtin>
+        <discovery_config>
+          <discoveryProtocol>SIMPLE</discoveryProtocol>
+          <!--
+            A three-second lease caused an endpoint re-discovery storm as soon
+            as a busy participant missed a few announcements.  These values
+            tolerate short scheduling/network stalls without delaying normal
+            shutdown detection excessively.
+          -->
+          <leaseDuration>
+            <sec>30</sec>
+            <nanosec>0</nanosec>
+          </leaseDuration>
+          <leaseAnnouncement>
+            <sec>5</sec>
+            <nanosec>0</nanosec>
+          </leaseAnnouncement>
+        </discovery_config>
+      </builtin>
+    </rtps>
+  </participant>
+
+  <data_writer profile_name="r1pro_robot_writer" is_default_profile="true">
+    <qos>
+      <publishMode>
+        <kind>ASYNCHRONOUS</kind>
+      </publishMode>
+      <data_sharing>
+        <kind>OFF</kind>
+      </data_sharing>
+    </qos>
+    <historyMemoryPolicy>PREALLOCATED_WITH_REALLOC</historyMemoryPolicy>
+  </data_writer>
+
+  <data_reader profile_name="r1pro_robot_reader" is_default_profile="true">
+    <qos>
+      <data_sharing>
+        <kind>OFF</kind>
+      </data_sharing>
+    </qos>
+    <historyMemoryPolicy>PREALLOCATED_WITH_REALLOC</historyMemoryPolicy>
+  </data_reader>
+</profiles>

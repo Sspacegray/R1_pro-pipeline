@@ -1,0 +1,68 @@
+imu_topic: /rslidar_imu_data  #imu话题
+lidar_topic: /rslidar_points  #雷达话题，96线，点云数量为172 万点/秒，10 hz 一帧就是17.2万个点云
+body_frame: base_link
+world_frame: lidar
+lidar_type: rslidar    #雷达类型 rslidar：速腾激光雷达 ，livox：mid360；速腾雷达使用时需要将SDK编译选项需要将点云类型设置为XYZIRT
+print_time_cost: false #是否打印建图程序运行时间
+
+lidar_filter_num: 6  #每隔多少个雷达点才保留一个，本质是点云下采样参数
+lidar_min_range: 0.1 #雷达范围，单位：m
+lidar_max_range: 60.0
+scan_down_sampling_rate: 0.3 #输入雷达点云采样，单位：m
+map_resolution: 0.3 #kd树地图体素降采样，单位：m
+
+cube_len: 60.0        # 局部地图立方体边长 90m
+move_thresh: 0.8      # 启动地图裁剪的距离阈值降低一点，避免频繁滚动
+det_range: 20.0       # 局部地图检测范围（默认值保留）
+
+
+na: 0.01 #加速度测量噪声的标准差。
+ng: 0.0005 #角速度测量噪声的标准差。
+nba: 0.0005 #加速度零偏的标准差。
+nbg: 0.00002 #角速度零偏的标准差。
+
+
+near_search_radius: 60 #最近邻搜索半径约束阈值
+
+effect_feat_num: 5 #当前点找到的近邻特征有效点数阈值
+
+imu_init_num: 10 #IMU初始化所需的样本数目，表示至少需要20次IMU数据用于初始化。
+
+near_search_num: 5 #邻近搜索的数量，可用于点云匹配中最近邻搜索、点云平面拟合
+
+plane_fitting_tolerance: 0.2 #平面拟合的容差，拟合平面，并保证所有邻居点距离拟合平面 ≤ 10 cm，才算拟合成功 （0.1）
+
+point2plane_dist: 0.3 #点到平面的距离阈值，点到平面的距离小于该阈值，则认为该点有效用来拟合平面 （0.3）
+
+similarity_score: 0.8 #当前点是否与拟合平面“贴合”，一个 [0,1] 之间的打分指标，值越大，越贴合 （0.8）
+
+ieskf_max_iter: 15 #ESKF的最大迭代次数，用于估计最优的状态
+
+ieskf_rotation_threshold_deg: 0.3 #ieskf每次迭代观测残差最小，旋转增量结束迭代条件,单位度 （0.1）
+
+ieskf_translation_threshold_cm: 3 #ieskf每次迭代观测残差最小，平移增量结束迭代条件，单位厘米 （1）
+
+gravity_align: false #是否进行重力对齐，true 表示在初始化时对齐IMU的重力方向。 2025
+
+esti_il: true #是否估计雷达相对于IMU的外参（旋转和平移）
+
+r_il: [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]  # IMU到LiDAR旋转（外参旋转）的旋转矩阵
+
+t_il: [-0.011, -0.02329, 0.04412]  #IMU到LiDAR平移（外参平移）向量,mid360参数[-0.011, -0.02329, 0.04412],履带车rs16 [-0.014, 0.000, -0.096]
+
+imu_to_baselink_r_il: [ 1.000 ,0.000 , 0.00  ,0.000,  1.000, 0.000, 0.000, 0.00 , 1.00 ]  #IMU到baselink的旋转矩阵，查看方法ros2 run tf2_ros tf2_echo base_link imu_link
+
+imu_to_baselink_t_il: [ 0.00, 0.000, 0.00]  #IMU到baselink的平移向量(基本没用到)
+
+laser_to_baselink_r_il: [ 1.000 ,0.000 , 0.00  ,0.000,  1.000, 0.000, 0.000, 0.00 , 1.00 ]  #laser到baselnk的旋转矩阵，查看方法ros2 run tf2_ros tf2_echo base_link lidar_link
+
+laser_to_baselink_t_il: [ 0.00, 0.000, 0.00]  #laser到baselnk的平移向量
+
+lidar_cov_inv: 1000.0 #雷达协方差
+
+# 日志配置选项
+enable_debug_logs: false         # 启用所有调试日志（包括IMU、激光、系统、特征监控日志）
+imu_log_interval: 100           # IMU日志输出间隔（预积分次数）
+lidar_log_interval: 15          # LiDAR日志输出间隔（帧数）
+system_log_interval: 25         # 系统日志输出间隔（帧数）
+feature_log_interval: 10        # 特征日志输出间隔（帧数）

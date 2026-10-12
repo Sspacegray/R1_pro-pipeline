@@ -1,0 +1,12 @@
+std_msgs/Header header
+string state
+bool in_relocalization
+bool runtime_reloc_locked
+bool map_to_odom_frozen
+bool pose_restored_from_disk
+bool wheel_odom_available
+float32 fitness
+float32 raw_fitness
+int32 reloc_success_count
+int32 tracking_loss_count
+geometry_msgs/Pose pose
