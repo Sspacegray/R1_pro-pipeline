@@ -15,6 +15,11 @@ runtime.
 - **ArUco 离散微调对齐 + 底盘控制也在本仓库**：`src/r1pro_aruco_fine_approach`，
   导航停稳后根据 ArUco 位姿做离散微调，直接发布底盘速度指令
   （`/motion_target/target_speed_chassis`）。
+- **YOLO 检测的推理代码在本仓库**：`vision_worker.py` 通过 `ultralytics.YOLO`
+  加载外部路径下的 `.pt` 权重做检测与分割（权重文件不随仓库分发）。
+- **FoundationPose 本体不在本仓库**：本仓库只包含集成层——`server_node.py`
+  以子进程方式拉起外部包 `foundation_pose_ros2.foundation_pose_node`，
+  管理其生命周期并读取位姿结果；FoundationPose 算法代码位于独立仓库。
 - 任务级工作流（抓取、倒液等，`code_workflows/`）属于 Web 层的业务编排，
   同样在本仓库。
 
