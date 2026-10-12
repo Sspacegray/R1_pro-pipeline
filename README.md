@@ -5,6 +5,19 @@ local companion packages. The directories are kept together because the web
 server starts several of them dynamically and expects sibling source trees at
 runtime.
 
+## 仓库范围说明（重要）
+
+- **本仓库只是 Web 层**：网页 UI + Web 服务器（`src/r1pro_web_control`），以及
+  它在运行时会动态拉起的配套包。机器人**底层控制层（真机控制）位于另一个独立仓库**，
+  不在本仓库内。
+- **视觉（ArUco 识别）也在本仓库**：`src/r1pro_aruco_box_pose`，从头部相机识别
+  ArUco 标记并发布位姿。
+- **ArUco 离散微调对齐 + 底盘控制也在本仓库**：`src/r1pro_aruco_fine_approach`，
+  导航停稳后根据 ArUco 位姿做离散微调，直接发布底盘速度指令
+  （`/motion_target/target_speed_chassis`）。
+- 任务级工作流（抓取、倒液等，`code_workflows/`）属于 Web 层的业务编排，
+  同样在本仓库。
+
 ## 在 Docker 中启动 Web（当前工作站）
 
 下面的命令适用于当前已经配置好的 Docker 容器：
