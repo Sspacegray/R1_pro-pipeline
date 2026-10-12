@@ -1,0 +1,1066 @@
+{
+  "sequences": [
+    {
+      "created_at": "2026-07-02T05:40:31.985431Z",
+      "description": "",
+      "id": "46e30594-78fe-4ae4-9b96-f6a833ba113b",
+      "name": "pickup02_flow",
+      "steps": [
+        {
+          "actions": [
+            "select_wrist_right_camera"
+          ],
+          "delay_s": 0,
+          "duration_override_s": null,
+          "id": "2a2d3f62-3b08-46bb-87e9-c08debab7d5f",
+          "overrides": {
+            "select_wrist_right_camera": {
+              "camera_key": "wrist_left",
+              "timeout_s": 5
+            }
+          },
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "yolo_bottle_0_5_right"
+          ],
+          "delay_s": 0,
+          "duration_override_s": null,
+          "id": "777acd23-6c02-482e-b5eb-6a72feaff146",
+          "overrides": {
+            "yolo_bottle_0_5_right": {
+              "camera_key": "wrist_left",
+              "confidence_threshold": 0.5,
+              "prompt": "bottle",
+              "timeout_s": 30
+            }
+          },
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "latch_best_bottle"
+          ],
+          "delay_s": 0,
+          "duration_override_s": null,
+          "id": "668899fd-9cfc-4d5f-92ea-64d155f00cd2",
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "close_yolo"
+          ],
+          "delay_s": 0,
+          "duration_override_s": null,
+          "id": "293c949b-8bd1-4a92-aab5-5208808bf138",
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "right_grasp_latched_bottle"
+          ],
+          "delay_s": 0,
+          "duration_override_s": null,
+          "id": "6c74f2ea-70f8-4c13-a790-8ff32c9207c4",
+          "overrides": {
+            "right_grasp_latched_bottle": {
+              "approach_distance_m": 0,
+              "arm": "left",
+              "orientation": "keep",
+              "phase2_settle_s": 1,
+              "timeout_s": 45,
+              "xyz_source": "latched_yolo"
+            }
+          },
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "read_right_ee_pose"
+          ],
+          "delay_s": 0,
+          "duration_override_s": null,
+          "id": "1c59952f-9b34-4d7c-833f-a6cfcef342d2",
+          "overrides": {},
+          "trigger": "after_end"
+        }
+      ],
+      "updated_at": "2026-07-02T05:40:31.985431Z"
+    },
+    {
+      "created_at": "2026-07-10T08:23:53.935261Z",
+      "description": "",
+      "id": "25a93cf36bf69e28",
+      "name": "放下箱子",
+      "steps": [
+        {
+          "actions": [
+            "躯干放下"
+          ],
+          "delay_s": 0,
+          "id": "1783671775065_5ac91c",
+          "overrides": {
+            "躯干放下": {
+              "joint_stable_velocity_deg_s": 3,
+              "stable_s": 0,
+              "targets": [
+                {
+                  "group": "torso",
+                  "index": 0,
+                  "name": "torso[1]",
+                  "unit": "deg",
+                  "value": 20.31
+                },
+                {
+                  "group": "torso",
+                  "index": 1,
+                  "name": "torso[2]",
+                  "unit": "deg",
+                  "value": -43.59
+                },
+                {
+                  "group": "torso",
+                  "index": 2,
+                  "name": "torso[3]",
+                  "unit": "deg",
+                  "value": -45.06
+                },
+                {
+                  "group": "torso",
+                  "index": 3,
+                  "name": "torso[4]",
+                  "unit": "deg",
+                  "value": 0.01
+                }
+              ],
+              "timeout_s": 6
+            }
+          },
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "打开两个夹爪"
+          ],
+          "delay_s": 0,
+          "id": "1783671787295_f57613",
+          "overrides": {
+            "打开两个夹爪": {
+              "gripper_stable_velocity": 5,
+              "stable_s": 0,
+              "targets": [
+                {
+                  "group": "left_gripper",
+                  "index": 0,
+                  "name": "left_gripper[1]",
+                  "unit": "open_0_100",
+                  "value": 100
+                },
+                {
+                  "group": "right_gripper",
+                  "index": 0,
+                  "name": "right_gripper[1]",
+                  "unit": "open_0_100",
+                  "value": 100
+                }
+              ],
+              "timeout_s": 4
+            }
+          },
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "躯干抬起"
+          ],
+          "delay_s": 0,
+          "id": "1783671822654_24652b",
+          "overrides": {},
+          "trigger": "after_end"
+        }
+      ],
+      "updated_at": "2026-07-10T08:23:53.935261Z"
+    },
+    {
+      "created_at": "2026-07-22T10:41:18.236638Z",
+      "description": "",
+      "id": "ada341e479c1baa6",
+      "name": "demo01",
+      "steps": [
+        {
+          "actions": [
+            "手抬高看薯片"
+          ],
+          "delay_s": 0,
+          "id": "1783675441408_2a1b1b",
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "导航到吧台2"
+          ],
+          "delay_s": 0,
+          "id": "1784706858396_163a13",
+          "overrides": {
+            "导航到吧台2": {
+              "position_tolerance_m": 0.2,
+              "stable_s": 2,
+              "timeout_s": 120,
+              "x_m": 0.54,
+              "y_m": 0.24,
+              "yaw_deg": 88,
+              "yaw_tolerance_deg": 20
+            }
+          },
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "前进一点"
+          ],
+          "delay_s": 0,
+          "id": "1784706968844_32992f",
+          "overrides": {
+            "前进一点": {
+              "duration_s": 4,
+              "omega_radps": 0,
+              "vx_mps": 0.05,
+              "vy_mps": 0
+            }
+          },
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "右腕识别 bottle 并夹取"
+          ],
+          "delay_s": 0,
+          "id": "1783675572387_fa320b",
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "闭合右夹爪"
+          ],
+          "delay_s": 0,
+          "id": "1783677304349_bc1bd1",
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "右臂抬高10cm"
+          ],
+          "delay_s": 0,
+          "id": "1783677306936_541422",
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "导航到洗手池右侧"
+          ],
+          "delay_s": 0,
+          "id": "1784698647497_3c9ec7",
+          "overrides": {
+            "导航到洗手池右侧": {
+              "position_tolerance_m": 0.2,
+              "stable_s": 0.5,
+              "timeout_s": 120,
+              "x_m": 2.34,
+              "y_m": 0.21,
+              "yaw_deg": 11.5,
+              "yaw_tolerance_deg": 20
+            }
+          },
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "低头抬手（不包括夹爪）"
+          ],
+          "delay_s": 0,
+          "id": "1783679294317_5b8252",
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "ArUco id1 底盘离散微调"
+          ],
+          "delay_s": 0,
+          "id": "1783681007862_c444e8",
+          "overrides": {
+            "ArUco id1 底盘离散微调": {
+              "workflow_id": "aruco_id1_chassis_fine_adjust"
+            }
+          },
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "从“低头-夹取-手抬高”放下东西到箱子"
+          ],
+          "delay_s": 0,
+          "id": "1783679412333_72ea6a",
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "打开两个夹爪"
+          ],
+          "delay_s": 0,
+          "id": "1783679434044_27fce6",
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "低头-待夹取-手抬高"
+          ],
+          "delay_s": 0,
+          "id": "1783679456056_e6e1a3",
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "夹取待闭合"
+          ],
+          "delay_s": 0,
+          "id": "1783679488716_0b6a22",
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "闭合两个夹爪"
+          ],
+          "delay_s": 0,
+          "id": "1783679495399_6bebee",
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "躯干抬起"
+          ],
+          "delay_s": 0,
+          "id": "1783679499642_8f46ea",
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "导航到放箱子的位置"
+          ],
+          "delay_s": 0,
+          "id": "1784716650346_b1d989",
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "前进一点"
+          ],
+          "delay_s": 0,
+          "id": "1784716672529_4a8292",
+          "overrides": {
+            "前进一点": {
+              "duration_s": 4,
+              "omega_radps": 0,
+              "vx_mps": 0.05,
+              "vy_mps": 0
+            }
+          },
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "躯干放下"
+          ],
+          "delay_s": 0,
+          "id": "1783679828670_2be6c2",
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "打开两个夹爪"
+          ],
+          "delay_s": 0,
+          "id": "1783679836638_3c538c",
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "躯干抬起"
+          ],
+          "delay_s": 0,
+          "id": "1783679846356_5671f9",
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "最后的后退"
+          ],
+          "delay_s": 0,
+          "id": "1783679878486_482ee9",
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "放下手臂"
+          ],
+          "delay_s": 0,
+          "id": "1783679887855_f1550d",
+          "overrides": {},
+          "trigger": "after_end"
+        }
+      ],
+      "updated_at": "2026-07-22T10:41:18.236638Z"
+    },
+    {
+      "created_at": "2026-07-30T15:04:47.241120Z",
+      "description": "",
+      "id": "4767fac8cbe3341d",
+      "name": "demo02",
+      "steps": [
+        {
+          "actions": [
+            "demo02 预加载头部 bottle YOLO"
+          ],
+          "delay_s": 0,
+          "id": "demo02_preload_head_bottle_yolo",
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "手抬高看薯片"
+          ],
+          "delay_s": 0,
+          "id": "86ccd98175b18496",
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "导航到吧台2"
+          ],
+          "delay_s": 0,
+          "id": "92b79f736b12c4c0",
+          "overrides": {
+            "导航到吧台2": {
+              "position_tolerance_m": 0.2,
+              "stable_s": 2,
+              "timeout_s": 120,
+              "x_m": 0.54,
+              "y_m": 0.24,
+              "yaw_deg": 88,
+              "yaw_tolerance_deg": 20
+            }
+          },
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "头部 bottle 基准底盘微调"
+          ],
+          "delay_s": 0,
+          "id": "head_left_bottle_chassis_fine_adjust_before_grasp",
+          "overrides": {
+            "头部 bottle 基准底盘微调": {
+              "clean_restart_yolo": false,
+              "initial_settle_s": 1,
+              "stop_yolo_when_done": false
+            }
+          },
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "头部相机（左）识别 bottle 并夹取"
+          ],
+          "delay_s": 0,
+          "id": "5cf11ef8a7ba326b",
+          "overrides": {
+            "头部相机（左）识别 bottle 并夹取": {
+              "reuse_existing_detection": true
+            }
+          },
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "闭合右夹爪"
+          ],
+          "delay_s": 0,
+          "id": "8bb0b760cec3bebf",
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "右臂抬高10cm"
+          ],
+          "delay_s": 0,
+          "id": "b9fdbd63e69042bf",
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "导航到洗手池右侧"
+          ],
+          "delay_s": 0,
+          "id": "8976b3101e453ca6",
+          "overrides": {
+            "导航到洗手池右侧": {
+              "position_tolerance_m": 0.2,
+              "stable_s": 0.5,
+              "timeout_s": 120,
+              "x_m": 2.34,
+              "y_m": 0.21,
+              "yaw_deg": 11.5,
+              "yaw_tolerance_deg": 20
+            }
+          },
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "低头抬手（不包括夹爪）"
+          ],
+          "delay_s": 0,
+          "id": "385ef592d773deb9",
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "ArUco id1 底盘离散微调"
+          ],
+          "delay_s": 0,
+          "id": "6413f8aff3951276",
+          "overrides": {
+            "ArUco id1 底盘离散微调": {
+              "workflow_id": "aruco_id1_chassis_fine_adjust"
+            }
+          },
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "从“低头-夹取-手抬高”放下东西到箱子"
+          ],
+          "delay_s": 0,
+          "id": "f43a6fc3f546d1cf",
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "打开两个夹爪"
+          ],
+          "delay_s": 0,
+          "id": "4cbd99b08aed688e",
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "低头-待夹取-手抬高"
+          ],
+          "delay_s": 0,
+          "id": "ca8ae0ff776ff3e4",
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "夹取待闭合"
+          ],
+          "delay_s": 0,
+          "id": "1727916769039aaa",
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "闭合两个夹爪"
+          ],
+          "delay_s": 0,
+          "id": "01f6dba010e71f44",
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "躯干抬起"
+          ],
+          "delay_s": 0,
+          "id": "39f9d7256c4a12c1",
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "导航到放箱子的位置"
+          ],
+          "delay_s": 0,
+          "id": "9a97631950eca438",
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "前进一点"
+          ],
+          "delay_s": 0,
+          "id": "2d2fd27eca1a3141",
+          "overrides": {
+            "前进一点": {
+              "duration_s": 4,
+              "omega_radps": 0,
+              "vx_mps": 0.05,
+              "vy_mps": 0
+            }
+          },
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "躯干放下"
+          ],
+          "delay_s": 0,
+          "id": "607e0cd5a66eeebb",
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "打开两个夹爪"
+          ],
+          "delay_s": 0,
+          "id": "e4c7099bc1c0362c",
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "躯干抬起"
+          ],
+          "delay_s": 0,
+          "id": "aac5c8bb2a4661c4",
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "最后的后退"
+          ],
+          "delay_s": 0,
+          "id": "23fb9e655413dae9",
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "放下手臂"
+          ],
+          "delay_s": 0,
+          "id": "7f87385676222b2d",
+          "overrides": {},
+          "trigger": "after_end"
+        }
+      ],
+      "updated_at": "2026-07-31T04:59:29.772983Z"
+    },
+    {
+      "created_at": "2026-09-11T04:36:29.494978Z",
+      "description": "",
+      "id": "4f9d8e5e71f26ffe",
+      "name": "倒液晶",
+      "steps": [
+        {
+          "actions": [
+            "00躯干右手准备"
+          ],
+          "delay_s": 0,
+          "id": "1789024828998_ad54b6",
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "01待夹取对准"
+          ],
+          "delay_s": 0,
+          "id": "1789024862214_7ba172",
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "右手前进015m"
+          ],
+          "delay_s": 0,
+          "id": "1789024870663_840de6",
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "03右爪闭合"
+          ],
+          "delay_s": 0,
+          "id": "1789024874170_4a7f81",
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "04移动到瓶子旁边"
+          ],
+          "delay_s": 0,
+          "id": "1789024881031_7c2edd",
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "右臂L轴旋转并Y+Z-同步移动"
+          ],
+          "delay_s": 0,
+          "id": "1789024888972_20f618",
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "右臂L轴原地旋转60度"
+          ],
+          "delay_s": 0,
+          "id": "1789024893231_57f115",
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "右手末端上移5cm"
+          ],
+          "delay_s": 0,
+          "id": "1789024900214_6ee45f",
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "右手移开瓶子20cm"
+          ],
+          "delay_s": 0,
+          "id": "1789024904845_6b5f12",
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "06待放下"
+          ],
+          "delay_s": 0,
+          "id": "1789024907981_15c147",
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "07放下"
+          ],
+          "delay_s": 0,
+          "id": "1789024912006_99a485",
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "右爪打开"
+          ],
+          "delay_s": 0,
+          "id": "1789024918438_c87236",
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "右手后退015m"
+          ],
+          "delay_s": 0,
+          "id": "1789024956373_35222b",
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "00躯干右手准备"
+          ],
+          "delay_s": 0,
+          "id": "1789024964406_5875d5",
+          "overrides": {},
+          "trigger": "after_end"
+        }
+      ],
+      "updated_at": "2026-09-11T04:36:29.494978Z"
+    },
+    {
+      "created_at": "2026-09-11T04:49:23.364801Z",
+      "description": "",
+      "id": "ab8df87a22d0e169",
+      "kind": "action_group",
+      "name": "倒液晶前半部分",
+      "steps": [
+        {
+          "actions": [
+            "00躯干右手准备"
+          ],
+          "delay_s": 0,
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "01待夹取对准"
+          ],
+          "delay_s": 0,
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "右手前进015m"
+          ],
+          "delay_s": 0,
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "03右爪闭合"
+          ],
+          "delay_s": 0,
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "04移动到瓶子旁边"
+          ],
+          "delay_s": 0,
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "右臂L轴旋转并Y+Z-同步移动"
+          ],
+          "delay_s": 0,
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "右臂L轴原地旋转60度"
+          ],
+          "delay_s": 0,
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "右臂L轴反向旋转并Y-Z+同步移动"
+          ],
+          "delay_s": 0,
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "06待放下"
+          ],
+          "delay_s": 0,
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "07放下"
+          ],
+          "delay_s": 0,
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "右爪打开"
+          ],
+          "delay_s": 0,
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "右手后退015m"
+          ],
+          "delay_s": 0,
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "00躯干右手准备"
+          ],
+          "delay_s": 0,
+          "overrides": {},
+          "trigger": "after_end"
+        }
+      ],
+      "updated_at": "2026-09-11T04:49:23.364801Z"
+    },
+    {
+      "created_at": "2026-09-11T04:54:36.860136Z",
+      "description": "",
+      "id": "092f4453492e7652",
+      "name": "倒液晶02",
+      "steps": [
+        {
+          "actions": [
+            "00躯干右手准备"
+          ],
+          "delay_s": 0,
+          "id": "1789102258100_8f6b50",
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "01待夹取对准"
+          ],
+          "delay_s": 0,
+          "id": "1789102355576_73787c",
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "右手前进015m"
+          ],
+          "delay_s": 0,
+          "id": "1789102362850_5890d9",
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "03右爪闭合"
+          ],
+          "delay_s": 0,
+          "id": "1789102421079_d6134b",
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "04移动到瓶子旁边"
+          ],
+          "delay_s": 0,
+          "id": "1789102427302_29c456",
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "右臂L轴旋转并Y+Z-同步移动"
+          ],
+          "delay_s": 0,
+          "id": "1789102435199_8326d7",
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "右臂L轴原地旋转60度"
+          ],
+          "delay_s": 0,
+          "id": "1789102442535_8a52df",
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "右臂L轴反向旋转并Y-Z+同步移动"
+          ],
+          "delay_s": 0,
+          "id": "1789102449335_5ea473",
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "06待放下"
+          ],
+          "delay_s": 0,
+          "id": "1789102451774_62c8c0",
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "07放下"
+          ],
+          "delay_s": 0,
+          "id": "1789102455422_51553c",
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "右爪打开"
+          ],
+          "delay_s": 0,
+          "id": "1789102458472_27f500",
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "右手后退015m"
+          ],
+          "delay_s": 0,
+          "id": "1789102466111_2f1484",
+          "overrides": {},
+          "trigger": "after_end"
+        },
+        {
+          "actions": [
+            "00躯干右手准备"
+          ],
+          "delay_s": 0,
+          "id": "1789102470623_b48291",
+          "overrides": {},
+          "trigger": "after_end"
+        }
+      ],
+      "updated_at": "2026-09-11T04:54:36.860136Z"
+    }
+  ],
+  "version": 2
+}

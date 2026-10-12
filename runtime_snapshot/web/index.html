@@ -1,0 +1,650 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>R1 Pro Web Control</title>
+  <link rel="stylesheet" href="/styles.css?v=20260729-vision-pages">
+</head>
+<body>
+  <aside class="rail">
+    <div class="brand">R1 Pro</div>
+    <button class="nav active" data-page="dashboard">仪表盘</button>
+    <button class="nav" data-page="joints">关节控制</button>
+    <button class="nav" data-page="ee">末端 6D</button>
+    <button class="nav" data-page="chassis">底盘控制</button>
+    <button class="nav" data-page="navigation">导航</button>
+    <button class="nav" data-page="camera">相机</button>
+    <button class="nav" data-page="recognition">识别</button>
+    <button class="nav" data-page="vla">VLA</button>
+    <button class="nav" data-page="workflow">原子动作工作流</button>
+    <button class="nav" data-page="diagnostics">诊断</button>
+  </aside>
+
+  <main class="shell">
+    <header class="topbar">
+      <div>
+        <h1 id="pageTitle">仪表盘</h1>
+        <p id="subtitle">base_link</p>
+      </div>
+      <div class="auth">
+        <span id="conn" class="pill warn">connecting</span>
+        <input id="token" type="password" placeholder="control token">
+        <button id="saveToken">保存</button>
+        <button id="stopAll" class="danger">STOP</button>
+      </div>
+    </header>
+
+    <section id="dashboard" class="page active">
+      <div class="grid four">
+        <section class="panel"><h2>系统</h2><dl id="systemFacts"></dl></section>
+        <section class="panel"><h2>电量</h2><dl id="batteryFacts"></dl></section>
+        <section class="panel"><h2>时间</h2><dl id="timeFacts"></dl></section>
+        <section class="panel"><h2>流程</h2><dl id="runtimeFacts"></dl></section>
+      </div>
+      <section class="panel">
+        <h2>控制目标</h2>
+        <div id="controlProfilePanel" class="control-profile-panel"></div>
+      </section>
+      <section class="panel">
+        <h2>机器人反馈</h2>
+        <div id="feedbackGrid" class="feedback-grid"></div>
+      </section>
+    </section>
+
+    <section id="joints" class="page">
+      <div class="page-head">
+        <div id="lock-joints"></div>
+        <div class="row wrap">
+          <button id="jointSelectAll">全选</button>
+          <button id="jointInvertSelection">反选</button>
+          <button id="jointClearSelection">清空选择</button>
+          <button id="jointCapture">读当前到目标</button>
+          <button id="jointSendSelected" data-lock-page="joints">执行选中</button>
+          <button id="jointSaveSelected" data-lock-page="joints">保存选中为原子动作</button>
+        </div>
+      </div>
+      <section class="panel">
+        <h2>20 关节 / 夹爪</h2>
+        <div id="jointTable" class="data-table"></div>
+      </section>
+      <section class="panel">
+        <h2>本页原子动作</h2>
+        <div id="jointActionList" class="list compact"></div>
+      </section>
+    </section>
+
+    <section id="ee" class="page">
+      <div class="page-head">
+        <div id="lock-ee"></div>
+        <div class="row wrap">
+          <select id="eeArm"><option value="right">右臂</option><option value="left">左臂</option></select>
+          <button id="eeCopyCurrent">当前到目标</button>
+          <button id="eeExecutePose" data-lock-page="ee">执行 6D 位姿</button>
+          <button id="eeSavePose" data-lock-page="ee">保存 6D 原子动作</button>
+        </div>
+      </div>
+      <div class="grid two">
+        <section class="panel"><h2>当前末端位姿</h2><div id="eeCurrent" class="summary-list"></div></section>
+        <section class="panel"><h2>目标 6D 位姿</h2><div id="eeTargetForm" class="form-grid"></div></section>
+      </div>
+      <div class="grid two">
+        <section class="panel">
+          <h2>相对运动原子动作</h2>
+          <div id="eeRelativeForm" class="form-grid"></div>
+          <div class="row wrap">
+            <button id="eeExecuteRelative" data-lock-page="ee">执行相对运动</button>
+            <button id="eeSaveRelative" data-lock-page="ee">保存相对运动</button>
+          </div>
+        </section>
+        <section class="panel">
+          <h2>键盘 / 点动</h2>
+          <div class="row wrap">
+            <label class="toggle"><input id="eeKeyboard" type="checkbox">键盘控制</label>
+            <label>平移步长 m<input id="eeStepLinear" type="number" step="0.001" value="0.01"></label>
+            <label>旋转步长 deg<input id="eeStepAngular" type="number" step="0.1" value="2"></label>
+            <label>执行时间 s<input id="eeStepDuration" type="number" step="0.1" value="0.6"></label>
+          </div>
+          <div id="eeJogButtons" class="jog-grid"></div>
+        </section>
+      </div>
+      <section class="panel ee-axis-panel">
+        <h2>绕手臂纵轴 L</h2>
+        <div class="ee-axis-control">
+          <span>零偏移时 L 穿过末端；非零偏移时末端绕平行轴走圆弧。</span>
+          <label>单步角度 deg<input id="eeAxisStepAngular" type="number" step="0.1" value="2"></label>
+          <label>单步最大速度 deg/s<input id="eeAxisMaxSpeed" type="number" min="0.1" step="0.1" value="10"></label>
+          <label>横向偏移 m<input id="eeAxisOffsetLateral" type="number" step="0.001" value="0"></label>
+          <label>竖向偏移 m<input id="eeAxisOffsetVertical" type="number" step="0.001" value="0.014"></label>
+          <label>旋转方向<select id="eeAxisRotationDirection"><option value="-1" selected>反向（−）</option><option value="1">正向（＋）</option></select></label>
+          <span id="eeAxisStatus" class="muted-note">横向、竖向均在 base_link 中取垂直于 L 的方向。</span>
+        </div>
+        <div id="eeAxisJogButtons" class="row wrap"></div>
+        <h3>持续旋转编排</h3>
+        <div class="axis-segment-head"><span>起始角 deg</span><span>结束角 deg</span><span>速度 deg/s</span><span></span></div>
+        <div id="eeAxisSegmentList" class="axis-segment-list"></div>
+        <div class="row wrap">
+          <button id="eeAxisAddSegment">添加分段</button>
+          <button id="eeAxisLoadExample">载入示例</button>
+          <button id="eeAxisValidateSequence" data-lock-page="ee">仅校验轨迹</button>
+          <button id="eeAxisRunSequence" data-lock-page="ee">开始持续旋转</button>
+          <button id="eeAxisStopSequence" class="danger">停止持续旋转</button>
+        </div>
+        <div id="eeAxisSequenceStatus" class="muted-note">设置后必须先点击“仅校验轨迹”；当前示例为反向旋转，总时长 50s。</div>
+      </section>
+      <section class="panel">
+        <h2>本页原子动作</h2>
+        <div id="eeActionList" class="list compact"></div>
+      </section>
+    </section>
+
+    <section id="chassis" class="page">
+      <div class="page-head">
+        <div id="lock-chassis"></div>
+        <div class="row wrap">
+          <span id="chassisNavigationGuard" class="muted-note">等待底盘控制权状态</span>
+          <label>线速度 m/s<input id="chassisLinear" type="number" step="0.01" value="0.10"></label>
+          <label>角速度 rad/s<input id="chassisAngular" type="number" step="0.01" value="0.30"></label>
+          <label>步长/时间 s<input id="chassisDuration" type="number" step="0.05" value="0.35"></label>
+          <label class="toggle"><input id="chassisKeyboard" type="checkbox">键盘控制</label>
+        </div>
+      </div>
+      <div class="grid two">
+        <section class="panel">
+          <h2>鼠标按钮控制</h2>
+          <div id="drivePad" class="drive-pad"></div>
+        </section>
+        <section class="panel">
+          <h2>底盘速度原子动作</h2>
+          <div id="chassisActionForm" class="form-grid"></div>
+          <div class="row wrap">
+            <button id="chassisExecuteAction" data-lock-page="chassis">执行速度动作</button>
+            <button id="chassisSaveAction" data-lock-page="chassis">保存速度动作</button>
+          </div>
+        </section>
+      </div>
+      <section class="panel">
+        <h2>本页原子动作</h2>
+        <div id="chassisActionList" class="list compact"></div>
+      </section>
+    </section>
+
+    <section id="navigation" class="page">
+      <div class="page-head">
+        <div id="lock-navigation"></div>
+        <div class="row wrap">
+          <button id="navModeManual" data-lock-page="navigation">切换到手动控制</button>
+          <button id="navModeNavigation" data-lock-page="navigation">切换到导航</button>
+          <button id="navStartLocalizationSpin" data-lock-page="navigation">开始原地旋转定位</button>
+          <button id="navCancelLocalizationSpin" class="danger" data-lock-page="navigation">停止旋转</button>
+          <span id="navLocalizationSpinStatus" class="muted-note"></span>
+          <span id="navControlState" class="muted-note">控制权状态未知</span>
+          <button id="navRefreshMap">刷新地图</button>
+          <button id="navClearGlobalCostmap" data-lock-page="navigation" title="清除 Nav2 全局代价地图中的临时障碍物">清除全局代价地图</button>
+          <button id="navCenterRobot">居中到机器人</button>
+          <button id="navSendGoal" data-lock-page="navigation">发送目标</button>
+          <button id="navSaveGoalAction" data-lock-page="navigation">保存导航原子动作</button>
+          <button id="navCancelGoal" class="danger" data-lock-page="navigation">取消导航</button>
+          <button id="navEmergencyStop" class="danger" data-lock-page="navigation">导航急停</button>
+        </div>
+      </div>
+      <div class="grid split navigation-grid">
+        <section class="panel navigation-map-panel">
+          <h2>地图</h2>
+          <div class="navigation-toolbar row wrap">
+            <label class="toggle nav-layer-global"><input id="navShowGlobalCostmap" type="checkbox" checked><span class="nav-layer-swatch"></span>global costmap</label>
+            <label class="toggle nav-layer-local"><input id="navShowLocalCostmap" type="checkbox" checked><span class="nav-layer-swatch"></span>local costmap</label>
+            <label class="toggle nav-layer-global-path"><input id="navShowGlobalPlan" type="checkbox" checked><span class="nav-layer-swatch"></span>/plan</label>
+            <label class="toggle nav-layer-local-path"><input id="navShowLocalPlan" type="checkbox" checked><span class="nav-layer-swatch"></span>/transformed_global_plan</label>
+            <span id="navOutputStatus" class="muted-note"></span>
+          </div>
+          <div class="navigation-canvas-wrap">
+            <canvas id="navigationCanvas"></canvas>
+            <div id="navigationEmpty" class="empty">等待地图 /map</div>
+          </div>
+          <div id="navigationStatus" class="stream-capture-status"></div>
+        </section>
+        <section class="panel">
+          <h2>目标位姿</h2>
+          <div id="navigationGoalForm" class="form-grid">
+            <label>X m<input id="navGoalX" type="number" step="0.001" value="0"></label>
+            <label>Y m<input id="navGoalY" type="number" step="0.001" value="0"></label>
+            <label>Yaw deg<input id="navGoalYaw" type="number" step="0.1" value="0"></label>
+            <label>动作超时 s<input id="navActionTimeout" type="number" min="1" step="1" value="120"></label>
+            <label>位置容差 m<input id="navPositionTolerance" type="number" min="0.01" step="0.01" value="0.20"></label>
+            <label>朝向容差 deg<input id="navYawTolerance" type="number" min="0" step="0.5" value="20"></label>
+            <label>到位稳定时间 s<input id="navStableTime" type="number" min="0" step="0.1" value="0.5"></label>
+          </div>
+          <h2>导航状态</h2>
+          <dl id="navigationFacts"></dl>
+          <h2>本页原子动作</h2>
+          <div id="navigationActionList" class="list compact"></div>
+        </section>
+      </div>
+    </section>
+
+    <section id="camera" class="page">
+      <div class="page-head">
+        <div id="lock-camera"></div>
+        <span class="muted-note">头部深度、视频订阅与取点由本页安全锁独立控制</span>
+      </div>
+      <section class="panel">
+        <h2>相机显示</h2>
+        <div class="head-depth-control">
+          <label class="toggle head-depth-toggle">
+            <span>头部相机深度处理</span>
+            <input id="headDepthProcessorEnable" type="checkbox" data-lock-page="camera">
+          </label>
+          <span id="headDepthProcessorStatus" class="pill warn">关闭</span>
+          <span id="headDepthProcessorDetails" class="head-depth-details">等待状态</span>
+        </div>
+        <div id="headDepthCalibrationWarning" class="head-depth-calibration-note">
+          提示：头部相机标定仍待现场复核。
+        </div>
+        <div id="streamGrid" class="viewer-grid">
+          <div class="viewer-slot">
+            <div class="viewer-title">
+              <span id="streamTitle0">未订阅</span>
+              <div class="stream-controls">
+                <select id="streamSelect0" data-slot="0"></select>
+                <button id="streamConnect0" data-lock-page="camera">确定</button>
+                <button id="streamDisconnect0">取消</button>
+                <input id="streamSavePath0" class="stream-save-path" placeholder="保存路径">
+                <button id="streamCapture0" data-lock-page="camera">拍照</button>
+              </div>
+            </div>
+            <div id="streamCaptureStatus0" class="stream-capture-status"></div>
+            <div id="streamViewer0" class="viewer"><img id="streamImage0" alt="stream"><div id="streamClickMarker0" class="click-marker"></div><div id="streamEmpty0" class="empty">未订阅视频流</div></div>
+            <div class="stream-click-panel">
+              <button id="toggleStreamClick0" data-lock-page="camera">点击取点</button>
+              <div id="streamClickStatus0" class="stream-capture-status"></div>
+            </div>
+            <div id="streamClickSummary0" class="summary-list"></div>
+          </div>
+          <div class="viewer-slot">
+            <div class="viewer-title">
+              <span id="streamTitle1">未订阅</span>
+              <div class="stream-controls">
+                <select id="streamSelect1" data-slot="1"></select>
+                <button id="streamConnect1" data-lock-page="camera">确定</button>
+                <button id="streamDisconnect1">取消</button>
+                <input id="streamSavePath1" class="stream-save-path" placeholder="保存路径">
+                <button id="streamCapture1" data-lock-page="camera">拍照</button>
+              </div>
+            </div>
+            <div id="streamCaptureStatus1" class="stream-capture-status"></div>
+            <div id="streamViewer1" class="viewer"><img id="streamImage1" alt="stream"><div id="streamClickMarker1" class="click-marker"></div><div id="streamEmpty1" class="empty">未订阅视频流</div></div>
+            <div class="stream-click-panel">
+              <button id="toggleStreamClick1" data-lock-page="camera">点击取点</button>
+              <div id="streamClickStatus1" class="stream-capture-status"></div>
+            </div>
+            <div id="streamClickSummary1" class="summary-list"></div>
+          </div>
+          <div class="viewer-slot">
+            <div class="viewer-title">
+              <span id="streamTitle2">未订阅</span>
+              <div class="stream-controls">
+                <select id="streamSelect2" data-slot="2"></select>
+                <button id="streamConnect2" data-lock-page="camera">确定</button>
+                <button id="streamDisconnect2">取消</button>
+                <input id="streamSavePath2" class="stream-save-path" placeholder="保存路径">
+                <button id="streamCapture2" data-lock-page="camera">拍照</button>
+              </div>
+            </div>
+            <div id="streamCaptureStatus2" class="stream-capture-status"></div>
+            <div id="streamViewer2" class="viewer"><img id="streamImage2" alt="stream"><div id="streamClickMarker2" class="click-marker"></div><div id="streamEmpty2" class="empty">未订阅视频流</div></div>
+            <div class="stream-click-panel">
+              <button id="toggleStreamClick2" data-lock-page="camera">点击取点</button>
+              <div id="streamClickStatus2" class="stream-capture-status"></div>
+            </div>
+            <div id="streamClickSummary2" class="summary-list"></div>
+          </div>
+          <div class="viewer-slot">
+            <div class="viewer-title">
+              <span id="streamTitle3">未订阅</span>
+              <div class="stream-controls">
+                <select id="streamSelect3" data-slot="3"></select>
+                <button id="streamConnect3" data-lock-page="camera">确定</button>
+                <button id="streamDisconnect3">取消</button>
+                <input id="streamSavePath3" class="stream-save-path" placeholder="保存路径">
+                <button id="streamCapture3" data-lock-page="camera">拍照</button>
+              </div>
+            </div>
+            <div id="streamCaptureStatus3" class="stream-capture-status"></div>
+            <div id="streamViewer3" class="viewer"><img id="streamImage3" alt="stream"><div id="streamClickMarker3" class="click-marker"></div><div id="streamEmpty3" class="empty">未订阅视频流</div></div>
+            <div class="stream-click-panel">
+              <button id="toggleStreamClick3" data-lock-page="camera">点击取点</button>
+              <div id="streamClickStatus3" class="stream-capture-status"></div>
+            </div>
+            <div id="streamClickSummary3" class="summary-list"></div>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <section id="recognition" class="page">
+      <div class="page-head">
+        <div id="lock-recognition"></div>
+        <div class="row wrap">
+          <span class="muted-note">识别进程与结果操作由本页安全锁独立控制</span>
+          <button id="goCameraFromRecognition">打开相机页</button>
+        </div>
+      </div>
+      <section class="panel recognition-console">
+        <div class="recognition-toolbar">
+          <label>相机<select id="yoloCamera"></select></label>
+          <label class="recognition-target-field">目标提示词<input id="recognitionTargetPrompt" placeholder="例如：蓝色料箱、冰红茶"></label>
+          <label>匹配资产<select id="yoloAsset"><option value="">等待自动匹配</option></select></label>
+          <div class="recognition-actions">
+            <button id="startYoloOnly" data-lock-page="recognition">仅启动 YOLO</button>
+            <button id="stopYoloOnly" data-lock-page="recognition">停止 YOLO</button>
+            <button id="startFullRecognition" class="primary" data-lock-page="recognition">完整识别</button>
+            <button id="reregisterRecognition" data-lock-page="recognition">重新注册</button>
+            <button id="stopFullRecognition" data-lock-page="recognition">全部停止</button>
+          </div>
+        </div>
+        <div class="recognition-prompt-line">
+          <span id="recognitionAssetStatus">输入目标后自动匹配资产</span>
+          <span id="recognitionActualPrompt">YOLO：-</span>
+        </div>
+        <div id="recognitionGateMessage" class="recognition-message"></div>
+        <div id="recognitionError" class="recognition-message warn"></div>
+
+        <div class="recognition-live-grid">
+          <div id="recognitionMainViewer" class="viewer recognition-main-viewer">
+            <img id="recognitionMainImage" alt="recognition stream">
+            <div id="recognitionMainEmpty" class="empty">识别未启动</div>
+          </div>
+          <aside class="recognition-result-card">
+            <div class="recognition-state-line">
+              <span id="recognitionStateDot" class="recognition-state-dot"></span>
+              <strong id="recognitionStage">未启动</strong>
+            </div>
+            <div id="recognitionPerformance" class="muted-note">数据 - · 推理 - · CUDA峰值 -</div>
+            <div class="segmented recognition-pose-tabs">
+              <button id="recognitionBasePoseTab" class="active">base_link</button>
+              <button id="recognitionCameraPoseTab">相机坐标</button>
+            </div>
+            <div id="recognitionPoseValues" class="recognition-pose-values">暂无有效位姿</div>
+            <div id="recognitionPoseMeta" class="muted-note"></div>
+          </aside>
+        </div>
+
+        <details class="recognition-log-wrap">
+          <summary>运行详情与高级参数</summary>
+          <div class="recognition-advanced-grid">
+            <label>置信度<input id="yoloConf" type="number" min="0" max="1" step="0.01" value="0.4"></label>
+            <label>YOLO 权重<input id="yoloModel" value=""></label>
+            <label>image size<input id="yoloImageSize" type="number" min="32" step="32" value="640"></label>
+            <label>max det<input id="yoloMaxDet" type="number" min="1" step="1" value="100"></label>
+            <label>device<input id="yoloDevice" placeholder="auto"></label>
+          </div>
+          <div id="detectionSummary" class="summary-list"></div>
+          <div id="foundationSummary" class="summary-list"></div>
+          <pre id="recognitionLog" class="recognition-log">等待状态</pre>
+        </details>
+      </section>
+
+      <details class="panel recognition-secondary">
+        <summary>ArUco 与手动识别工具</summary>
+        <section id="arucoPanel" class="recognition-aruco-panel">
+          <h2>ArUco</h2>
+          <div class="row wrap">
+            <button id="startArucoPose" data-lock-page="recognition">打开识别</button>
+            <button id="stopArucoPose" data-lock-page="recognition">关闭识别</button>
+            <button id="startArucoFine" data-lock-page="recognition">启动微调节点</button>
+            <button id="stopArucoFine" data-lock-page="recognition">停止微调节点</button>
+            <label class="toggle">微调开关<input id="arucoFineEnable" type="checkbox" data-lock-page="recognition"></label>
+          </div>
+          <div class="row wrap">
+            <button id="saveArucoPoseOpen" data-lock-page="recognition">保存识别开启动作</button>
+            <button id="saveArucoPoseClose" data-lock-page="recognition">保存识别关闭动作</button>
+            <button id="saveArucoFineEnable" data-lock-page="recognition">保存微调开启动作</button>
+            <button id="saveArucoFineDisable" data-lock-page="recognition">保存微调关闭动作</button>
+          </div>
+          <div class="viewer compact-viewer"><img id="arucoImage" alt="aruco stream"><div id="arucoStreamEmpty" class="empty">ArUco 识别关闭，未订阅视频流</div></div>
+          <div id="arucoSummary" class="summary-list"></div>
+        </section>
+      </details>
+      <section class="panel">
+        <h2>本页原子动作</h2>
+        <div id="visionActionList" class="list compact"></div>
+      </section>
+    </section>
+
+    <section id="vla" class="page">
+      <div class="page-head">
+        <div id="lock-vla"></div>
+        <div id="vlaStatus" class="stream-capture-status"></div>
+      </div>
+      <div class="grid two">
+        <section class="panel">
+          <h2>回放</h2>
+          <div class="vla-config-grid">
+            <label>数据集<select id="vlaDatasetSelect"></select></label>
+            <label>自定义路径<input id="vlaDatasetPath" placeholder="/path/to/lerobot_dataset 或 /path/to/file.mcap"></label>
+            <label>数据格式<select id="vlaDatasetFormat"><option value="auto">自动</option><option value="lerobot">LeRobot</option><option value="mcap">MCAP</option></select></label>
+            <label>Episode<select id="vlaEpisodeSelect"></select></label>
+            <label>Frame<input id="vlaFrameSlider" type="range" min="0" max="0" value="0"></label>
+            <label>Frame index<input id="vlaFrameIndex" type="number" min="0" value="0"></label>
+            <label>数据集 state 维度<select id="vlaStateSchema"><option value="upper_body_20">躯干 + 双臂 20 维</option><option value="bimanual_16">双臂 16 维</option><option value="left_arm_8">左臂 8 维</option><option value="right_arm_8">右臂 8 维</option></select></label>
+            <label>数据集动作维度<select id="vlaActionSchema"><option value="bimanual_16">双臂 16 维</option><option value="left_arm_8">左臂 8 维</option><option value="right_arm_8">右臂 8 维</option><option value="upper_body_20">躯干 + 双臂 20 维</option></select></label>
+            <label>执行后端<select id="vlaPlaybackProfile"><option value="sim">仿真</option><option value="real">真机</option></select></label>
+            <label>播放速度<input id="vlaRawLeftArmSpeed" type="number" min="0.1" max="1" step="0.1" value="1"></label>
+            <label>曲线<select id="vlaCurveGroup"><option value="all">全部</option><option value="torso">躯干</option><option value="left_arm">左臂</option><option value="right_arm">右臂</option><option value="left_gripper">左夹爪</option><option value="right_gripper">右夹爪</option></select></label>
+            <label>单位<select id="vlaCurveUnit"><option value="deg">deg</option><option value="rad">rad</option></select></label>
+          </div>
+          <div class="row wrap">
+            <button id="vlaRefreshDatasets">刷新数据集</button>
+            <button id="vlaLoadDataset">加载数据集</button>
+            <button id="vlaExecutePlaybackFrame" data-lock-page="vla">执行回放帧</button>
+            <button id="vlaExecutePlaybackChunk" data-lock-page="vla">执行回放 chunk</button>
+            <button id="vlaExecuteRawLeftArm" data-lock-page="vla">完整回放</button>
+          </div>
+          <div class="vla-video-grid">
+            <div class="viewer compact-viewer"><img id="vlaDatasetImageHigh" alt="dataset cam high"><div id="vlaDatasetEmptyHigh" class="empty">cam_high</div></div>
+            <div class="viewer compact-viewer"><img id="vlaDatasetImageLeft" alt="dataset left wrist"><div id="vlaDatasetEmptyLeft" class="empty">cam_left_wrist</div></div>
+            <div class="viewer compact-viewer"><img id="vlaDatasetImageRight" alt="dataset right wrist"><div id="vlaDatasetEmptyRight" class="empty">cam_right_wrist</div></div>
+          </div>
+          <canvas id="vlaPlaybackChart" class="vla-chart"></canvas>
+          <h3>远端 MCAP 开环评估</h3>
+          <div class="vla-config-grid">
+            <label>Start frame<input id="vlaMcapStartFrame" type="number" min="0" value="0"></label>
+            <label>End frame<input id="vlaMcapEndFrame" type="number" min="1" placeholder="全部"></label>
+            <label>Stride<input id="vlaMcapStride" type="number" min="1" placeholder="服务端 horizon"></label>
+            <label>同步误差(s)<input id="vlaMcapSyncError" type="number" min="0.001" step="0.01" value="0.25"></label>
+          </div>
+          <details>
+            <summary>MCAP topic overrides</summary>
+            <div class="vla-config-grid">
+              <label>Head image<input id="vlaMcapTopicHead"></label>
+              <label>Left wrist<input id="vlaMcapTopicLeftWrist"></label>
+              <label>Right wrist<input id="vlaMcapTopicRightWrist"></label>
+              <label>Torso state<input id="vlaMcapTopicTorsoState"></label>
+              <label>Left arm state<input id="vlaMcapTopicLeftState"></label>
+              <label>Left gripper state<input id="vlaMcapTopicLeftGripperState"></label>
+              <label>Right arm state<input id="vlaMcapTopicRightState"></label>
+              <label>Right gripper state<input id="vlaMcapTopicRightGripperState"></label>
+              <label>Torso action<input id="vlaMcapTopicTorsoAction"></label>
+              <label>Left arm action<input id="vlaMcapTopicLeftAction"></label>
+              <label>Left gripper action<input id="vlaMcapTopicLeftGripperAction"></label>
+              <label>Right arm action<input id="vlaMcapTopicRightAction"></label>
+              <label>Right gripper action<input id="vlaMcapTopicRightGripperAction"></label>
+            </div>
+          </details>
+          <div class="row wrap">
+            <button id="vlaMcapChannels">列出 Channels</button>
+            <button id="vlaMcapDryRun">同步检查</button>
+            <button id="vlaMcapEvalStart">开始远端评估</button>
+            <button id="vlaMcapEvalStop">停止评估</button>
+          </div>
+          <div id="vlaMcapEvalSummary" class="summary-list"></div>
+          <pre id="vlaMcapChannelsOutput" class="diagnostics"></pre>
+          <canvas id="vlaMcapEvalChart" class="vla-chart"></canvas>
+        </section>
+        <section class="panel">
+          <h2>推理</h2>
+          <div class="vla-config-grid">
+            <label>任务<select id="vlaRemoteTask" disabled><option value="">请先连接 Policy Server</option></select></label>
+            <label>输入<select id="vlaInputSource"><option value="live">真实相机</option><option value="dataset">数据集视频</option></select></label>
+            <label>数据集 state<select id="vlaStateSource"><option value="dataset_open_loop">开环</option><option value="feedback">闭环反馈</option></select></label>
+            <label>执行后端<select id="vlaInferProfile"><option value="sim">仿真</option><option value="real">真机</option></select></label>
+            <label>实际执行维度<select id="vlaExecutionSchema"><option value="server">服务端默认</option></select></label>
+            <label>Policy host<input id="vlaPolicyHost" value="10.30.20.1"></label>
+            <label>Policy port<input id="vlaPolicyPort" type="number" value="18081"></label>
+          </div>
+          <div class="row wrap">
+            <button id="vlaConnectPolicy">连接 Policy</button>
+            <button id="vlaLoadTask">加载任务</button>
+            <button id="vlaInfer">推理</button>
+            <button id="vlaFullInfer">完整推理</button>
+            <button id="vlaStopFullInfer">停止完整推理</button>
+            <button id="vlaExecuteFullResult" data-lock-page="vla">执行完整推理结果</button>
+            <button id="vlaStopFullResult">停止完整结果</button>
+            <button id="vlaExecuteFirst" data-lock-page="vla">执行第一步</button>
+            <button id="vlaExecuteChunk" data-lock-page="vla">执行 chunk</button>
+            <label>任务 chunk 数<input id="vlaTaskMaxChunks" type="number" min="1" max="100" value="20"></label>
+            <label>chunk 后等待(s)<input id="vlaTaskSettleS" type="number" min="0" max="5" step="0.1" value="0.5"></label>
+            <button id="vlaRunTask" data-lock-page="vla">执行完整任务</button>
+            <button id="vlaStopTask">停止任务</button>
+          </div>
+          <div class="vla-video-grid">
+            <div class="viewer compact-viewer"><img id="vlaInferImageHigh" alt="infer cam high"><div id="vlaInferEmptyHigh" class="empty">cam_high</div></div>
+            <div class="viewer compact-viewer"><img id="vlaInferImageLeft" alt="infer left wrist"><div id="vlaInferEmptyLeft" class="empty">cam_left_wrist</div></div>
+            <div class="viewer compact-viewer"><img id="vlaInferImageRight" alt="infer right wrist"><div id="vlaInferEmptyRight" class="empty">cam_right_wrist</div></div>
+          </div>
+          <canvas id="vlaInferChart" class="vla-chart"></canvas>
+          <div id="vlaTaskSummary" class="summary-list"></div>
+          <div id="vlaInferSummary" class="summary-list"></div>
+        </section>
+      </div>
+    </section>
+
+    <section id="workflow" class="page">
+      <div class="page-head">
+        <div id="lock-workflow"></div>
+        <div class="row wrap">
+          <button id="generateTemplates" data-lock-page="workflow">生成默认原子动作模板</button>
+          <button id="reloadActions">重载动作</button>
+          <button id="reloadSequences">重载工作流</button>
+        </div>
+      </div>
+      <section class="panel">
+        <h2>代码工作流</h2>
+        <div class="grid split">
+          <div>
+            <div class="row wrap">
+              <button id="reloadCodeWorkflows">重载代码工作流</button>
+              <button id="runCodeWorkflow" data-lock-page="workflow">执行代码工作流</button>
+              <button id="stopCodeWorkflow" class="danger">停止代码工作流</button>
+              <button id="saveCodeWorkflowAction" data-lock-page="workflow">另存为原子动作</button>
+            </div>
+            <div id="codeWorkflowList" class="list compact"></div>
+          </div>
+          <div>
+            <input id="codeWorkflowActionName" placeholder="另存动作名称">
+            <div id="codeWorkflowParamForm" class="param-grid"></div>
+            <h2>代码工作流状态</h2>
+            <div id="codeWorkflowVideoFrame" class="viewer compact-viewer workflow-video-frame">
+              <img id="codeWorkflowVideo" alt="code workflow recognition stream">
+              <div id="codeWorkflowVideoEmpty" class="empty">等待识别结果</div>
+            </div>
+            <pre id="codeWorkflowStatusLog" class="log code-workflow-log"></pre>
+          </div>
+        </div>
+      </section>
+      <div class="grid three workflow-grid">
+        <section class="panel">
+          <h2>原子动作</h2>
+          <div id="newActionList" class="list"></div>
+        </section>
+        <section class="panel">
+          <h2>原子动作工作组</h2>
+          <div id="actionGroupList" class="list"></div>
+          <input id="actionGroupName" placeholder="工作组名称">
+          <input id="actionGroupDescription" placeholder="中文备注">
+          <div class="row wrap">
+            <select id="actionGroupActionPicker"></select>
+            <button id="addActionToGroup">加入</button>
+            <button id="newActionGroup">新建</button>
+            <button id="clearActionGroup">清空</button>
+          </div>
+          <div id="actionGroupActions" class="sequence-steps"></div>
+          <div class="row wrap">
+            <button id="saveActionGroup" data-lock-page="workflow">保存工作组</button>
+            <button id="renameActionGroup" data-lock-page="workflow">重命名</button>
+            <button id="deleteActionGroup" class="danger" data-lock-page="workflow">删除</button>
+          </div>
+        </section>
+        <section class="panel">
+          <h2>动作编辑</h2>
+          <input id="actionName" placeholder="动作名称">
+          <input id="actionDescription" placeholder="中文备注">
+          <select id="actionType"></select>
+          <div id="actionParamForm" class="param-grid"></div>
+          <textarea id="actionParams" class="json-only" rows="13"></textarea>
+          <div class="row wrap">
+            <button id="saveAction" data-lock-page="workflow">保存</button>
+            <button id="executeAction" data-lock-page="workflow">执行</button>
+            <button id="renameAction" data-lock-page="workflow">重命名</button>
+            <button id="deleteAction" class="danger" data-lock-page="workflow">删除</button>
+          </div>
+        </section>
+      </div>
+      <div class="grid split">
+        <section class="panel">
+          <h2>工作流列表</h2>
+          <div id="sequenceList" class="list compact"></div>
+          <div class="workflow-runtime">
+            <h2 id="workflowVideoTitle">识别视频</h2>
+            <div id="workflowVideoFrame" class="viewer compact-viewer workflow-video-frame">
+              <img id="workflowVideo" alt="workflow vision stream">
+              <div id="workflowVideoEmpty" class="empty">无识别视频</div>
+            </div>
+            <h2>系统提示</h2>
+            <pre id="workflowRuntimeLog" class="log workflow-log"></pre>
+          </div>
+        </section>
+        <section class="panel">
+          <h2>工作流编排</h2>
+          <div class="row wrap workflow-run-controls">
+            <button id="runSequence" data-lock-page="workflow">执行工作流</button>
+            <button id="stopSequence" class="danger">停止</button>
+          </div>
+          <input id="sequenceName" placeholder="工作流名称">
+          <input id="sequenceDescription" placeholder="中文备注">
+          <div class="row wrap">
+            <select id="stepActionPicker"></select>
+            <button id="addStep">追加步骤</button>
+            <button id="validateSequence">合法性检查</button>
+          </div>
+          <div id="sequenceSteps" class="sequence-steps"></div>
+          <textarea id="sequenceJson" class="json-only" rows="10"></textarea>
+          <div class="row wrap">
+            <button id="saveSequence" data-lock-page="workflow">保存工作流</button>
+            <button id="saveSequenceAs" data-lock-page="workflow">另存为</button>
+            <button id="renameSequence" data-lock-page="workflow">重命名</button>
+            <button id="deleteSequence" class="danger" data-lock-page="workflow">删除</button>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <section id="diagnostics" class="page">
+      <div class="grid three">
+        <section class="panel"><h2>Topics</h2><div id="topicsSummary" class="summary-list"></div></section>
+        <section class="panel">
+          <h2>Health</h2>
+          <div id="diagnosticsSummary" class="summary-list"></div>
+          <div class="row wrap">
+            <button id="toggleJsonMode">打开 JSON 模式</button>
+            <span id="jsonModeStatus" class="pill warn">已关闭</span>
+          </div>
+        </section>
+        <section class="panel json-only"><h2>Raw State</h2><pre id="rawStateJson" class="log"></pre></section>
+      </div>
+    </section>
+  </main>
+  <script src="/app.js?v=20260826-ee-axial-motion"></script>
+</body>
+</html>

@@ -1,0 +1,235 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+# Run this file from the host. It starts the prepared ROS 2 container and then
+# re-runs itself inside that container. The real-only launch does not start
+# MotrixSim, but Web control actions can publish commands to the physical robot.
+
+SCRIPT_PATH="$(readlink -f "${BASH_SOURCE[0]}")"
+CONTAINER_NAME="${R1PRO_CONTAINER:-ros2_humble_gpu}"
+ROS_DOMAIN="${R1PRO_ROS_DOMAIN_ID:-102}"
+WEB_PORT="${R1PRO_WEB_PORT:-8080}"
+
+if [[ "${1:-}" != "--inside-container" ]]; then
+  if ! command -v docker >/dev/null 2>&1; then
+    echo "错误：宿主机没有找到 docker 命令。" >&2
+    exit 1
+  fi
+
+  if ! docker container inspect "$CONTAINER_NAME" >/dev/null 2>&1; then
+    echo "错误：Docker 容器不存在：$CONTAINER_NAME" >&2
+    echo "可以通过 R1PRO_CONTAINER 指定其他容器名称。" >&2
+    exit 1
+  fi
+
+  DDS_INTERFACE_IP="${R1PRO_DDS_INTERFACE_IP:-}"
+  if [[ -z "$DDS_INTERFACE_IP" ]]; then
+    DDS_INTERFACE_IP="$(
+      ip -o -4 address show up scope global \
+        | awk '$4 ~ /^192[.]168[.]3[.]/ {sub(/\/.*/, "", $4); print $4; exit}'
+    )"
+  fi
+
+  if [[ ! "$DDS_INTERFACE_IP" =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}$ ]]; then
+    echo "错误：没有找到机器人网段 192.168.3.x 的工作站 IPv4 地址。" >&2
+    echo "请先连接机器人网络，或执行：" >&2
+    echo "  R1PRO_DDS_INTERFACE_IP=192.168.3.x $SCRIPT_PATH" >&2
+    exit 1
+  fi
+
+  docker start "$CONTAINER_NAME" >/dev/null
+
+  docker_tty=(-i)
+  if [[ -t 0 && -t 1 ]]; then
+    docker_tty=(-it)
+  fi
+
+  echo "启动容器：$CONTAINER_NAME"
+  echo "真机 DDS 网卡：$DDS_INTERFACE_IP"
+  echo "Web 地址：http://127.0.0.1:$WEB_PORT"
+
+  exec docker exec "${docker_tty[@]}" \
+    -e R1PRO_DDS_INTERFACE_IP="$DDS_INTERFACE_IP" \
+    -e R1PRO_ROS_DOMAIN_ID="$ROS_DOMAIN" \
+    -e R1PRO_WEB_PORT="$WEB_PORT" \
+    "$CONTAINER_NAME" \
+    bash "$SCRIPT_PATH" --inside-container
+fi
+
+DDS_INTERFACE_IP="${R1PRO_DDS_INTERFACE_IP:?R1PRO_DDS_INTERFACE_IP is required}"
+ROS_DOMAIN="${R1PRO_ROS_DOMAIN_ID:-102}"
+WEB_PORT="${R1PRO_WEB_PORT:-8080}"
+
+if [[ ! "$WEB_PORT" =~ ^[0-9]+$ ]] || ((WEB_PORT < 1 || WEB_PORT > 65535)); then
+  echo "错误：无效的 Web 端口：$WEB_PORT" >&2
+  exit 1
+fi
+
+ROS_SETUP=/opt/ros/humble/setup.bash
+OVERLAY_SETUP=/home/pc10/r1pro_web_colcon/install/setup.bash
+BATTERY_SETUP=/home/pc10/r1pro_battery_ws/install/setup.bash
+FASTDDS_PROFILE_SOURCE=/home/pc10/r1pro_web_colcon/install/r1pro_web_control/share/r1pro_web_control/config/fastdds_workstation_udp.xml
+FASTDDS_PROFILE_RUNTIME=/tmp/r1pro_fastdds_workstation_udp.xml
+PROJECT_ROOT='/home/pc10/桌面/r1pro-web-control-stack'
+URDF_FILE='/home/pc10/桌面/galaxea/install/mobiman/share/mobiman/urdf/R1_PRO_Z/urdf/r1_pro_z.urdf'
+FOUNDATIONPOSE_PYTHON=/home/pc10/miniconda3/envs/foundationpose/bin/python
+
+required_paths=(
+  "$ROS_SETUP"
+  "$OVERLAY_SETUP"
+  "$BATTERY_SETUP"
+  "$FASTDDS_PROFILE_SOURCE"
+  "$URDF_FILE"
+  "$FOUNDATIONPOSE_PYTHON"
+  "$PROJECT_ROOT/src/FoundationPose/FoundationPose"
+  "$PROJECT_ROOT/src/FoundationPose/objects"
+  "$PROJECT_ROOT/src/wrist_yoloe_segmentation/model/yoloe-26s-seg.pt"
+  "$PROJECT_ROOT/src/r1pro_aruco_box_pose/config/head_left_aruco_box_pose.yaml"
+  "$PROJECT_ROOT/src/stereo_depth_offline_bundle"
+)
+
+for required_path in "${required_paths[@]}"; do
+  if [[ ! -e "$required_path" ]]; then
+    echo "错误：缺少启动所需路径：$required_path" >&2
+    exit 1
+  fi
+done
+
+find_existing_stack_pids() {
+  ps -eo pid=,args= | awk -v self="$$" '
+    $1 == self { next }
+    $0 ~ /(^|\/)awk / { next }
+    index($0, "ros2 launch r1pro_web_control") ||
+    index($0, "install/r1pro_web_control/lib/r1pro_web_control/r1pro_web_server") ||
+    index($0, "install/motrixsim_ros2_node/lib/motrixsim_ros2_node/sim_node") ||
+    index($0, "install/motrixsim_ros2_node/lib/motrixsim_ros2_node/r1pro_web_bridge") ||
+    index($0, "__node:=motrixsim_robot_state_publisher") ||
+    index($0, "__node:=r1pro_web_left_wrist_camera_tf_bridge") ||
+    index($0, "__node:=r1pro_web_right_wrist_camera_tf_bridge") {
+      print $1
+    }
+  '
+}
+
+port_is_in_use() {
+  local port="$1"
+  if command -v ss >/dev/null 2>&1; then
+    ss -ltnH "sport = :$port" | grep -q .
+    return
+  fi
+  if command -v netstat >/dev/null 2>&1; then
+    netstat -ltn 2>/dev/null | awk -v port=":$port" '$4 ~ port"$" { found=1 } END { exit !found }'
+    return
+  fi
+  if command -v lsof >/dev/null 2>&1; then
+    lsof -nP -iTCP:"$port" -sTCP:LISTEN -t >/dev/null 2>&1
+    return
+  fi
+
+  # Minimal ROS images may not contain iproute2/net-tools/lsof. A localhost
+  # connection check is sufficient because Web listens on 0.0.0.0 by default.
+  python3 - "$port" <<'PY'
+import socket
+import sys
+
+sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+sock.settimeout(0.2)
+try:
+    occupied = sock.connect_ex(("127.0.0.1", int(sys.argv[1]))) == 0
+finally:
+    sock.close()
+raise SystemExit(0 if occupied else 1)
+PY
+}
+
+show_port_owner() {
+  local port="$1"
+  if command -v ss >/dev/null 2>&1; then
+    ss -lntp "sport = :$port" >&2 || true
+  elif command -v netstat >/dev/null 2>&1; then
+    netstat -lntp 2>/dev/null | grep -E ":${port}[[:space:]]" >&2 || true
+  elif command -v lsof >/dev/null 2>&1; then
+    lsof -nP -iTCP:"$port" -sTCP:LISTEN >&2 || true
+  else
+    echo "未安装 ss/netstat/lsof，无法显示端口占用进程。" >&2
+  fi
+}
+
+old_pids="$(find_existing_stack_pids | sort -u | tr '\n' ' ')"
+if [[ -n "${old_pids// }" ]]; then
+  echo "停止旧 Web/仿真进程：$old_pids"
+  kill -TERM $old_pids 2>/dev/null || true
+
+  for _ in $(seq 1 20); do
+    sleep 0.25
+    remaining_pids="$(find_existing_stack_pids | sort -u | tr '\n' ' ')"
+    [[ -z "${remaining_pids// }" ]] && break
+  done
+
+  remaining_pids="$(find_existing_stack_pids | sort -u | tr '\n' ' ')"
+  if [[ -n "${remaining_pids// }" ]]; then
+    echo "强制结束未退出的旧进程：$remaining_pids"
+    kill -KILL $remaining_pids 2>/dev/null || true
+    sleep 1
+  fi
+fi
+
+if port_is_in_use "$WEB_PORT"; then
+  echo "错误：端口 $WEB_PORT 仍被其他进程占用，拒绝启动第二套 Web。" >&2
+  show_port_owner "$WEB_PORT"
+  exit 1
+fi
+
+sed -E \
+  "s#<address>[0-9]{1,3}(\.[0-9]{1,3}){3}</address>#<address>${DDS_INTERFACE_IP}</address>#" \
+  "$FASTDDS_PROFILE_SOURCE" \
+  >"$FASTDDS_PROFILE_RUNTIME"
+
+if ! grep -q "<address>${DDS_INTERFACE_IP}</address>" "$FASTDDS_PROFILE_RUNTIME"; then
+  echo "错误：生成 Fast DDS 网卡配置失败。" >&2
+  exit 1
+fi
+
+# ROS Humble's setup scripts are not nounset-safe: they reference
+# AMENT_TRACE_SETUP_FILES before declaring it. Keep strict mode for the
+# launcher itself, but temporarily disable only nounset while sourcing ROS.
+set +u
+source "$ROS_SETUP"
+source "$OVERLAY_SETUP"
+source "$BATTERY_SETUP"
+python3 -c 'from hdas_msg.msg import Bms; Bms.__import_type_support__(); assert Bms._TYPE_SUPPORT is not None'
+set -u
+
+export ROS_DOMAIN_ID="$ROS_DOMAIN"
+export RMW_IMPLEMENTATION=rmw_fastrtps_cpp
+export ROS_LOCALHOST_ONLY=0
+export R1PRO_FASTDDS_PROFILE="$FASTDDS_PROFILE_RUNTIME"
+export FASTRTPS_DEFAULT_PROFILES_FILE="$FASTDDS_PROFILE_RUNTIME"
+export FASTDDS_DEFAULT_PROFILES_FILE="$FASTDDS_PROFILE_RUNTIME"
+export RMW_FASTRTPS_USE_QOS_FROM_XML=1
+
+echo
+echo "============================================================"
+echo "R1 Pro 真机 Web 即将启动"
+echo "ROS_DOMAIN_ID=$ROS_DOMAIN_ID"
+echo "DDS_INTERFACE_IP=$DDS_INTERFACE_IP"
+echo "Web=http://127.0.0.1:$WEB_PORT"
+echo "警告：解锁网页控制后，指令会发送给真实机器人。"
+echo "停止服务请按 Ctrl+C。"
+echo "============================================================"
+echo
+
+exec ros2 launch r1pro_web_control r1pro_web_control.launch.py \
+  port:="$WEB_PORT" \
+  default_control_profile:=real \
+  full_urdf_path:="$URDF_FILE" \
+  foundation_pose_root:="$PROJECT_ROOT/src/FoundationPose/FoundationPose" \
+  foundation_pose_assets_root:="$PROJECT_ROOT/src/FoundationPose/objects" \
+  camera_model_path:="$PROJECT_ROOT/src/wrist_yoloe_segmentation/model/yoloe-26s-seg.pt" \
+  foundation_pose_python:="$FOUNDATIONPOSE_PYTHON" \
+  vision_python:="$FOUNDATIONPOSE_PYTHON" \
+  head_depth_python:="$FOUNDATIONPOSE_PYTHON" \
+  foundation_pose_ld_library_path:=/home/pc10/miniconda3/envs/foundationpose/lib \
+  head_depth_bundle_root:="$PROJECT_ROOT/src/stereo_depth_offline_bundle" \
+  aruco_box_pose_config_file:="$PROJECT_ROOT/src/r1pro_aruco_box_pose/config/head_left_aruco_box_pose.yaml" \
+  vla_dataset_root:="$PROJECT_ROOT/src/vla_openpi/datasets"

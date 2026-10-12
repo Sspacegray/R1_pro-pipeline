@@ -1,0 +1,5688 @@
+{
+  "actions": [
+    {
+      "created_at": "2026-08-20T06:47:57.306928Z",
+      "description": "中文备注：从关节控制页保存的选中关节/夹爪目标。",
+      "id": "3865d69ab513007c",
+      "name": "浇花int",
+      "params": {
+        "targets": [
+          {
+            "group": "torso",
+            "index": 0,
+            "name": "torso[1]",
+            "unit": "deg",
+            "value": 8.47
+          },
+          {
+            "group": "torso",
+            "index": 1,
+            "name": "torso[2]",
+            "unit": "deg",
+            "value": -13.82
+          },
+          {
+            "group": "torso",
+            "index": 2,
+            "name": "torso[3]",
+            "unit": "deg",
+            "value": -28.42
+          },
+          {
+            "group": "torso",
+            "index": 3,
+            "name": "torso[4]",
+            "unit": "deg",
+            "value": 0.14
+          },
+          {
+            "group": "left_arm",
+            "index": 0,
+            "name": "left_arm[1]",
+            "unit": "deg",
+            "value": 10
+          },
+          {
+            "group": "left_arm",
+            "index": 1,
+            "name": "left_arm[2]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "left_arm",
+            "index": 2,
+            "name": "left_arm[3]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "left_arm",
+            "index": 3,
+            "name": "left_arm[4]",
+            "unit": "deg",
+            "value": -119.3
+          },
+          {
+            "group": "left_arm",
+            "index": 4,
+            "name": "left_arm[5]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "left_arm",
+            "index": 5,
+            "name": "left_arm[6]",
+            "unit": "deg",
+            "value": 0.04
+          },
+          {
+            "group": "left_arm",
+            "index": 6,
+            "name": "left_arm[7]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "right_arm",
+            "index": 0,
+            "name": "right_arm[1]",
+            "unit": "deg",
+            "value": -86.8
+          },
+          {
+            "group": "right_arm",
+            "index": 1,
+            "name": "right_arm[2]",
+            "unit": "deg",
+            "value": -27.62
+          },
+          {
+            "group": "right_arm",
+            "index": 2,
+            "name": "right_arm[3]",
+            "unit": "deg",
+            "value": 27.19
+          },
+          {
+            "group": "right_arm",
+            "index": 3,
+            "name": "right_arm[4]",
+            "unit": "deg",
+            "value": -60.92
+          },
+          {
+            "group": "right_arm",
+            "index": 4,
+            "name": "right_arm[5]",
+            "unit": "deg",
+            "value": -28.67
+          },
+          {
+            "group": "right_arm",
+            "index": 5,
+            "name": "right_arm[6]",
+            "unit": "deg",
+            "value": 24.04
+          },
+          {
+            "group": "right_arm",
+            "index": 6,
+            "name": "right_arm[7]",
+            "unit": "deg",
+            "value": 85.79
+          },
+          {
+            "group": "left_gripper",
+            "index": 0,
+            "name": "left_gripper[1]",
+            "unit": "open_0_100",
+            "value": 101
+          },
+          {
+            "group": "right_gripper",
+            "index": 0,
+            "name": "right_gripper[1]",
+            "unit": "open_0_100",
+            "value": 101.27
+          }
+        ],
+        "timeout_s": 3
+      },
+      "source_page": "joints",
+      "type": "joint_targets",
+      "updated_at": "2026-08-20T06:47:57.306928Z"
+    },
+    {
+      "created_at": "2026-06-25T03:35:25.684279Z",
+      "description": "",
+      "id": "712bae13-3b07-49f9-84f1-18d3f9be5417",
+      "migration_warnings": [],
+      "name": "pickup01",
+      "params": {
+        "targets": [
+          {
+            "group": "torso",
+            "index": 0,
+            "name": "torso[1]",
+            "unit": "deg",
+            "value": 20.070712366662985
+          },
+          {
+            "group": "torso",
+            "index": 1,
+            "name": "torso[2]",
+            "unit": "deg",
+            "value": -44.026077748297794
+          },
+          {
+            "group": "torso",
+            "index": 2,
+            "name": "torso[3]",
+            "unit": "deg",
+            "value": -34.87021258099029
+          },
+          {
+            "group": "torso",
+            "index": 3,
+            "name": "torso[4]",
+            "unit": "deg",
+            "value": 0.005729577806566919
+          },
+          {
+            "group": "left_arm",
+            "index": 0,
+            "name": "left_arm[1]",
+            "unit": "deg",
+            "value": 0.012190591385762195
+          },
+          {
+            "group": "left_arm",
+            "index": 1,
+            "name": "left_arm[2]",
+            "unit": "deg",
+            "value": 0.0
+          },
+          {
+            "group": "left_arm",
+            "index": 2,
+            "name": "left_arm[3]",
+            "unit": "deg",
+            "value": 0.0
+          },
+          {
+            "group": "left_arm",
+            "index": 3,
+            "name": "left_arm[4]",
+            "unit": "deg",
+            "value": -92.69725689733575
+          },
+          {
+            "group": "left_arm",
+            "index": 4,
+            "name": "left_arm[5]",
+            "unit": "deg",
+            "value": 0.0
+          },
+          {
+            "group": "left_arm",
+            "index": 5,
+            "name": "left_arm[6]",
+            "unit": "deg",
+            "value": 0.012190591385762195
+          },
+          {
+            "group": "left_arm",
+            "index": 6,
+            "name": "left_arm[7]",
+            "unit": "deg",
+            "value": 0.0
+          },
+          {
+            "group": "right_arm",
+            "index": 0,
+            "name": "right_arm[1]",
+            "unit": "deg",
+            "value": 0.0
+          },
+          {
+            "group": "right_arm",
+            "index": 1,
+            "name": "right_arm[2]",
+            "unit": "deg",
+            "value": 0.0
+          },
+          {
+            "group": "right_arm",
+            "index": 2,
+            "name": "right_arm[3]",
+            "unit": "deg",
+            "value": 0.0
+          },
+          {
+            "group": "right_arm",
+            "index": 3,
+            "name": "right_arm[4]",
+            "unit": "deg",
+            "value": -92.7094474887215
+          },
+          {
+            "group": "right_arm",
+            "index": 4,
+            "name": "right_arm[5]",
+            "unit": "deg",
+            "value": 0.0
+          },
+          {
+            "group": "right_arm",
+            "index": 5,
+            "name": "right_arm[6]",
+            "unit": "deg",
+            "value": 0.0
+          },
+          {
+            "group": "right_arm",
+            "index": 6,
+            "name": "right_arm[7]",
+            "unit": "deg",
+            "value": 0.0
+          },
+          {
+            "group": "left_gripper",
+            "index": 0,
+            "name": "left_gripper[1]",
+            "unit": "open_0_100",
+            "value": 101.62111271634791
+          },
+          {
+            "group": "right_gripper",
+            "index": 0,
+            "name": "right_gripper[1]",
+            "unit": "open_0_100",
+            "value": 97.78519695096655
+          }
+        ]
+      },
+      "type": "joint_targets",
+      "updated_at": "2026-06-27T08:20:45.839072Z"
+    },
+    {
+      "created_at": "2026-06-25T03:39:57.603107Z",
+      "description": "",
+      "id": "49da4cad-6820-4a0a-a117-e456f385b478",
+      "migration_warnings": [],
+      "name": "stand1",
+      "params": {
+        "targets": [
+          {
+            "group": "torso",
+            "index": 0,
+            "name": "torso[1]",
+            "unit": "deg",
+            "value": 20.030603788309378
+          },
+          {
+            "group": "torso",
+            "index": 1,
+            "name": "torso[2]",
+            "unit": "deg",
+            "value": -44.04899644805777
+          },
+          {
+            "group": "torso",
+            "index": 2,
+            "name": "torso[3]",
+            "unit": "deg",
+            "value": -34.78426831066402
+          },
+          {
+            "group": "torso",
+            "index": 3,
+            "name": "torso[4]",
+            "unit": "deg",
+            "value": 0.005729577806566919
+          },
+          {
+            "group": "left_arm",
+            "index": 0,
+            "name": "left_arm[1]",
+            "unit": "deg",
+            "value": 0.02438118277152439
+          },
+          {
+            "group": "left_arm",
+            "index": 1,
+            "name": "left_arm[2]",
+            "unit": "deg",
+            "value": 0.0
+          },
+          {
+            "group": "left_arm",
+            "index": 2,
+            "name": "left_arm[3]",
+            "unit": "deg",
+            "value": 0.0
+          },
+          {
+            "group": "left_arm",
+            "index": 3,
+            "name": "left_arm[4]",
+            "unit": "deg",
+            "value": 0.0
+          },
+          {
+            "group": "left_arm",
+            "index": 4,
+            "name": "left_arm[5]",
+            "unit": "deg",
+            "value": 0.0
+          },
+          {
+            "group": "left_arm",
+            "index": 5,
+            "name": "left_arm[6]",
+            "unit": "deg",
+            "value": 0.02438118277152439
+          },
+          {
+            "group": "left_arm",
+            "index": 6,
+            "name": "left_arm[7]",
+            "unit": "deg",
+            "value": 0.0
+          },
+          {
+            "group": "right_arm",
+            "index": 0,
+            "name": "right_arm[1]",
+            "unit": "deg",
+            "value": 0.0
+          },
+          {
+            "group": "right_arm",
+            "index": 1,
+            "name": "right_arm[2]",
+            "unit": "deg",
+            "value": 0.0
+          },
+          {
+            "group": "right_arm",
+            "index": 2,
+            "name": "right_arm[3]",
+            "unit": "deg",
+            "value": 0.0
+          },
+          {
+            "group": "right_arm",
+            "index": 3,
+            "name": "right_arm[4]",
+            "unit": "deg",
+            "value": 0.0
+          },
+          {
+            "group": "right_arm",
+            "index": 4,
+            "name": "right_arm[5]",
+            "unit": "deg",
+            "value": 0.0
+          },
+          {
+            "group": "right_arm",
+            "index": 5,
+            "name": "right_arm[6]",
+            "unit": "deg",
+            "value": 0.0
+          },
+          {
+            "group": "right_arm",
+            "index": 6,
+            "name": "right_arm[7]",
+            "unit": "deg",
+            "value": 0.0
+          },
+          {
+            "group": "left_gripper",
+            "index": 0,
+            "name": "left_gripper[1]",
+            "unit": "open_0_100",
+            "value": 101.62111271634791
+          },
+          {
+            "group": "right_gripper",
+            "index": 0,
+            "name": "right_gripper[1]",
+            "unit": "open_0_100",
+            "value": 96.73309705700721
+          }
+        ]
+      },
+      "type": "joint_targets",
+      "updated_at": "2026-06-27T08:20:45.839072Z"
+    },
+    {
+      "created_at": "2026-06-25T03:40:47.591985Z",
+      "description": "",
+      "id": "8d3990ae-480d-4369-8530-0ebe6718eb43",
+      "migration_warnings": [],
+      "name": "let-arms-down",
+      "params": {
+        "targets": [
+          {
+            "group": "left_arm",
+            "index": 0,
+            "name": "left_arm[1]",
+            "unit": "deg",
+            "value": 0.02438118277152439
+          },
+          {
+            "group": "left_arm",
+            "index": 1,
+            "name": "left_arm[2]",
+            "unit": "deg",
+            "value": 0.0
+          },
+          {
+            "group": "left_arm",
+            "index": 2,
+            "name": "left_arm[3]",
+            "unit": "deg",
+            "value": 0.0
+          },
+          {
+            "group": "left_arm",
+            "index": 3,
+            "name": "left_arm[4]",
+            "unit": "deg",
+            "value": 0.0
+          },
+          {
+            "group": "left_arm",
+            "index": 4,
+            "name": "left_arm[5]",
+            "unit": "deg",
+            "value": 0.0
+          },
+          {
+            "group": "left_arm",
+            "index": 5,
+            "name": "left_arm[6]",
+            "unit": "deg",
+            "value": 0.02438118277152439
+          },
+          {
+            "group": "left_arm",
+            "index": 6,
+            "name": "left_arm[7]",
+            "unit": "deg",
+            "value": 0.0
+          },
+          {
+            "group": "right_arm",
+            "index": 0,
+            "name": "right_arm[1]",
+            "unit": "deg",
+            "value": 0.0
+          },
+          {
+            "group": "right_arm",
+            "index": 1,
+            "name": "right_arm[2]",
+            "unit": "deg",
+            "value": 0.0
+          },
+          {
+            "group": "right_arm",
+            "index": 2,
+            "name": "right_arm[3]",
+            "unit": "deg",
+            "value": 0.0
+          },
+          {
+            "group": "right_arm",
+            "index": 3,
+            "name": "right_arm[4]",
+            "unit": "deg",
+            "value": 0.0
+          },
+          {
+            "group": "right_arm",
+            "index": 4,
+            "name": "right_arm[5]",
+            "unit": "deg",
+            "value": 0.0
+          },
+          {
+            "group": "right_arm",
+            "index": 5,
+            "name": "right_arm[6]",
+            "unit": "deg",
+            "value": 0.0
+          },
+          {
+            "group": "right_arm",
+            "index": 6,
+            "name": "right_arm[7]",
+            "unit": "deg",
+            "value": 0.0
+          },
+          {
+            "group": "left_gripper",
+            "index": 0,
+            "name": "left_gripper[1]",
+            "unit": "open_0_100",
+            "value": 101.62111271634791
+          },
+          {
+            "group": "right_gripper",
+            "index": 0,
+            "name": "right_gripper[1]",
+            "unit": "open_0_100",
+            "value": 96.73309705700721
+          }
+        ]
+      },
+      "type": "joint_targets",
+      "updated_at": "2026-06-27T08:20:45.839072Z"
+    },
+    {
+      "created_at": "2026-06-25T03:41:46.791600Z",
+      "description": "",
+      "id": "02f6bb77-09a8-454d-97fd-2b428cf5ea18",
+      "migration_warnings": [],
+      "name": "stand-torso-01",
+      "params": {
+        "targets": [
+          {
+            "group": "torso",
+            "index": 0,
+            "name": "torso[1]",
+            "unit": "deg",
+            "value": 20.030603788309378
+          },
+          {
+            "group": "torso",
+            "index": 1,
+            "name": "torso[2]",
+            "unit": "deg",
+            "value": -44.04899644805777
+          },
+          {
+            "group": "torso",
+            "index": 2,
+            "name": "torso[3]",
+            "unit": "deg",
+            "value": -34.78426831066402
+          },
+          {
+            "group": "torso",
+            "index": 3,
+            "name": "torso[4]",
+            "unit": "deg",
+            "value": 0.005729577806566919
+          }
+        ]
+      },
+      "type": "joint_targets",
+      "updated_at": "2026-06-27T08:20:45.839072Z"
+    },
+    {
+      "created_at": "2026-06-25T03:42:23.255206Z",
+      "description": "",
+      "id": "f3b113bc-8d4d-43d6-acb5-f43b1a0c9b3b",
+      "migration_warnings": [],
+      "name": "pickup-arms-01",
+      "params": {
+        "targets": [
+          {
+            "group": "left_arm",
+            "index": 0,
+            "name": "left_arm[1]",
+            "unit": "deg",
+            "value": 0.02438118277152439
+          },
+          {
+            "group": "left_arm",
+            "index": 1,
+            "name": "left_arm[2]",
+            "unit": "deg",
+            "value": 0.0
+          },
+          {
+            "group": "left_arm",
+            "index": 2,
+            "name": "left_arm[3]",
+            "unit": "deg",
+            "value": 0.0
+          },
+          {
+            "group": "left_arm",
+            "index": 3,
+            "name": "left_arm[4]",
+            "unit": "deg",
+            "value": -92.57535098347812
+          },
+          {
+            "group": "left_arm",
+            "index": 4,
+            "name": "left_arm[5]",
+            "unit": "deg",
+            "value": 0.0
+          },
+          {
+            "group": "left_arm",
+            "index": 5,
+            "name": "left_arm[6]",
+            "unit": "deg",
+            "value": 0.02438118277152439
+          },
+          {
+            "group": "left_arm",
+            "index": 6,
+            "name": "left_arm[7]",
+            "unit": "deg",
+            "value": 0.0
+          },
+          {
+            "group": "right_arm",
+            "index": 0,
+            "name": "right_arm[1]",
+            "unit": "deg",
+            "value": 0.0
+          },
+          {
+            "group": "right_arm",
+            "index": 1,
+            "name": "right_arm[2]",
+            "unit": "deg",
+            "value": 0.0
+          },
+          {
+            "group": "right_arm",
+            "index": 2,
+            "name": "right_arm[3]",
+            "unit": "deg",
+            "value": 0.0
+          },
+          {
+            "group": "right_arm",
+            "index": 3,
+            "name": "right_arm[4]",
+            "unit": "deg",
+            "value": -92.58754157486389
+          },
+          {
+            "group": "right_arm",
+            "index": 4,
+            "name": "right_arm[5]",
+            "unit": "deg",
+            "value": 0.0
+          },
+          {
+            "group": "right_arm",
+            "index": 5,
+            "name": "right_arm[6]",
+            "unit": "deg",
+            "value": 0.0
+          },
+          {
+            "group": "right_arm",
+            "index": 6,
+            "name": "right_arm[7]",
+            "unit": "deg",
+            "value": 0.0
+          },
+          {
+            "group": "left_gripper",
+            "index": 0,
+            "name": "left_gripper[1]",
+            "unit": "open_0_100",
+            "value": 101.62111271634791
+          },
+          {
+            "group": "right_gripper",
+            "index": 0,
+            "name": "right_gripper[1]",
+            "unit": "open_0_100",
+            "value": 96.73309705700721
+          }
+        ]
+      },
+      "type": "joint_targets",
+      "updated_at": "2026-06-27T08:20:45.839072Z"
+    },
+    {
+      "created_at": "2026-06-26T07:59:27.077986Z",
+      "description": "",
+      "id": "4e08eeba-5355-4cfb-a324-07fe540983b8",
+      "migration_warnings": [],
+      "name": "select_wrist_right_camera",
+      "params": {
+        "camera_key": "wrist_right",
+        "timeout_s": 5.0
+      },
+      "type": "switch_camera",
+      "updated_at": "2026-06-27T08:20:45.839072Z"
+    },
+    {
+      "created_at": "2026-06-26T07:59:27.077986Z",
+      "description": "",
+      "id": "084eb354-63bb-4146-a94d-57fdbeece435",
+      "migration_warnings": [],
+      "name": "yolo_bottle_0_5_right",
+      "params": {
+        "camera_key": "wrist_right",
+        "confidence_threshold": 0.5,
+        "prompt": "bottle",
+        "timeout_s": 30.0
+      },
+      "type": "yolo_open",
+      "updated_at": "2026-06-27T08:20:45.839072Z"
+    },
+    {
+      "created_at": "2026-06-26T07:59:27.077986Z",
+      "description": "",
+      "id": "a8620d4a-a2dd-4698-bda5-9aa23282b192",
+      "migration_warnings": [],
+      "name": "latch_best_bottle",
+      "params": {
+        "min_confidence": 0.5,
+        "timeout_s": 20.0
+      },
+      "type": "latch_yolo",
+      "updated_at": "2026-06-27T08:20:45.839072Z"
+    },
+    {
+      "created_at": "2026-06-26T07:59:27.077986Z",
+      "description": "",
+      "id": "e5ddb915-9951-440c-9fe8-e513e0ccb37d",
+      "migration_warnings": [],
+      "name": "close_yolo",
+      "params": {
+        "timeout_s": 5.0
+      },
+      "type": "yolo_close",
+      "updated_at": "2026-06-27T08:20:45.839072Z"
+    },
+    {
+      "created_at": "2026-06-26T07:59:27.077986Z",
+      "description": "",
+      "id": "7c62e501-dfd7-4710-8e55-bfa874e7856c",
+      "migration_warnings": [],
+      "name": "right_grasp_latched_bottle",
+      "params": {
+        "approach_distance_m": 0.04,
+        "arm": "right",
+        "orientation": "keep",
+        "phase2_settle_s": 1.0,
+        "timeout_s": 45.0,
+        "xyz_source": "latched_yolo"
+      },
+      "type": "grasp",
+      "updated_at": "2026-06-27T08:20:45.839072Z"
+    },
+    {
+      "created_at": "2026-06-26T07:59:27.077986Z",
+      "description": "",
+      "id": "b7c7a1e8-7aef-4fd1-906d-a910994f657b",
+      "migration_warnings": [],
+      "name": "read_right_ee_pose",
+      "params": {
+        "arm": "right",
+        "timeout_s": 5.0
+      },
+      "type": "read_ee_pose",
+      "updated_at": "2026-06-27T08:20:45.839072Z"
+    },
+    {
+      "created_at": "2026-06-26T07:59:27.077986Z",
+      "description": "",
+      "id": "2a7f0d9a-a391-4909-82ff-73648e5ffe41",
+      "migration_warnings": [],
+      "name": "right_lift_20cm",
+      "params": {
+        "arm": "right",
+        "offset": [
+          0.0,
+          0.0,
+          0.2
+        ],
+        "offset_frame": "base",
+        "orientation": "keep",
+        "reference_source": "latched_ee_pose",
+        "timeout_s": 20.0
+      },
+      "type": "ee_plan_relative",
+      "updated_at": "2026-06-27T08:20:45.839072Z"
+    },
+    {
+      "created_at": "2026-06-28T08:54:08.766068Z",
+      "description": "模板：左右手可作为参数配置，按当前/锁存位姿做末端相对平移和姿态旋转。",
+      "generated_template": true,
+      "id": "template_ee_relative",
+      "name": "ee_relative_template",
+      "params": {
+        "arm": "right",
+        "delta_rpy_deg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "delta_xyz_m": [
+          0.0,
+          0.0,
+          0.1
+        ],
+        "duration_s": 3.0,
+        "offset_frame": "base",
+        "orientation": "rpy",
+        "reference_source": "current",
+        "timeout_s": 3.0
+      },
+      "source_page": "ee",
+      "type": "ee_plan_relative",
+      "updated_at": "2026-06-28T08:54:08.766109Z"
+    },
+    {
+      "created_at": "2026-06-28T08:54:08.766068Z",
+      "description": "模板：左右手可作为参数配置，控制末端移动到指定 6D 绝对位姿。",
+      "generated_template": true,
+      "id": "template_ee_pose",
+      "name": "ee_pose_template",
+      "params": {
+        "arm": "right",
+        "duration_s": 3.0,
+        "orientation": "rpy",
+        "rpy_deg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "timeout_s": 3.0,
+        "xyz_m": [
+          0.45,
+          -0.25,
+          0.35
+        ],
+        "xyz_source": "manual"
+      },
+      "source_page": "ee",
+      "type": "ee_plan",
+      "updated_at": "2026-06-28T08:54:08.766118Z"
+    },
+    {
+      "created_at": "2026-06-28T08:54:08.766068Z",
+      "description": "模板：底盘按给定 vx/vy/角速度持续下发一段时间，到时自动停止。",
+      "generated_template": true,
+      "id": "template_chassis_velocity",
+      "name": "chassis_velocity_template",
+      "params": {
+        "duration_s": 1.0,
+        "omega_radps": 0.0,
+        "vx_mps": 0.1,
+        "vy_mps": 0.0
+      },
+      "source_page": "chassis",
+      "type": "chassis_velocity",
+      "updated_at": "2026-06-28T08:54:08.766123Z"
+    },
+    {
+      "created_at": "2026-06-28T08:54:50.534724Z",
+      "description": "中文备注：测试缺少视觉输入。",
+      "id": "bf7e6962043e6376",
+      "name": "needs_workflow_xyz",
+      "params": {
+        "arm": "right",
+        "orientation": "keep",
+        "timeout_s": 1,
+        "xyz_source": "workflow_xyz"
+      },
+      "source_page": "workflow",
+      "type": "ee_plan",
+      "updated_at": "2026-06-28T08:54:50.534724Z"
+    },
+    {
+      "created_at": "2026-06-28T10:03:40.241243Z",
+      "description": "中文备注：从关节控制页保存的选中关节/夹爪目标。",
+      "id": "6431c07560d31c21",
+      "name": "pick02",
+      "params": {
+        "targets": [
+          {
+            "group": "left_arm",
+            "index": 0,
+            "name": "left_arm[1]",
+            "unit": "deg",
+            "value": 10
+          },
+          {
+            "group": "left_arm",
+            "index": 1,
+            "name": "left_arm[2]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "left_arm",
+            "index": 2,
+            "name": "left_arm[3]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "left_arm",
+            "index": 3,
+            "name": "left_arm[4]",
+            "unit": "deg",
+            "value": -110
+          },
+          {
+            "group": "left_arm",
+            "index": 4,
+            "name": "left_arm[5]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "left_arm",
+            "index": 5,
+            "name": "left_arm[6]",
+            "unit": "deg",
+            "value": 0.04
+          },
+          {
+            "group": "left_arm",
+            "index": 6,
+            "name": "left_arm[7]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "right_arm",
+            "index": 0,
+            "name": "right_arm[1]",
+            "unit": "deg",
+            "value": 10
+          },
+          {
+            "group": "right_arm",
+            "index": 1,
+            "name": "right_arm[2]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "right_arm",
+            "index": 2,
+            "name": "right_arm[3]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "right_arm",
+            "index": 3,
+            "name": "right_arm[4]",
+            "unit": "deg",
+            "value": -110
+          },
+          {
+            "group": "right_arm",
+            "index": 4,
+            "name": "right_arm[5]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "right_arm",
+            "index": 5,
+            "name": "right_arm[6]",
+            "unit": "deg",
+            "value": 0.01
+          },
+          {
+            "group": "right_arm",
+            "index": 6,
+            "name": "right_arm[7]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "left_gripper",
+            "index": 0,
+            "name": "left_gripper[1]",
+            "unit": "open_0_100",
+            "value": 100
+          },
+          {
+            "group": "right_gripper",
+            "index": 0,
+            "name": "right_gripper[1]",
+            "unit": "open_0_100",
+            "value": 100
+          }
+        ],
+        "timeout_s": 3
+      },
+      "source_page": "joints",
+      "type": "joint_targets",
+      "updated_at": "2026-06-28T10:03:40.241243Z"
+    },
+    {
+      "created_at": "2026-06-30T03:38:51.171108Z",
+      "description": "中文备注：从关节控制页保存的选中关节/夹爪目标。",
+      "id": "7f1f6c719ebb385a",
+      "name": "pick03",
+      "params": {
+        "targets": [
+          {
+            "group": "torso",
+            "index": 0,
+            "name": "torso[1]",
+            "unit": "deg",
+            "value": 15.11
+          },
+          {
+            "group": "torso",
+            "index": 1,
+            "name": "torso[2]",
+            "unit": "deg",
+            "value": -24.73
+          },
+          {
+            "group": "torso",
+            "index": 2,
+            "name": "torso[3]",
+            "unit": "deg",
+            "value": -15
+          },
+          {
+            "group": "torso",
+            "index": 3,
+            "name": "torso[4]",
+            "unit": "deg",
+            "value": 0.01
+          },
+          {
+            "group": "left_arm",
+            "index": 0,
+            "name": "left_arm[1]",
+            "unit": "deg",
+            "value": -19.86
+          },
+          {
+            "group": "left_arm",
+            "index": 1,
+            "name": "left_arm[2]",
+            "unit": "deg",
+            "value": -0.05
+          },
+          {
+            "group": "left_arm",
+            "index": 2,
+            "name": "left_arm[3]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "left_arm",
+            "index": 3,
+            "name": "left_arm[4]",
+            "unit": "deg",
+            "value": -109.33
+          },
+          {
+            "group": "left_arm",
+            "index": 4,
+            "name": "left_arm[5]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "left_arm",
+            "index": 5,
+            "name": "left_arm[6]",
+            "unit": "deg",
+            "value": 0.09
+          },
+          {
+            "group": "left_arm",
+            "index": 6,
+            "name": "left_arm[7]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "right_arm",
+            "index": 0,
+            "name": "right_arm[1]",
+            "unit": "deg",
+            "value": -19.96
+          },
+          {
+            "group": "right_arm",
+            "index": 1,
+            "name": "right_arm[2]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "right_arm",
+            "index": 2,
+            "name": "right_arm[3]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "right_arm",
+            "index": 3,
+            "name": "right_arm[4]",
+            "unit": "deg",
+            "value": -109.8
+          },
+          {
+            "group": "right_arm",
+            "index": 4,
+            "name": "right_arm[5]",
+            "unit": "deg",
+            "value": -0.01
+          },
+          {
+            "group": "right_arm",
+            "index": 5,
+            "name": "right_arm[6]",
+            "unit": "deg",
+            "value": 0.01
+          },
+          {
+            "group": "right_arm",
+            "index": 6,
+            "name": "right_arm[7]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "left_gripper",
+            "index": 0,
+            "name": "left_gripper[1]",
+            "unit": "open_0_100",
+            "value": 101.64
+          },
+          {
+            "group": "right_gripper",
+            "index": 0,
+            "name": "right_gripper[1]",
+            "unit": "open_0_100",
+            "value": 98.66
+          }
+        ],
+        "timeout_s": 3
+      },
+      "source_page": "joints",
+      "type": "joint_targets",
+      "updated_at": "2026-06-30T03:38:51.171108Z"
+    },
+    {
+      "created_at": "2026-06-30T03:53:50.411422Z",
+      "description": "中文备注：从关节控制页保存的选中关节/夹爪目标。",
+      "id": "7f8afc536b196228",
+      "name": "lookbox",
+      "params": {
+        "targets": [
+          {
+            "group": "torso",
+            "index": 0,
+            "name": "torso[1]",
+            "unit": "deg",
+            "value": 20.2
+          },
+          {
+            "group": "torso",
+            "index": 1,
+            "name": "torso[2]",
+            "unit": "deg",
+            "value": -43.88
+          },
+          {
+            "group": "torso",
+            "index": 2,
+            "name": "torso[3]",
+            "unit": "deg",
+            "value": -45
+          },
+          {
+            "group": "torso",
+            "index": 3,
+            "name": "torso[4]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "left_arm",
+            "index": 0,
+            "name": "left_arm[1]",
+            "unit": "deg",
+            "value": 10.01
+          },
+          {
+            "group": "left_arm",
+            "index": 1,
+            "name": "left_arm[2]",
+            "unit": "deg",
+            "value": -0.01
+          },
+          {
+            "group": "left_arm",
+            "index": 2,
+            "name": "left_arm[3]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "left_arm",
+            "index": 3,
+            "name": "left_arm[4]",
+            "unit": "deg",
+            "value": -109.86
+          },
+          {
+            "group": "left_arm",
+            "index": 4,
+            "name": "left_arm[5]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "left_arm",
+            "index": 5,
+            "name": "left_arm[6]",
+            "unit": "deg",
+            "value": 0.05
+          },
+          {
+            "group": "left_arm",
+            "index": 6,
+            "name": "left_arm[7]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "right_arm",
+            "index": 0,
+            "name": "right_arm[1]",
+            "unit": "deg",
+            "value": 9.97
+          },
+          {
+            "group": "right_arm",
+            "index": 1,
+            "name": "right_arm[2]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "right_arm",
+            "index": 2,
+            "name": "right_arm[3]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "right_arm",
+            "index": 3,
+            "name": "right_arm[4]",
+            "unit": "deg",
+            "value": -109.89
+          },
+          {
+            "group": "right_arm",
+            "index": 4,
+            "name": "right_arm[5]",
+            "unit": "deg",
+            "value": -0.01
+          },
+          {
+            "group": "right_arm",
+            "index": 5,
+            "name": "right_arm[6]",
+            "unit": "deg",
+            "value": 0.01
+          },
+          {
+            "group": "right_arm",
+            "index": 6,
+            "name": "right_arm[7]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "left_gripper",
+            "index": 0,
+            "name": "left_gripper[1]",
+            "unit": "open_0_100",
+            "value": 101.64
+          },
+          {
+            "group": "right_gripper",
+            "index": 0,
+            "name": "right_gripper[1]",
+            "unit": "open_0_100",
+            "value": 99.19
+          }
+        ],
+        "timeout_s": 3
+      },
+      "source_page": "joints",
+      "type": "joint_targets",
+      "updated_at": "2026-06-30T03:53:50.411422Z"
+    },
+    {
+      "created_at": "2026-06-30T08:51:43.938229Z",
+      "description": "中文备注：从关节控制页保存的选中关节/夹爪目标。",
+      "id": "485518a1882df86e",
+      "name": "打开两个夹爪",
+      "params": {
+        "gripper_stable_velocity": 5.0,
+        "stable_s": 1.0,
+        "targets": [
+          {
+            "group": "left_gripper",
+            "index": 0,
+            "name": "left_gripper[1]",
+            "unit": "open_0_100",
+            "value": 100
+          },
+          {
+            "group": "right_gripper",
+            "index": 0,
+            "name": "right_gripper[1]",
+            "unit": "open_0_100",
+            "value": 100
+          }
+        ],
+        "timeout_s": 4
+      },
+      "source_page": "joints",
+      "type": "joint_targets",
+      "updated_at": "2026-06-30T08:51:43.938229Z"
+    },
+    {
+      "created_at": "2026-06-30T08:52:15.717619Z",
+      "description": "中文备注：从关节控制页保存的选中关节/夹爪目标。",
+      "id": "ba71a9babdc54b3c",
+      "name": "闭合两个夹爪",
+      "params": {
+        "gripper_close_wait_s": 1.0,
+        "gripper_stable_velocity": 5.0,
+        "stable_s": 1.0,
+        "targets": [
+          {
+            "group": "left_gripper",
+            "index": 0,
+            "name": "left_gripper[1]",
+            "unit": "open_0_100",
+            "value": 0
+          },
+          {
+            "group": "right_gripper",
+            "index": 0,
+            "name": "right_gripper[1]",
+            "unit": "open_0_100",
+            "value": 0
+          }
+        ],
+        "timeout_s": 4
+      },
+      "source_page": "joints",
+      "type": "joint_targets",
+      "updated_at": "2026-06-30T08:52:15.717619Z"
+    },
+    {
+      "created_at": "2026-06-30T08:55:01.273273Z",
+      "description": "中文备注：从关节控制页保存的选中关节/夹爪目标。",
+      "id": "baac99046ba39397",
+      "name": "躯干放下",
+      "params": {
+        "joint_stable_velocity_deg_s": 3.0,
+        "stable_s": 1.0,
+        "targets": [
+          {
+            "group": "torso",
+            "index": 0,
+            "name": "torso[1]",
+            "unit": "deg",
+            "value": 20.31
+          },
+          {
+            "group": "torso",
+            "index": 1,
+            "name": "torso[2]",
+            "unit": "deg",
+            "value": -43.59
+          },
+          {
+            "group": "torso",
+            "index": 2,
+            "name": "torso[3]",
+            "unit": "deg",
+            "value": -45.06
+          },
+          {
+            "group": "torso",
+            "index": 3,
+            "name": "torso[4]",
+            "unit": "deg",
+            "value": 0.01
+          }
+        ],
+        "timeout_s": 6
+      },
+      "source_page": "joints",
+      "type": "joint_targets",
+      "updated_at": "2026-06-30T08:55:01.273273Z"
+    },
+    {
+      "created_at": "2026-06-30T08:55:54.274483Z",
+      "description": "中文备注：从关节控制页保存的选中关节/夹爪目标。",
+      "id": "b2187d0cfd92e6b4",
+      "name": "躯干抬起",
+      "params": {
+        "joint_stable_velocity_deg_s": 3.0,
+        "stable_s": 1.0,
+        "targets": [
+          {
+            "group": "torso",
+            "index": 0,
+            "name": "torso[1]",
+            "unit": "deg",
+            "value": 20.31
+          },
+          {
+            "group": "torso",
+            "index": 1,
+            "name": "torso[2]",
+            "unit": "deg",
+            "value": -43.61
+          },
+          {
+            "group": "torso",
+            "index": 2,
+            "name": "torso[3]",
+            "unit": "deg",
+            "value": -30
+          },
+          {
+            "group": "torso",
+            "index": 3,
+            "name": "torso[4]",
+            "unit": "deg",
+            "value": 0.01
+          }
+        ],
+        "timeout_s": 6
+      },
+      "source_page": "joints",
+      "type": "joint_targets",
+      "updated_at": "2026-06-30T08:55:54.274483Z"
+    },
+    {
+      "created_at": "2026-06-30T08:57:15.854046Z",
+      "description": "中文备注：从关节控制页保存的选中关节/夹爪目标。",
+      "id": "780f090590674461",
+      "name": "放下手臂",
+      "params": {
+        "targets": [
+          {
+            "group": "left_arm",
+            "index": 0,
+            "name": "left_arm[1]",
+            "unit": "deg",
+            "value": 0.04
+          },
+          {
+            "group": "left_arm",
+            "index": 1,
+            "name": "left_arm[2]",
+            "unit": "deg",
+            "value": -0.01
+          },
+          {
+            "group": "left_arm",
+            "index": 2,
+            "name": "left_arm[3]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "left_arm",
+            "index": 3,
+            "name": "left_arm[4]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "left_arm",
+            "index": 4,
+            "name": "left_arm[5]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "left_arm",
+            "index": 5,
+            "name": "left_arm[6]",
+            "unit": "deg",
+            "value": 0.04
+          },
+          {
+            "group": "left_arm",
+            "index": 6,
+            "name": "left_arm[7]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "right_arm",
+            "index": 0,
+            "name": "right_arm[1]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "right_arm",
+            "index": 1,
+            "name": "right_arm[2]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "right_arm",
+            "index": 2,
+            "name": "right_arm[3]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "right_arm",
+            "index": 3,
+            "name": "right_arm[4]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "right_arm",
+            "index": 4,
+            "name": "right_arm[5]",
+            "unit": "deg",
+            "value": -0.01
+          },
+          {
+            "group": "right_arm",
+            "index": 5,
+            "name": "right_arm[6]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "right_arm",
+            "index": 6,
+            "name": "right_arm[7]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "left_gripper",
+            "index": 0,
+            "name": "left_gripper[1]",
+            "unit": "open_0_100",
+            "value": 101.62
+          },
+          {
+            "group": "right_gripper",
+            "index": 0,
+            "name": "right_gripper[1]",
+            "unit": "open_0_100",
+            "value": 98.24
+          }
+        ],
+        "timeout_s": 3
+      },
+      "source_page": "joints",
+      "type": "joint_targets",
+      "updated_at": "2026-06-30T08:57:15.854046Z"
+    },
+    {
+      "created_at": "2026-06-30T09:02:39.346044Z",
+      "description": "中文备注：从关节控制页保存的选中关节/夹爪目标。",
+      "id": "f23929f31df75f33",
+      "name": "待夹取0",
+      "params": {
+        "targets": [
+          {
+            "group": "left_arm",
+            "index": 0,
+            "name": "left_arm[1]",
+            "unit": "deg",
+            "value": -69.38
+          },
+          {
+            "group": "left_arm",
+            "index": 1,
+            "name": "left_arm[2]",
+            "unit": "deg",
+            "value": 4.57
+          },
+          {
+            "group": "left_arm",
+            "index": 2,
+            "name": "left_arm[3]",
+            "unit": "deg",
+            "value": -4.1
+          },
+          {
+            "group": "left_arm",
+            "index": 3,
+            "name": "left_arm[4]",
+            "unit": "deg",
+            "value": 0.06
+          },
+          {
+            "group": "left_arm",
+            "index": 4,
+            "name": "left_arm[5]",
+            "unit": "deg",
+            "value": -1.72
+          },
+          {
+            "group": "left_arm",
+            "index": 5,
+            "name": "left_arm[6]",
+            "unit": "deg",
+            "value": 50.83
+          },
+          {
+            "group": "left_arm",
+            "index": 6,
+            "name": "left_arm[7]",
+            "unit": "deg",
+            "value": -6.38
+          },
+          {
+            "group": "right_arm",
+            "index": 0,
+            "name": "right_arm[1]",
+            "unit": "deg",
+            "value": -69.07
+          },
+          {
+            "group": "right_arm",
+            "index": 1,
+            "name": "right_arm[2]",
+            "unit": "deg",
+            "value": -4.51
+          },
+          {
+            "group": "right_arm",
+            "index": 2,
+            "name": "right_arm[3]",
+            "unit": "deg",
+            "value": 3.72
+          },
+          {
+            "group": "right_arm",
+            "index": 3,
+            "name": "right_arm[4]",
+            "unit": "deg",
+            "value": 0.06
+          },
+          {
+            "group": "right_arm",
+            "index": 4,
+            "name": "right_arm[5]",
+            "unit": "deg",
+            "value": 1.61
+          },
+          {
+            "group": "right_arm",
+            "index": 5,
+            "name": "right_arm[6]",
+            "unit": "deg",
+            "value": 49.1
+          },
+          {
+            "group": "right_arm",
+            "index": 6,
+            "name": "right_arm[7]",
+            "unit": "deg",
+            "value": 5.86
+          },
+          {
+            "group": "left_gripper",
+            "index": 0,
+            "name": "left_gripper[1]",
+            "unit": "open_0_100",
+            "value": 101.62
+          },
+          {
+            "group": "right_gripper",
+            "index": 0,
+            "name": "right_gripper[1]",
+            "unit": "open_0_100",
+            "value": 98.24
+          }
+        ],
+        "timeout_s": 3
+      },
+      "source_page": "joints",
+      "type": "joint_targets",
+      "updated_at": "2026-06-30T09:02:39.346044Z"
+    },
+    {
+      "created_at": "2026-06-30T09:03:56.831144Z",
+      "description": "中文备注：从关节控制页保存的选中关节/夹爪目标。",
+      "id": "9b63a552c9d94bcb",
+      "name": "待夹取-抬起",
+      "params": {
+        "targets": [
+          {
+            "group": "left_arm",
+            "index": 0,
+            "name": "left_arm[1]",
+            "unit": "deg",
+            "value": -90
+          },
+          {
+            "group": "left_arm",
+            "index": 1,
+            "name": "left_arm[2]",
+            "unit": "deg",
+            "value": 4.47
+          },
+          {
+            "group": "left_arm",
+            "index": 2,
+            "name": "left_arm[3]",
+            "unit": "deg",
+            "value": -4.06
+          },
+          {
+            "group": "left_arm",
+            "index": 3,
+            "name": "left_arm[4]",
+            "unit": "deg",
+            "value": 0.3
+          },
+          {
+            "group": "left_arm",
+            "index": 4,
+            "name": "left_arm[5]",
+            "unit": "deg",
+            "value": -1.71
+          },
+          {
+            "group": "left_arm",
+            "index": 5,
+            "name": "left_arm[6]",
+            "unit": "deg",
+            "value": 50.86
+          },
+          {
+            "group": "left_arm",
+            "index": 6,
+            "name": "left_arm[7]",
+            "unit": "deg",
+            "value": -6.29
+          },
+          {
+            "group": "right_arm",
+            "index": 0,
+            "name": "right_arm[1]",
+            "unit": "deg",
+            "value": -90
+          },
+          {
+            "group": "right_arm",
+            "index": 1,
+            "name": "right_arm[2]",
+            "unit": "deg",
+            "value": -4.49
+          },
+          {
+            "group": "right_arm",
+            "index": 2,
+            "name": "right_arm[3]",
+            "unit": "deg",
+            "value": 3.67
+          },
+          {
+            "group": "right_arm",
+            "index": 3,
+            "name": "right_arm[4]",
+            "unit": "deg",
+            "value": 0.22
+          },
+          {
+            "group": "right_arm",
+            "index": 4,
+            "name": "right_arm[5]",
+            "unit": "deg",
+            "value": 1.56
+          },
+          {
+            "group": "right_arm",
+            "index": 5,
+            "name": "right_arm[6]",
+            "unit": "deg",
+            "value": 49.08
+          },
+          {
+            "group": "right_arm",
+            "index": 6,
+            "name": "right_arm[7]",
+            "unit": "deg",
+            "value": 5.84
+          },
+          {
+            "group": "left_gripper",
+            "index": 0,
+            "name": "left_gripper[1]",
+            "unit": "open_0_100",
+            "value": 101.62
+          },
+          {
+            "group": "right_gripper",
+            "index": 0,
+            "name": "right_gripper[1]",
+            "unit": "open_0_100",
+            "value": 99.18
+          }
+        ],
+        "timeout_s": 3
+      },
+      "source_page": "joints",
+      "type": "joint_targets",
+      "updated_at": "2026-06-30T09:03:56.831144Z"
+    },
+    {
+      "created_at": "2026-06-30T10:59:10.324053Z",
+      "description": "中文备注：从关节控制页保存的选中关节/夹爪目标。",
+      "id": "7dfff27550456240",
+      "name": "低头-待夹取-手抬高",
+      "params": {
+        "joint_stable_velocity_deg_s": 3.0,
+        "stable_s": 1.0,
+        "targets": [
+          {
+            "group": "torso",
+            "index": 0,
+            "name": "torso[1]",
+            "unit": "deg",
+            "value": 20.16
+          },
+          {
+            "group": "torso",
+            "index": 1,
+            "name": "torso[2]",
+            "unit": "deg",
+            "value": -43.77
+          },
+          {
+            "group": "torso",
+            "index": 2,
+            "name": "torso[3]",
+            "unit": "deg",
+            "value": -44.77
+          },
+          {
+            "group": "torso",
+            "index": 3,
+            "name": "torso[4]",
+            "unit": "deg",
+            "value": -0.03
+          },
+          {
+            "group": "left_arm",
+            "index": 0,
+            "name": "left_arm[1]",
+            "unit": "deg",
+            "value": -110
+          },
+          {
+            "group": "left_arm",
+            "index": 1,
+            "name": "left_arm[2]",
+            "unit": "deg",
+            "value": 4.34
+          },
+          {
+            "group": "left_arm",
+            "index": 2,
+            "name": "left_arm[3]",
+            "unit": "deg",
+            "value": -4.02
+          },
+          {
+            "group": "left_arm",
+            "index": 3,
+            "name": "left_arm[4]",
+            "unit": "deg",
+            "value": 0.61
+          },
+          {
+            "group": "left_arm",
+            "index": 4,
+            "name": "left_arm[5]",
+            "unit": "deg",
+            "value": -1.66
+          },
+          {
+            "group": "left_arm",
+            "index": 5,
+            "name": "left_arm[6]",
+            "unit": "deg",
+            "value": 50.88
+          },
+          {
+            "group": "left_arm",
+            "index": 6,
+            "name": "left_arm[7]",
+            "unit": "deg",
+            "value": -6.19
+          },
+          {
+            "group": "right_arm",
+            "index": 0,
+            "name": "right_arm[1]",
+            "unit": "deg",
+            "value": -110
+          },
+          {
+            "group": "right_arm",
+            "index": 1,
+            "name": "right_arm[2]",
+            "unit": "deg",
+            "value": -4.46
+          },
+          {
+            "group": "right_arm",
+            "index": 2,
+            "name": "right_arm[3]",
+            "unit": "deg",
+            "value": 3.61
+          },
+          {
+            "group": "right_arm",
+            "index": 3,
+            "name": "right_arm[4]",
+            "unit": "deg",
+            "value": 0.38
+          },
+          {
+            "group": "right_arm",
+            "index": 4,
+            "name": "right_arm[5]",
+            "unit": "deg",
+            "value": 1.5
+          },
+          {
+            "group": "right_arm",
+            "index": 5,
+            "name": "right_arm[6]",
+            "unit": "deg",
+            "value": 49.07
+          },
+          {
+            "group": "right_arm",
+            "index": 6,
+            "name": "right_arm[7]",
+            "unit": "deg",
+            "value": 5.84
+          },
+          {
+            "group": "left_gripper",
+            "index": 0,
+            "name": "left_gripper[1]",
+            "unit": "open_0_100",
+            "value": 101.62
+          },
+          {
+            "group": "right_gripper",
+            "index": 0,
+            "name": "right_gripper[1]",
+            "unit": "open_0_100",
+            "value": 98.04
+          }
+        ],
+        "timeout_s": 8
+      },
+      "source_page": "joints",
+      "type": "joint_targets",
+      "updated_at": "2026-06-30T10:59:10.324053Z"
+    },
+    {
+      "created_at": "2026-06-30T12:45:55.940213Z",
+      "description": "中文备注：底盘速度按持续时间下发，到时自动停止。",
+      "id": "cfcfad0d5e14b6ef",
+      "name": "前进一点",
+      "params": {
+        "duration_s": 2,
+        "omega_radps": 0,
+        "vx_mps": 0.05,
+        "vy_mps": 0
+      },
+      "source_page": "chassis",
+      "type": "chassis_velocity",
+      "updated_at": "2026-06-30T12:45:55.940213Z"
+    },
+    {
+      "created_at": "2026-06-30T12:46:21.131445Z",
+      "description": "中文备注：底盘速度按持续时间下发，到时自动停止。",
+      "id": "c167d23213a1fd3e",
+      "name": "后退一点",
+      "params": {
+        "duration_s": 2,
+        "omega_radps": 0,
+        "vx_mps": -0.05,
+        "vy_mps": 0
+      },
+      "source_page": "chassis",
+      "type": "chassis_velocity",
+      "updated_at": "2026-06-30T12:46:21.131445Z"
+    },
+    {
+      "created_at": "2026-06-30T12:46:54.196735Z",
+      "description": "中文备注：底盘速度按持续时间下发，到时自动停止。",
+      "id": "a2ae94e7040468d6",
+      "name": "左边一点",
+      "params": {
+        "duration_s": 2,
+        "omega_radps": 0,
+        "vx_mps": 0,
+        "vy_mps": 0.05
+      },
+      "source_page": "chassis",
+      "type": "chassis_velocity",
+      "updated_at": "2026-06-30T12:46:54.196735Z"
+    },
+    {
+      "created_at": "2026-06-30T12:47:13.315621Z",
+      "description": "中文备注：底盘速度按持续时间下发，到时自动停止。",
+      "id": "9b307ba71399da57",
+      "name": "右边一点",
+      "params": {
+        "duration_s": 2,
+        "omega_radps": 0,
+        "vx_mps": 0,
+        "vy_mps": -0.05
+      },
+      "source_page": "chassis",
+      "type": "chassis_velocity",
+      "updated_at": "2026-06-30T12:47:13.315621Z"
+    },
+    {
+      "created_at": "2026-06-30T13:00:11.355921Z",
+      "description": "中文备注：从关节控制页保存的选中关节/夹爪目标。",
+      "id": "ddad55fa39deb0df",
+      "name": "夹取待闭合",
+      "params": {
+        "joint_stable_velocity_deg_s": 3.0,
+        "stable_s": 1.0,
+        "targets": [
+          {
+            "group": "torso",
+            "index": 0,
+            "name": "torso[1]",
+            "unit": "deg",
+            "value": 20.38
+          },
+          {
+            "group": "torso",
+            "index": 1,
+            "name": "torso[2]",
+            "unit": "deg",
+            "value": -45
+          },
+          {
+            "group": "torso",
+            "index": 2,
+            "name": "torso[3]",
+            "unit": "deg",
+            "value": -45.03
+          },
+          {
+            "group": "torso",
+            "index": 3,
+            "name": "torso[4]",
+            "unit": "deg",
+            "value": 0.01
+          },
+          {
+            "group": "left_arm",
+            "index": 0,
+            "name": "left_arm[1]",
+            "unit": "deg",
+            "value": -89.84
+          },
+          {
+            "group": "left_arm",
+            "index": 1,
+            "name": "left_arm[2]",
+            "unit": "deg",
+            "value": 4.35
+          },
+          {
+            "group": "left_arm",
+            "index": 2,
+            "name": "left_arm[3]",
+            "unit": "deg",
+            "value": -4.05
+          },
+          {
+            "group": "left_arm",
+            "index": 3,
+            "name": "left_arm[4]",
+            "unit": "deg",
+            "value": 10
+          },
+          {
+            "group": "left_arm",
+            "index": 4,
+            "name": "left_arm[5]",
+            "unit": "deg",
+            "value": -1.71
+          },
+          {
+            "group": "left_arm",
+            "index": 5,
+            "name": "left_arm[6]",
+            "unit": "deg",
+            "value": 50.88
+          },
+          {
+            "group": "left_arm",
+            "index": 6,
+            "name": "left_arm[7]",
+            "unit": "deg",
+            "value": -6.24
+          },
+          {
+            "group": "right_arm",
+            "index": 0,
+            "name": "right_arm[1]",
+            "unit": "deg",
+            "value": -89.92
+          },
+          {
+            "group": "right_arm",
+            "index": 1,
+            "name": "right_arm[2]",
+            "unit": "deg",
+            "value": -4.44
+          },
+          {
+            "group": "right_arm",
+            "index": 2,
+            "name": "right_arm[3]",
+            "unit": "deg",
+            "value": 3.61
+          },
+          {
+            "group": "right_arm",
+            "index": 3,
+            "name": "right_arm[4]",
+            "unit": "deg",
+            "value": 10
+          },
+          {
+            "group": "right_arm",
+            "index": 4,
+            "name": "right_arm[5]",
+            "unit": "deg",
+            "value": 1.51
+          },
+          {
+            "group": "right_arm",
+            "index": 5,
+            "name": "right_arm[6]",
+            "unit": "deg",
+            "value": 49.07
+          },
+          {
+            "group": "right_arm",
+            "index": 6,
+            "name": "right_arm[7]",
+            "unit": "deg",
+            "value": 5.84
+          },
+          {
+            "group": "left_gripper",
+            "index": 0,
+            "name": "left_gripper[1]",
+            "unit": "open_0_100",
+            "value": 101.62
+          },
+          {
+            "group": "right_gripper",
+            "index": 0,
+            "name": "right_gripper[1]",
+            "unit": "open_0_100",
+            "value": 101.27
+          }
+        ],
+        "timeout_s": 8
+      },
+      "source_page": "joints",
+      "type": "joint_targets",
+      "updated_at": "2026-06-30T13:00:11.355921Z"
+    },
+    {
+      "created_at": "2026-06-30T14:50:24.054889Z",
+      "description": "中文备注：底盘速度按持续时间下发，到时自动停止。",
+      "id": "e177e4cf8c001492",
+      "name": "原地转2圈",
+      "params": {
+        "duration_s": 20,
+        "omega_radps": 0.3,
+        "vx_mps": 0,
+        "vy_mps": 0
+      },
+      "source_page": "chassis",
+      "type": "chassis_velocity",
+      "updated_at": "2026-06-30T14:50:24.054889Z"
+    },
+    {
+      "created_at": "2026-06-30T14:54:49.518922Z",
+      "description": "中文备注：从关节控制页保存的选中关节/夹爪目标。",
+      "id": "0e55d85b928bd7f0",
+      "name": "手抬高看薯片",
+      "params": {
+        "targets": [
+          {
+            "group": "torso",
+            "index": 0,
+            "name": "torso[1]",
+            "unit": "deg",
+            "value": 20.49
+          },
+          {
+            "group": "torso",
+            "index": 1,
+            "name": "torso[2]",
+            "unit": "deg",
+            "value": -43.54
+          },
+          {
+            "group": "torso",
+            "index": 2,
+            "name": "torso[3]",
+            "unit": "deg",
+            "value": -29.99
+          },
+          {
+            "group": "torso",
+            "index": 3,
+            "name": "torso[4]",
+            "unit": "deg",
+            "value": 0.03
+          },
+          {
+            "group": "left_arm",
+            "index": 0,
+            "name": "left_arm[1]",
+            "unit": "deg",
+            "value": -19.81
+          },
+          {
+            "group": "left_arm",
+            "index": 1,
+            "name": "left_arm[2]",
+            "unit": "deg",
+            "value": -0.05
+          },
+          {
+            "group": "left_arm",
+            "index": 2,
+            "name": "left_arm[3]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "left_arm",
+            "index": 3,
+            "name": "left_arm[4]",
+            "unit": "deg",
+            "value": -109.22
+          },
+          {
+            "group": "left_arm",
+            "index": 4,
+            "name": "left_arm[5]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "left_arm",
+            "index": 5,
+            "name": "left_arm[6]",
+            "unit": "deg",
+            "value": 0.1
+          },
+          {
+            "group": "left_arm",
+            "index": 6,
+            "name": "left_arm[7]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "right_arm",
+            "index": 0,
+            "name": "right_arm[1]",
+            "unit": "deg",
+            "value": -19.93
+          },
+          {
+            "group": "right_arm",
+            "index": 1,
+            "name": "right_arm[2]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "right_arm",
+            "index": 2,
+            "name": "right_arm[3]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "right_arm",
+            "index": 3,
+            "name": "right_arm[4]",
+            "unit": "deg",
+            "value": -109.69
+          },
+          {
+            "group": "right_arm",
+            "index": 4,
+            "name": "right_arm[5]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "right_arm",
+            "index": 5,
+            "name": "right_arm[6]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "right_arm",
+            "index": 6,
+            "name": "right_arm[7]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "left_gripper",
+            "index": 0,
+            "name": "left_gripper[1]",
+            "unit": "open_0_100",
+            "value": 101.64
+          },
+          {
+            "group": "right_gripper",
+            "index": 0,
+            "name": "right_gripper[1]",
+            "unit": "open_0_100",
+            "value": 97.66
+          }
+        ],
+        "timeout_s": 3
+      },
+      "source_page": "joints",
+      "type": "joint_targets",
+      "updated_at": "2026-06-30T14:54:49.518922Z"
+    },
+    {
+      "created_at": "2026-06-30T15:50:09.726105Z",
+      "description": "中文备注：底盘速度按持续时间下发，到时自动停止。",
+      "id": "4449eb06fb5e4119",
+      "name": "右转一点",
+      "params": {
+        "duration_s": 1,
+        "omega_radps": -0.1,
+        "vx_mps": 0,
+        "vy_mps": 0
+      },
+      "source_page": "chassis",
+      "type": "chassis_velocity",
+      "updated_at": "2026-06-30T15:50:09.726105Z"
+    },
+    {
+      "created_at": "2026-06-30T15:50:33.751386Z",
+      "description": "中文备注：底盘速度按持续时间下发，到时自动停止。",
+      "id": "579e15d22f5c06fa",
+      "name": "左转一点",
+      "params": {
+        "duration_s": 1,
+        "omega_radps": 0.1,
+        "vx_mps": 0,
+        "vy_mps": 0
+      },
+      "source_page": "chassis",
+      "type": "chassis_velocity",
+      "updated_at": "2026-06-30T15:50:33.751386Z"
+    },
+    {
+      "created_at": "2026-07-06T09:12:54.227715Z",
+      "description": "VLA init posture from provided joint feedback; arm values converted rad->deg, grippers kept open_0_100.",
+      "generated_template": false,
+      "id": "c8679c1aa3d74e6c",
+      "name": "vla_init",
+      "params": {
+        "joint_stable_velocity_deg_s": 3,
+        "stable_s": 1,
+        "targets": [
+          {
+            "group": "left_arm",
+            "index": 0,
+            "name": "left_arm[1]",
+            "unit": "deg",
+            "value": -7.236973
+          },
+          {
+            "group": "left_arm",
+            "index": 1,
+            "name": "left_arm[2]",
+            "unit": "deg",
+            "value": 3.169545
+          },
+          {
+            "group": "left_arm",
+            "index": 2,
+            "name": "left_arm[3]",
+            "unit": "deg",
+            "value": -1.319751
+          },
+          {
+            "group": "left_arm",
+            "index": 3,
+            "name": "left_arm[4]",
+            "unit": "deg",
+            "value": -88.46159
+          },
+          {
+            "group": "left_arm",
+            "index": 4,
+            "name": "left_arm[5]",
+            "unit": "deg",
+            "value": 4.46231
+          },
+          {
+            "group": "left_arm",
+            "index": 5,
+            "name": "left_arm[6]",
+            "unit": "deg",
+            "value": 14.885214
+          },
+          {
+            "group": "left_arm",
+            "index": 6,
+            "name": "left_arm[7]",
+            "unit": "deg",
+            "value": 1.420477
+          },
+          {
+            "group": "left_gripper",
+            "index": 0,
+            "name": "left_gripper[1]",
+            "unit": "open_0_100",
+            "value": 51.843899
+          },
+          {
+            "group": "right_arm",
+            "index": 0,
+            "name": "right_arm[1]",
+            "unit": "deg",
+            "value": 0.127712
+          },
+          {
+            "group": "right_arm",
+            "index": 1,
+            "name": "right_arm[2]",
+            "unit": "deg",
+            "value": -0.00212
+          },
+          {
+            "group": "right_arm",
+            "index": 2,
+            "name": "right_arm[3]",
+            "unit": "deg",
+            "value": 0.000802
+          },
+          {
+            "group": "right_arm",
+            "index": 3,
+            "name": "right_arm[4]",
+            "unit": "deg",
+            "value": -92.711046
+          },
+          {
+            "group": "right_arm",
+            "index": 4,
+            "name": "right_arm[5]",
+            "unit": "deg",
+            "value": -0.014553
+          },
+          {
+            "group": "right_arm",
+            "index": 5,
+            "name": "right_arm[6]",
+            "unit": "deg",
+            "value": -0.003724
+          },
+          {
+            "group": "right_arm",
+            "index": 6,
+            "name": "right_arm[7]",
+            "unit": "deg",
+            "value": -0.000802
+          },
+          {
+            "group": "right_gripper",
+            "index": 0,
+            "name": "right_gripper[1]",
+            "unit": "open_0_100",
+            "value": 48.695816
+          }
+        ],
+        "timeout_s": 8
+      },
+      "source_page": "joints",
+      "type": "joint_targets",
+      "updated_at": "2026-07-06T09:12:54.227715Z"
+    },
+    {
+      "created_at": "2026-07-07T11:58:41.204332Z",
+      "description": "中文备注：读取当前 YOLO 识别结果，包含置信度和 base_link 下 xyz。",
+      "id": "a41a42429a9414a0",
+      "name": "头看bottle",
+      "params": {
+        "min_confidence": 0.6
+      },
+      "source_page": "vision",
+      "type": "read_yolo_detections",
+      "updated_at": "2026-07-07T11:58:41.204332Z"
+    },
+    {
+      "created_at": "2026-07-07T12:00:39.114716Z",
+      "description": "中文备注：读取当前 YOLO 识别结果，包含置信度和 base_link 下 xyz。",
+      "id": "a09a91075cc0b7fb",
+      "name": "右手看bottle",
+      "params": {
+        "min_confidence": 0.6
+      },
+      "source_page": "vision",
+      "type": "read_yolo_detections",
+      "updated_at": "2026-07-07T12:00:39.114716Z"
+    },
+    {
+      "created_at": "2026-07-07T12:44:26.379966Z",
+      "description": "中文备注：末端相对运动原子动作，左右手通过 arm 参数配置。",
+      "id": "648adf3a6de7d7c1",
+      "name": "从“低头-夹取-手抬高”放下东西到箱子",
+      "params": {
+        "allow_torso_ik": false,
+        "arm": "right",
+        "delta_rpy_deg": [
+          0,
+          0,
+          0
+        ],
+        "delta_xyz_m": [
+          -0.2,
+          0.2,
+          -0.2
+        ],
+        "offset_frame": "base",
+        "orientation": "rpy",
+        "reference_source": "current",
+        "timeout_s": 3
+      },
+      "source_page": "ee",
+      "type": "ee_plan_relative",
+      "updated_at": "2026-07-07T12:44:26.379966Z"
+    },
+    {
+      "created_at": "2026-07-09T05:01:42.995196Z",
+      "description": "中文备注：从关节控制页保存的选中关节/夹爪目标。",
+      "id": "502470d414087268",
+      "name": "物品入篮init",
+      "params": {
+        "targets": [
+          {
+            "group": "torso",
+            "index": 0,
+            "name": "torso[1]",
+            "unit": "deg",
+            "value": 14.17
+          },
+          {
+            "group": "torso",
+            "index": 1,
+            "name": "torso[2]",
+            "unit": "deg",
+            "value": -35.27
+          },
+          {
+            "group": "torso",
+            "index": 2,
+            "name": "torso[3]",
+            "unit": "deg",
+            "value": -45
+          },
+          {
+            "group": "torso",
+            "index": 3,
+            "name": "torso[4]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "left_arm",
+            "index": 0,
+            "name": "left_arm[1]",
+            "unit": "deg",
+            "value": -10
+          },
+          {
+            "group": "left_arm",
+            "index": 1,
+            "name": "left_arm[2]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "left_arm",
+            "index": 2,
+            "name": "left_arm[3]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "left_arm",
+            "index": 3,
+            "name": "left_arm[4]",
+            "unit": "deg",
+            "value": -100
+          },
+          {
+            "group": "left_arm",
+            "index": 4,
+            "name": "left_arm[5]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "left_arm",
+            "index": 5,
+            "name": "left_arm[6]",
+            "unit": "deg",
+            "value": 0.05
+          },
+          {
+            "group": "left_arm",
+            "index": 6,
+            "name": "left_arm[7]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "right_arm",
+            "index": 0,
+            "name": "right_arm[1]",
+            "unit": "deg",
+            "value": -10
+          },
+          {
+            "group": "right_arm",
+            "index": 1,
+            "name": "right_arm[2]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "right_arm",
+            "index": 2,
+            "name": "right_arm[3]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "right_arm",
+            "index": 3,
+            "name": "right_arm[4]",
+            "unit": "deg",
+            "value": -100
+          },
+          {
+            "group": "right_arm",
+            "index": 4,
+            "name": "right_arm[5]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "right_arm",
+            "index": 5,
+            "name": "right_arm[6]",
+            "unit": "deg",
+            "value": 0.02
+          },
+          {
+            "group": "right_arm",
+            "index": 6,
+            "name": "right_arm[7]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "left_gripper",
+            "index": 0,
+            "name": "left_gripper[1]",
+            "unit": "open_0_100",
+            "value": 101.64
+          },
+          {
+            "group": "right_gripper",
+            "index": 0,
+            "name": "right_gripper[1]",
+            "unit": "open_0_100",
+            "value": 98.04
+          }
+        ],
+        "timeout_s": 3
+      },
+      "source_page": "joints",
+      "type": "joint_targets",
+      "updated_at": "2026-07-09T05:01:42.995196Z"
+    },
+    {
+      "created_at": "2026-07-09T05:14:20.311258Z",
+      "description": "中文备注：从关节控制页保存的选中关节/夹爪目标。",
+      "id": "7ca7061cbd55d7f4",
+      "name": "物品入篮init2",
+      "params": {
+        "targets": [
+          {
+            "group": "torso",
+            "index": 0,
+            "name": "torso[1]",
+            "unit": "deg",
+            "value": 14.22
+          },
+          {
+            "group": "torso",
+            "index": 1,
+            "name": "torso[2]",
+            "unit": "deg",
+            "value": -35.07
+          },
+          {
+            "group": "torso",
+            "index": 2,
+            "name": "torso[3]",
+            "unit": "deg",
+            "value": -60.01
+          },
+          {
+            "group": "torso",
+            "index": 3,
+            "name": "torso[4]",
+            "unit": "deg",
+            "value": 0.01
+          },
+          {
+            "group": "left_arm",
+            "index": 0,
+            "name": "left_arm[1]",
+            "unit": "deg",
+            "value": -19.96
+          },
+          {
+            "group": "left_arm",
+            "index": 1,
+            "name": "left_arm[2]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "left_arm",
+            "index": 2,
+            "name": "left_arm[3]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "left_arm",
+            "index": 3,
+            "name": "left_arm[4]",
+            "unit": "deg",
+            "value": -109.76
+          },
+          {
+            "group": "left_arm",
+            "index": 4,
+            "name": "left_arm[5]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "left_arm",
+            "index": 5,
+            "name": "left_arm[6]",
+            "unit": "deg",
+            "value": 0.05
+          },
+          {
+            "group": "left_arm",
+            "index": 6,
+            "name": "left_arm[7]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "right_arm",
+            "index": 0,
+            "name": "right_arm[1]",
+            "unit": "deg",
+            "value": -19.92
+          },
+          {
+            "group": "right_arm",
+            "index": 1,
+            "name": "right_arm[2]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "right_arm",
+            "index": 2,
+            "name": "right_arm[3]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "right_arm",
+            "index": 3,
+            "name": "right_arm[4]",
+            "unit": "deg",
+            "value": -109.9
+          },
+          {
+            "group": "right_arm",
+            "index": 4,
+            "name": "right_arm[5]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "right_arm",
+            "index": 5,
+            "name": "right_arm[6]",
+            "unit": "deg",
+            "value": 0.01
+          },
+          {
+            "group": "right_arm",
+            "index": 6,
+            "name": "right_arm[7]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "left_gripper",
+            "index": 0,
+            "name": "left_gripper[1]",
+            "unit": "open_0_100",
+            "value": 101.62
+          },
+          {
+            "group": "right_gripper",
+            "index": 0,
+            "name": "right_gripper[1]",
+            "unit": "open_0_100",
+            "value": 97.08
+          }
+        ],
+        "timeout_s": 3
+      },
+      "source_page": "joints",
+      "type": "joint_targets",
+      "updated_at": "2026-07-09T05:14:20.311258Z"
+    },
+    {
+      "created_at": "2026-07-10T09:06:17.896665Z",
+      "description": "中文备注：底盘速度按持续时间下发，到时自动停止。",
+      "id": "95eb635703f753ec",
+      "name": "后退一大步",
+      "params": {
+        "duration_s": 2,
+        "omega_radps": 0,
+        "vx_mps": -0.1,
+        "vy_mps": 0
+      },
+      "source_page": "chassis",
+      "type": "chassis_velocity",
+      "updated_at": "2026-07-10T09:06:17.896665Z"
+    },
+    {
+      "created_at": "2026-07-10T09:06:26.615788Z",
+      "description": "中文备注：底盘速度按持续时间下发，到时自动停止。",
+      "id": "8d76c3a79b84f9da",
+      "name": "前进一大步",
+      "params": {
+        "duration_s": 2,
+        "omega_radps": 0,
+        "vx_mps": 0.1,
+        "vy_mps": 0
+      },
+      "source_page": "chassis",
+      "type": "chassis_velocity",
+      "updated_at": "2026-07-10T09:06:26.615788Z"
+    },
+    {
+      "created_at": "2026-07-10T09:25:45.839195Z",
+      "description": "模板：右腕相机识别 bottle，水平推进夹取并闭合右夹爪。",
+      "generated_template": true,
+      "id": "template_right_wrist_bottle_grasp",
+      "name": "右腕识别 bottle 并夹取",
+      "params": {
+        "workflow_id": "right_wrist_bottle_grasp"
+      },
+      "source_page": "workflow",
+      "type": "code_workflow",
+      "updated_at": "2026-07-10T09:25:45.839246Z"
+    },
+    {
+      "created_at": "2026-07-10T09:52:39.517700Z",
+      "description": "中文备注：从关节控制页保存的选中关节/夹爪目标。",
+      "id": "7e59719fbdf2f14c",
+      "name": "闭合右夹爪",
+      "params": {
+        "targets": [
+          {
+            "group": "right_gripper",
+            "index": 0,
+            "name": "right_gripper[1]",
+            "unit": "open_0_100",
+            "value": 1
+          }
+        ],
+        "timeout_s": 3
+      },
+      "source_page": "joints",
+      "type": "joint_targets",
+      "updated_at": "2026-07-10T09:52:39.517700Z"
+    },
+    {
+      "created_at": "2026-07-10T09:54:13.411678Z",
+      "description": "中文备注：末端相对运动原子动作，左右手通过 arm 参数配置。",
+      "id": "b217d0985ca5a513",
+      "name": "右臂抬高10cm",
+      "params": {
+        "allow_torso_ik": false,
+        "arm": "right",
+        "delta_rpy_deg": [
+          0,
+          0,
+          0
+        ],
+        "delta_xyz_m": [
+          0,
+          0,
+          0.1
+        ],
+        "offset_frame": "base",
+        "orientation": "rpy",
+        "reference_source": "current",
+        "timeout_s": 3
+      },
+      "source_page": "ee",
+      "type": "ee_plan_relative",
+      "updated_at": "2026-07-10T09:54:13.411678Z"
+    },
+    {
+      "created_at": "2026-07-10T10:28:04.215204Z",
+      "description": "中文备注：从关节控制页保存的选中关节/夹爪目标。",
+      "id": "31b52f93168905ea",
+      "name": "低头抬手（不包括夹爪）",
+      "params": {
+        "targets": [
+          {
+            "group": "torso",
+            "index": 0,
+            "name": "torso[1]",
+            "unit": "deg",
+            "value": 20.23
+          },
+          {
+            "group": "torso",
+            "index": 1,
+            "name": "torso[2]",
+            "unit": "deg",
+            "value": -43.68
+          },
+          {
+            "group": "torso",
+            "index": 2,
+            "name": "torso[3]",
+            "unit": "deg",
+            "value": -44.73
+          },
+          {
+            "group": "torso",
+            "index": 3,
+            "name": "torso[4]",
+            "unit": "deg",
+            "value": 0.01
+          },
+          {
+            "group": "left_arm",
+            "index": 0,
+            "name": "left_arm[1]",
+            "unit": "deg",
+            "value": -109.95
+          },
+          {
+            "group": "left_arm",
+            "index": 1,
+            "name": "left_arm[2]",
+            "unit": "deg",
+            "value": 4.32
+          },
+          {
+            "group": "left_arm",
+            "index": 2,
+            "name": "left_arm[3]",
+            "unit": "deg",
+            "value": -4.01
+          },
+          {
+            "group": "left_arm",
+            "index": 3,
+            "name": "left_arm[4]",
+            "unit": "deg",
+            "value": 0.68
+          },
+          {
+            "group": "left_arm",
+            "index": 4,
+            "name": "left_arm[5]",
+            "unit": "deg",
+            "value": -1.63
+          },
+          {
+            "group": "left_arm",
+            "index": 5,
+            "name": "left_arm[6]",
+            "unit": "deg",
+            "value": 50.88
+          },
+          {
+            "group": "left_arm",
+            "index": 6,
+            "name": "left_arm[7]",
+            "unit": "deg",
+            "value": -6.17
+          },
+          {
+            "group": "right_arm",
+            "index": 0,
+            "name": "right_arm[1]",
+            "unit": "deg",
+            "value": -109.96
+          },
+          {
+            "group": "right_arm",
+            "index": 1,
+            "name": "right_arm[2]",
+            "unit": "deg",
+            "value": -4.44
+          },
+          {
+            "group": "right_arm",
+            "index": 2,
+            "name": "right_arm[3]",
+            "unit": "deg",
+            "value": 3.58
+          },
+          {
+            "group": "right_arm",
+            "index": 3,
+            "name": "right_arm[4]",
+            "unit": "deg",
+            "value": 0.44
+          },
+          {
+            "group": "right_arm",
+            "index": 4,
+            "name": "right_arm[5]",
+            "unit": "deg",
+            "value": 1.48
+          },
+          {
+            "group": "right_arm",
+            "index": 5,
+            "name": "right_arm[6]",
+            "unit": "deg",
+            "value": 49.05
+          },
+          {
+            "group": "right_arm",
+            "index": 6,
+            "name": "right_arm[7]",
+            "unit": "deg",
+            "value": 5.84
+          }
+        ],
+        "timeout_s": 3
+      },
+      "source_page": "joints",
+      "type": "joint_targets",
+      "updated_at": "2026-07-10T10:28:04.215204Z"
+    },
+    {
+      "created_at": "2026-07-10T10:32:55.306096Z",
+      "description": "中文备注：底盘速度按持续时间下发，到时自动停止。",
+      "id": "78a72094c12ddbbe",
+      "name": "后退很多",
+      "params": {
+        "duration_s": 15,
+        "omega_radps": 0,
+        "vx_mps": -0.15,
+        "vy_mps": 0
+      },
+      "source_page": "chassis",
+      "type": "chassis_velocity",
+      "updated_at": "2026-07-10T10:32:55.306096Z"
+    },
+    {
+      "created_at": "2026-07-10T10:36:25.931351Z",
+      "description": "中文备注：底盘速度按持续时间下发，到时自动停止。",
+      "id": "c1ed5f81718bb956",
+      "name": "最后的前进",
+      "params": {
+        "duration_s": 11,
+        "omega_radps": 0,
+        "vx_mps": 0.1,
+        "vy_mps": 0
+      },
+      "source_page": "chassis",
+      "type": "chassis_velocity",
+      "updated_at": "2026-07-10T10:36:25.931351Z"
+    },
+    {
+      "created_at": "2026-07-10T10:37:50.601774Z",
+      "description": "中文备注：底盘速度按持续时间下发，到时自动停止。",
+      "id": "e2f0447f342ace23",
+      "name": "最后的后退",
+      "params": {
+        "duration_s": 7,
+        "omega_radps": 0,
+        "vx_mps": -0.1,
+        "vy_mps": 0
+      },
+      "source_page": "chassis",
+      "type": "chassis_velocity",
+      "updated_at": "2026-07-10T10:37:50.601774Z"
+    },
+    {
+      "created_at": "2026-07-10T10:39:26.748148Z",
+      "description": "中文备注：底盘速度按持续时间下发，到时自动停止。",
+      "generated_template": false,
+      "id": "649cf127af63fdc3",
+      "name": "右转90°左右",
+      "params": {
+        "duration_s": 6,
+        "omega_radps": -0.3,
+        "vx_mps": 0,
+        "vy_mps": 0
+      },
+      "source_page": "chassis",
+      "type": "chassis_velocity",
+      "updated_at": "2026-07-10T10:39:26.748148Z"
+    },
+    {
+      "created_at": "2026-07-10T10:42:18.954200Z",
+      "description": "中文备注：底盘速度按持续时间下发，到时自动停止。",
+      "generated_template": false,
+      "id": "f5cf7683839b9c61",
+      "name": "前进很多",
+      "params": {
+        "duration_s": 14,
+        "omega_radps": 0,
+        "vx_mps": 0.15,
+        "vy_mps": 0
+      },
+      "source_page": "chassis",
+      "type": "chassis_velocity",
+      "updated_at": "2026-07-10T10:42:18.954200Z"
+    },
+    {
+      "created_at": "2026-07-10T10:52:28.250086Z",
+      "description": "模板：用 ArUco id=1 在 base_link 下的反馈离散微调底盘。",
+      "generated_template": true,
+      "id": "template_aruco_id1_chassis_fine_adjust",
+      "name": "ArUco id1 底盘离散微调",
+      "params": {
+        "workflow_id": "aruco_id1_chassis_fine_adjust"
+      },
+      "source_page": "workflow",
+      "type": "code_workflow",
+      "updated_at": "2026-07-10T10:52:28.250086Z"
+    },
+    {
+      "created_at": "2026-07-14T05:10:54.939847Z",
+      "description": "中文备注：从关节控制页保存的选中关节/夹爪目标。",
+      "id": "dbea5b29d96d1129",
+      "name": "物入篮init03",
+      "params": {
+        "targets": [
+          {
+            "group": "torso",
+            "index": 0,
+            "name": "torso[1]",
+            "unit": "deg",
+            "value": 13.8
+          },
+          {
+            "group": "torso",
+            "index": 1,
+            "name": "torso[2]",
+            "unit": "deg",
+            "value": -33
+          },
+          {
+            "group": "torso",
+            "index": 2,
+            "name": "torso[3]",
+            "unit": "deg",
+            "value": -58.9
+          },
+          {
+            "group": "torso",
+            "index": 3,
+            "name": "torso[4]",
+            "unit": "deg",
+            "value": 0.07
+          },
+          {
+            "group": "left_arm",
+            "index": 0,
+            "name": "left_arm[1]",
+            "unit": "deg",
+            "value": -19.9
+          },
+          {
+            "group": "left_arm",
+            "index": 1,
+            "name": "left_arm[2]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "left_arm",
+            "index": 2,
+            "name": "left_arm[3]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "left_arm",
+            "index": 3,
+            "name": "left_arm[4]",
+            "unit": "deg",
+            "value": -109.52
+          },
+          {
+            "group": "left_arm",
+            "index": 4,
+            "name": "left_arm[5]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "left_arm",
+            "index": 5,
+            "name": "left_arm[6]",
+            "unit": "deg",
+            "value": 0.07
+          },
+          {
+            "group": "left_arm",
+            "index": 6,
+            "name": "left_arm[7]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "right_arm",
+            "index": 0,
+            "name": "right_arm[1]",
+            "unit": "deg",
+            "value": -19.66
+          },
+          {
+            "group": "right_arm",
+            "index": 1,
+            "name": "right_arm[2]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "right_arm",
+            "index": 2,
+            "name": "right_arm[3]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "right_arm",
+            "index": 3,
+            "name": "right_arm[4]",
+            "unit": "deg",
+            "value": -109.73
+          },
+          {
+            "group": "right_arm",
+            "index": 4,
+            "name": "right_arm[5]",
+            "unit": "deg",
+            "value": -0.02
+          },
+          {
+            "group": "right_arm",
+            "index": 5,
+            "name": "right_arm[6]",
+            "unit": "deg",
+            "value": -0.15
+          },
+          {
+            "group": "right_arm",
+            "index": 6,
+            "name": "right_arm[7]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "left_gripper",
+            "index": 0,
+            "name": "left_gripper[1]",
+            "unit": "open_0_100",
+            "value": 80.93
+          },
+          {
+            "group": "right_gripper",
+            "index": 0,
+            "name": "right_gripper[1]",
+            "unit": "open_0_100",
+            "value": 79.16
+          }
+        ],
+        "timeout_s": 3
+      },
+      "source_page": "joints",
+      "type": "joint_targets",
+      "updated_at": "2026-07-14T05:10:54.939847Z"
+    },
+    {
+      "created_at": "2026-07-15T10:53:03.595814Z",
+      "description": "中文备注：从关节控制页保存的选中关节/夹爪目标。",
+      "id": "1fffda103cb9ad80",
+      "name": "new物品入盒子init",
+      "params": {
+        "targets": [
+          {
+            "group": "torso",
+            "index": 0,
+            "name": "torso[1]",
+            "unit": "deg",
+            "value": 13.78
+          },
+          {
+            "group": "torso",
+            "index": 1,
+            "name": "torso[2]",
+            "unit": "deg",
+            "value": -33.04
+          },
+          {
+            "group": "torso",
+            "index": 2,
+            "name": "torso[3]",
+            "unit": "deg",
+            "value": -58.89
+          },
+          {
+            "group": "torso",
+            "index": 3,
+            "name": "torso[4]",
+            "unit": "deg",
+            "value": 0.11
+          },
+          {
+            "group": "left_arm",
+            "index": 0,
+            "name": "left_arm[1]",
+            "unit": "deg",
+            "value": 14.91
+          },
+          {
+            "group": "left_arm",
+            "index": 1,
+            "name": "left_arm[2]",
+            "unit": "deg",
+            "value": -0.05
+          },
+          {
+            "group": "left_arm",
+            "index": 2,
+            "name": "left_arm[3]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "left_arm",
+            "index": 3,
+            "name": "left_arm[4]",
+            "unit": "deg",
+            "value": -116.14
+          },
+          {
+            "group": "left_arm",
+            "index": 4,
+            "name": "left_arm[5]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "left_arm",
+            "index": 5,
+            "name": "left_arm[6]",
+            "unit": "deg",
+            "value": -22.64
+          },
+          {
+            "group": "left_arm",
+            "index": 6,
+            "name": "left_arm[7]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "right_arm",
+            "index": 0,
+            "name": "right_arm[1]",
+            "unit": "deg",
+            "value": -98.37
+          },
+          {
+            "group": "right_arm",
+            "index": 1,
+            "name": "right_arm[2]",
+            "unit": "deg",
+            "value": -56.6
+          },
+          {
+            "group": "right_arm",
+            "index": 2,
+            "name": "right_arm[3]",
+            "unit": "deg",
+            "value": 65.98
+          },
+          {
+            "group": "right_arm",
+            "index": 3,
+            "name": "right_arm[4]",
+            "unit": "deg",
+            "value": -83.03
+          },
+          {
+            "group": "right_arm",
+            "index": 4,
+            "name": "right_arm[5]",
+            "unit": "deg",
+            "value": -72.49
+          },
+          {
+            "group": "right_arm",
+            "index": 5,
+            "name": "right_arm[6]",
+            "unit": "deg",
+            "value": -0.72
+          },
+          {
+            "group": "right_arm",
+            "index": 6,
+            "name": "right_arm[7]",
+            "unit": "deg",
+            "value": 60.54
+          },
+          {
+            "group": "left_gripper",
+            "index": 0,
+            "name": "left_gripper[1]",
+            "unit": "open_0_100",
+            "value": 101.64
+          },
+          {
+            "group": "right_gripper",
+            "index": 0,
+            "name": "right_gripper[1]",
+            "unit": "open_0_100",
+            "value": 98.61
+          }
+        ],
+        "timeout_s": 3
+      },
+      "source_page": "joints",
+      "type": "joint_targets",
+      "updated_at": "2026-07-15T10:53:03.595814Z"
+    },
+    {
+      "created_at": "2026-07-16T07:45:51.888862Z",
+      "description": "中文备注：从关节控制页保存的选中关节/夹爪目标。",
+      "id": "d526a17e784c369e",
+      "name": "new物品入盒init2",
+      "params": {
+        "targets": [
+          {
+            "group": "torso",
+            "index": 0,
+            "name": "torso[1]",
+            "unit": "deg",
+            "value": 12.31
+          },
+          {
+            "group": "torso",
+            "index": 1,
+            "name": "torso[2]",
+            "unit": "deg",
+            "value": -32.62
+          },
+          {
+            "group": "torso",
+            "index": 2,
+            "name": "torso[3]",
+            "unit": "deg",
+            "value": -59.94
+          },
+          {
+            "group": "torso",
+            "index": 3,
+            "name": "torso[4]",
+            "unit": "deg",
+            "value": 0.14
+          },
+          {
+            "group": "left_arm",
+            "index": 0,
+            "name": "left_arm[1]",
+            "unit": "deg",
+            "value": 14.91
+          },
+          {
+            "group": "left_arm",
+            "index": 1,
+            "name": "left_arm[2]",
+            "unit": "deg",
+            "value": -0.05
+          },
+          {
+            "group": "left_arm",
+            "index": 2,
+            "name": "left_arm[3]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "left_arm",
+            "index": 3,
+            "name": "left_arm[4]",
+            "unit": "deg",
+            "value": -116.13
+          },
+          {
+            "group": "left_arm",
+            "index": 4,
+            "name": "left_arm[5]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "left_arm",
+            "index": 5,
+            "name": "left_arm[6]",
+            "unit": "deg",
+            "value": -22.64
+          },
+          {
+            "group": "left_arm",
+            "index": 6,
+            "name": "left_arm[7]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "right_arm",
+            "index": 0,
+            "name": "right_arm[1]",
+            "unit": "deg",
+            "value": -91.04
+          },
+          {
+            "group": "right_arm",
+            "index": 1,
+            "name": "right_arm[2]",
+            "unit": "deg",
+            "value": -51.69
+          },
+          {
+            "group": "right_arm",
+            "index": 2,
+            "name": "right_arm[3]",
+            "unit": "deg",
+            "value": 29.15
+          },
+          {
+            "group": "right_arm",
+            "index": 3,
+            "name": "right_arm[4]",
+            "unit": "deg",
+            "value": -67.45
+          },
+          {
+            "group": "right_arm",
+            "index": 4,
+            "name": "right_arm[5]",
+            "unit": "deg",
+            "value": -35.3
+          },
+          {
+            "group": "right_arm",
+            "index": 5,
+            "name": "right_arm[6]",
+            "unit": "deg",
+            "value": 13.63
+          },
+          {
+            "group": "right_arm",
+            "index": 6,
+            "name": "right_arm[7]",
+            "unit": "deg",
+            "value": 89.39
+          },
+          {
+            "group": "left_gripper",
+            "index": 0,
+            "name": "left_gripper[1]",
+            "unit": "open_0_100",
+            "value": 101.64
+          },
+          {
+            "group": "right_gripper",
+            "index": 0,
+            "name": "right_gripper[1]",
+            "unit": "open_0_100",
+            "value": 101.27
+          }
+        ],
+        "timeout_s": 3
+      },
+      "source_page": "joints",
+      "type": "joint_targets",
+      "updated_at": "2026-07-16T07:45:51.888862Z"
+    },
+    {
+      "created_at": "2026-07-20T08:14:47.847252Z",
+      "description": "中文备注：从关节控制页保存的选中关节/夹爪目标。",
+      "id": "2a149a9d770f3e1e",
+      "name": "开水龙头init",
+      "params": {
+        "targets": [
+          {
+            "group": "torso",
+            "index": 0,
+            "name": "torso[1]",
+            "unit": "deg",
+            "value": 15.07
+          },
+          {
+            "group": "torso",
+            "index": 1,
+            "name": "torso[2]",
+            "unit": "deg",
+            "value": -39.92
+          },
+          {
+            "group": "torso",
+            "index": 2,
+            "name": "torso[3]",
+            "unit": "deg",
+            "value": -55
+          },
+          {
+            "group": "torso",
+            "index": 3,
+            "name": "torso[4]",
+            "unit": "deg",
+            "value": 0.07
+          },
+          {
+            "group": "left_arm",
+            "index": 0,
+            "name": "left_arm[1]",
+            "unit": "deg",
+            "value": 10
+          },
+          {
+            "group": "left_arm",
+            "index": 1,
+            "name": "left_arm[2]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "left_arm",
+            "index": 2,
+            "name": "left_arm[3]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "left_arm",
+            "index": 3,
+            "name": "left_arm[4]",
+            "unit": "deg",
+            "value": -119.86
+          },
+          {
+            "group": "left_arm",
+            "index": 4,
+            "name": "left_arm[5]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "left_arm",
+            "index": 5,
+            "name": "left_arm[6]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "left_arm",
+            "index": 6,
+            "name": "left_arm[7]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "right_arm",
+            "index": 0,
+            "name": "right_arm[1]",
+            "unit": "deg",
+            "value": 9.85
+          },
+          {
+            "group": "right_arm",
+            "index": 1,
+            "name": "right_arm[2]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "right_arm",
+            "index": 2,
+            "name": "right_arm[3]",
+            "unit": "deg",
+            "value": -0.04
+          },
+          {
+            "group": "right_arm",
+            "index": 3,
+            "name": "right_arm[4]",
+            "unit": "deg",
+            "value": -119.47
+          },
+          {
+            "group": "right_arm",
+            "index": 4,
+            "name": "right_arm[5]",
+            "unit": "deg",
+            "value": -0.04
+          },
+          {
+            "group": "right_arm",
+            "index": 5,
+            "name": "right_arm[6]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "right_arm",
+            "index": 6,
+            "name": "right_arm[7]",
+            "unit": "deg",
+            "value": 0.02
+          },
+          {
+            "group": "left_gripper",
+            "index": 0,
+            "name": "left_gripper[1]",
+            "unit": "open_0_100",
+            "value": 101.64
+          },
+          {
+            "group": "right_gripper",
+            "index": 0,
+            "name": "right_gripper[1]",
+            "unit": "open_0_100",
+            "value": 97.8
+          }
+        ],
+        "timeout_s": 3
+      },
+      "source_page": "joints",
+      "type": "joint_targets",
+      "updated_at": "2026-07-20T08:14:47.847252Z"
+    },
+    {
+      "created_at": "2026-07-22T05:29:29.602173Z",
+      "description": "中文备注：开始时自动切换到导航控制，到达目标位姿后自动切回手动控制；失败、超时或停止也会尝试恢复手动控制。",
+      "id": "83f53ef0df78ba47",
+      "name": "导航到洗手池右侧",
+      "params": {
+        "position_tolerance_m": 0.2,
+        "stable_s": 0.5,
+        "timeout_s": 120,
+        "x_m": 2.34,
+        "y_m": 0.21,
+        "yaw_deg": 11.5,
+        "yaw_tolerance_deg": 20
+      },
+      "source_page": "navigation",
+      "type": "navigate_to_pose",
+      "updated_at": "2026-07-22T05:29:29.602173Z"
+    },
+    {
+      "created_at": "2026-07-22T07:26:43.870910Z",
+      "description": "中文备注：开始时自动切换到导航控制，到达目标位姿后自动切回手动控制；失败、超时或停止也会尝试恢复手动控制。",
+      "id": "9663b2d114b22318",
+      "name": "导航到吧台",
+      "params": {
+        "position_tolerance_m": 0.2,
+        "stable_s": 0.5,
+        "timeout_s": 120,
+        "x_m": 0.528,
+        "y_m": 0.315,
+        "yaw_deg": 87,
+        "yaw_tolerance_deg": 20
+      },
+      "source_page": "navigation",
+      "type": "navigate_to_pose",
+      "updated_at": "2026-07-22T07:26:43.870910Z"
+    },
+    {
+      "created_at": "2026-07-22T07:46:35.819668Z",
+      "description": "中文备注：开始时自动切换到导航控制，到达目标位姿后自动切回手动控制；失败、超时或停止也会尝试恢复手动控制。",
+      "id": "dae98e6deddb0040",
+      "name": "导航到冰箱左侧",
+      "params": {
+        "position_tolerance_m": 0.2,
+        "stable_s": 0.5,
+        "timeout_s": 120,
+        "x_m": 0.552,
+        "y_m": -0.336,
+        "yaw_deg": -92,
+        "yaw_tolerance_deg": 20
+      },
+      "source_page": "navigation",
+      "type": "navigate_to_pose",
+      "updated_at": "2026-07-22T07:46:35.819668Z"
+    },
+    {
+      "created_at": "2026-07-22T07:53:44.534952Z",
+      "description": "中文备注：开始时自动切换到导航控制，到达目标位姿后自动切回手动控制；失败、超时或停止也会尝试恢复手动控制。",
+      "id": "c21e55a5cc2c0be3",
+      "name": "导航到吧台2",
+      "params": {
+        "position_tolerance_m": 0.2,
+        "stable_s": 0.5,
+        "timeout_s": 120,
+        "x_m": 0.54,
+        "y_m": 0.24,
+        "yaw_deg": 88,
+        "yaw_tolerance_deg": 20
+      },
+      "source_page": "navigation",
+      "type": "navigate_to_pose",
+      "updated_at": "2026-07-22T07:53:44.534952Z"
+    },
+    {
+      "created_at": "2026-07-22T08:15:27.496680Z",
+      "description": "中文备注：开始时自动切换到导航控制，到达目标位姿后自动切回手动控制；失败、超时或停止也会尝试恢复手动控制。",
+      "id": "ac5d3e300dc2eb4f",
+      "name": "导航到冰箱左侧2",
+      "params": {
+        "position_tolerance_m": 0.2,
+        "stable_s": 0.5,
+        "timeout_s": 120,
+        "x_m": 0.843,
+        "y_m": -0.291,
+        "yaw_deg": -92,
+        "yaw_tolerance_deg": 20
+      },
+      "source_page": "navigation",
+      "type": "navigate_to_pose",
+      "updated_at": "2026-07-22T08:15:27.496680Z"
+    },
+    {
+      "created_at": "2026-07-22T10:37:13.101081Z",
+      "description": "中文备注：开始时自动切换到导航控制，到达目标位姿后自动切回手动控制；失败、超时或停止也会尝试恢复手动控制。",
+      "id": "f8229c69dee59a6c",
+      "name": "导航到放箱子的位置",
+      "params": {
+        "position_tolerance_m": 0.2,
+        "stable_s": 0.5,
+        "timeout_s": 120,
+        "x_m": 1.166,
+        "y_m": -0.443,
+        "yaw_deg": -89,
+        "yaw_tolerance_deg": 20
+      },
+      "source_page": "navigation",
+      "type": "navigate_to_pose",
+      "updated_at": "2026-07-22T10:37:13.101081Z"
+    },
+    {
+      "created_at": "2026-07-28T07:34:31.771256Z",
+      "description": "中文备注：从关节控制页保存的选中关节/夹爪目标。",
+      "id": "588ce5a58739be0f",
+      "name": "浇花init",
+      "params": {
+        "targets": [
+          {
+            "group": "torso",
+            "index": 0,
+            "name": "torso[1]",
+            "unit": "deg",
+            "value": 17.43
+          },
+          {
+            "group": "torso",
+            "index": 1,
+            "name": "torso[2]",
+            "unit": "deg",
+            "value": -39.64
+          },
+          {
+            "group": "torso",
+            "index": 2,
+            "name": "torso[3]",
+            "unit": "deg",
+            "value": -54.94
+          },
+          {
+            "group": "torso",
+            "index": 3,
+            "name": "torso[4]",
+            "unit": "deg",
+            "value": 0.23
+          },
+          {
+            "group": "left_arm",
+            "index": 0,
+            "name": "left_arm[1]",
+            "unit": "deg",
+            "value": 10
+          },
+          {
+            "group": "left_arm",
+            "index": 1,
+            "name": "left_arm[2]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "left_arm",
+            "index": 2,
+            "name": "left_arm[3]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "left_arm",
+            "index": 3,
+            "name": "left_arm[4]",
+            "unit": "deg",
+            "value": -119.63
+          },
+          {
+            "group": "left_arm",
+            "index": 4,
+            "name": "left_arm[5]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "left_arm",
+            "index": 5,
+            "name": "left_arm[6]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "left_arm",
+            "index": 6,
+            "name": "left_arm[7]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "right_arm",
+            "index": 0,
+            "name": "right_arm[1]",
+            "unit": "deg",
+            "value": -86.86
+          },
+          {
+            "group": "right_arm",
+            "index": 1,
+            "name": "right_arm[2]",
+            "unit": "deg",
+            "value": -27.66
+          },
+          {
+            "group": "right_arm",
+            "index": 2,
+            "name": "right_arm[3]",
+            "unit": "deg",
+            "value": 27.17
+          },
+          {
+            "group": "right_arm",
+            "index": 3,
+            "name": "right_arm[4]",
+            "unit": "deg",
+            "value": -61.07
+          },
+          {
+            "group": "right_arm",
+            "index": 4,
+            "name": "right_arm[5]",
+            "unit": "deg",
+            "value": -28.71
+          },
+          {
+            "group": "right_arm",
+            "index": 5,
+            "name": "right_arm[6]",
+            "unit": "deg",
+            "value": 24.08
+          },
+          {
+            "group": "right_arm",
+            "index": 6,
+            "name": "right_arm[7]",
+            "unit": "deg",
+            "value": 85.79
+          },
+          {
+            "group": "left_gripper",
+            "index": 0,
+            "name": "left_gripper[1]",
+            "unit": "open_0_100",
+            "value": 101.61
+          },
+          {
+            "group": "right_gripper",
+            "index": 0,
+            "name": "right_gripper[1]",
+            "unit": "open_0_100",
+            "value": 101.27
+          }
+        ],
+        "timeout_s": 3
+      },
+      "source_page": "joints",
+      "type": "joint_targets",
+      "updated_at": "2026-07-28T07:34:31.771256Z"
+    },
+    {
+      "created_at": "2026-07-31T04:59:29.772983Z",
+      "description": "demo02 专用：自动请求启动头部深度，后台加载头部 bottle YOLO 权重和提示词，同时提前启动 ArUco 积累 TF；不执行 CUDA 预热，机器人到位前不输出真实 YOLO 检测结果。",
+      "generated_template": true,
+      "id": "template_demo02_preload_head_bottle_yolo",
+      "name": "demo02 预加载头部 bottle YOLO",
+      "params": {
+        "workflow_id": "demo02_preload_head_bottle_yolo"
+      },
+      "source_page": "workflow",
+      "type": "code_workflow",
+      "updated_at": "2026-07-31T04:59:29.772983Z"
+    },
+    {
+      "created_at": "2026-07-30T12:48:04.996592Z",
+      "description": "模板：切换到导航控制并前往 map 坐标系目标，到位后自动切回手动控制。",
+      "generated_template": true,
+      "id": "template_navigate_to_pose",
+      "name": "navigate_to_pose_template",
+      "params": {
+        "position_tolerance_m": 0.2,
+        "stable_s": 0.5,
+        "timeout_s": 120.0,
+        "x_m": 0.0,
+        "y_m": 0.0,
+        "yaw_deg": 0.0,
+        "yaw_tolerance_deg": 20.0
+      },
+      "source_page": "navigation",
+      "type": "navigate_to_pose",
+      "updated_at": "2026-07-30T12:48:04.996629Z"
+    },
+    {
+      "created_at": "2026-07-30T12:48:04.996592Z",
+      "description": "模板：头部左相机识别 bottle，右臂水平推进并闭合右夹爪。",
+      "generated_template": true,
+      "id": "template_head_left_bottle_grasp",
+      "name": "头部相机（左）识别 bottle 并夹取",
+      "params": {
+        "workflow_id": "head_left_bottle_grasp"
+      },
+      "source_page": "workflow",
+      "type": "code_workflow",
+      "updated_at": "2026-07-30T12:48:04.996635Z"
+    },
+    {
+      "created_at": "2026-07-30T15:07:01.830734Z",
+      "description": "模板：先用头部深度桌边校正朝向，再用补偿后的 bottle 三维位置恢复底盘 x/y。",
+      "generated_template": true,
+      "id": "template_head_left_bottle_chassis_fine_adjust",
+      "name": "头部 bottle 基准底盘微调",
+      "params": {
+        "workflow_id": "head_left_bottle_chassis_fine_adjust"
+      },
+      "source_page": "workflow",
+      "type": "code_workflow",
+      "updated_at": "2026-07-30T15:07:01.830788Z"
+    },
+    {
+      "created_at": "2026-08-06T11:40:17.171998Z",
+      "description": "中文备注：从关节控制页保存的选中关节/夹爪目标。",
+      "id": "f53cb7fd50abf3f6",
+      "name": "右手放平",
+      "params": {
+        "targets": [
+          {
+            "group": "right_arm",
+            "index": 0,
+            "name": "right_arm[1]",
+            "unit": "deg",
+            "value": -29.96
+          },
+          {
+            "group": "right_arm",
+            "index": 1,
+            "name": "right_arm[2]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "right_arm",
+            "index": 2,
+            "name": "right_arm[3]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "right_arm",
+            "index": 3,
+            "name": "right_arm[4]",
+            "unit": "deg",
+            "value": -79.88
+          },
+          {
+            "group": "right_arm",
+            "index": 4,
+            "name": "right_arm[5]",
+            "unit": "deg",
+            "value": -0.02
+          },
+          {
+            "group": "right_arm",
+            "index": 5,
+            "name": "right_arm[6]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "right_arm",
+            "index": 6,
+            "name": "right_arm[7]",
+            "unit": "deg",
+            "value": 0
+          }
+        ],
+        "timeout_s": 3
+      },
+      "source_page": "joints",
+      "type": "joint_targets",
+      "updated_at": "2026-08-06T11:40:17.171998Z"
+    },
+    {
+      "created_at": "2026-08-26T11:01:29.923614Z",
+      "description": "中文备注：从关节控制页保存的选中关节/夹爪目标。",
+      "id": "0b156b0ad5f2a523",
+      "name": "躯干和右手放平",
+      "params": {
+        "targets": [
+          {
+            "group": "torso",
+            "index": 0,
+            "name": "torso[1]",
+            "unit": "deg",
+            "value": 15
+          },
+          {
+            "group": "torso",
+            "index": 1,
+            "name": "torso[2]",
+            "unit": "deg",
+            "value": -40
+          },
+          {
+            "group": "torso",
+            "index": 2,
+            "name": "torso[3]",
+            "unit": "deg",
+            "value": -40
+          },
+          {
+            "group": "torso",
+            "index": 3,
+            "name": "torso[4]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "left_arm",
+            "index": 0,
+            "name": "left_arm[1]",
+            "unit": "deg",
+            "value": 10
+          },
+          {
+            "group": "left_arm",
+            "index": 1,
+            "name": "left_arm[2]",
+            "unit": "deg",
+            "value": -0.01
+          },
+          {
+            "group": "left_arm",
+            "index": 2,
+            "name": "left_arm[3]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "left_arm",
+            "index": 3,
+            "name": "left_arm[4]",
+            "unit": "deg",
+            "value": -119.55
+          },
+          {
+            "group": "left_arm",
+            "index": 4,
+            "name": "left_arm[5]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "left_arm",
+            "index": 5,
+            "name": "left_arm[6]",
+            "unit": "deg",
+            "value": 0.01
+          },
+          {
+            "group": "left_arm",
+            "index": 6,
+            "name": "left_arm[7]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "right_arm",
+            "index": 0,
+            "name": "right_arm[1]",
+            "unit": "deg",
+            "value": -30
+          },
+          {
+            "group": "right_arm",
+            "index": 1,
+            "name": "right_arm[2]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "right_arm",
+            "index": 2,
+            "name": "right_arm[3]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "right_arm",
+            "index": 3,
+            "name": "right_arm[4]",
+            "unit": "deg",
+            "value": -75
+          },
+          {
+            "group": "right_arm",
+            "index": 4,
+            "name": "right_arm[5]",
+            "unit": "deg",
+            "value": -0.04
+          },
+          {
+            "group": "right_arm",
+            "index": 5,
+            "name": "right_arm[6]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "right_arm",
+            "index": 6,
+            "name": "right_arm[7]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "left_gripper",
+            "index": 0,
+            "name": "left_gripper[1]",
+            "unit": "open_0_100",
+            "value": 101.64
+          },
+          {
+            "group": "right_gripper",
+            "index": 0,
+            "name": "right_gripper[1]",
+            "unit": "open_0_100",
+            "value": 97.85
+          }
+        ],
+        "timeout_s": 3
+      },
+      "source_page": "joints",
+      "type": "joint_targets",
+      "updated_at": "2026-08-26T11:01:29.923614Z"
+    },
+    {
+      "created_at": "2026-08-26T11:22:26.669983Z",
+      "description": "中文备注：从关节控制页保存的选中关节/夹爪目标。",
+      "id": "f8441ca435ef514f",
+      "name": "躯干右手放平夹爪闭合",
+      "params": {
+        "targets": [
+          {
+            "group": "torso",
+            "index": 0,
+            "name": "torso[1]",
+            "unit": "deg",
+            "value": 15.05
+          },
+          {
+            "group": "torso",
+            "index": 1,
+            "name": "torso[2]",
+            "unit": "deg",
+            "value": -39.96
+          },
+          {
+            "group": "torso",
+            "index": 2,
+            "name": "torso[3]",
+            "unit": "deg",
+            "value": -39.99
+          },
+          {
+            "group": "torso",
+            "index": 3,
+            "name": "torso[4]",
+            "unit": "deg",
+            "value": 0.01
+          },
+          {
+            "group": "right_arm",
+            "index": 0,
+            "name": "right_arm[1]",
+            "unit": "deg",
+            "value": -29.96
+          },
+          {
+            "group": "right_arm",
+            "index": 1,
+            "name": "right_arm[2]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "right_arm",
+            "index": 2,
+            "name": "right_arm[3]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "right_arm",
+            "index": 3,
+            "name": "right_arm[4]",
+            "unit": "deg",
+            "value": -74.89
+          },
+          {
+            "group": "right_arm",
+            "index": 4,
+            "name": "right_arm[5]",
+            "unit": "deg",
+            "value": -0.02
+          },
+          {
+            "group": "right_arm",
+            "index": 5,
+            "name": "right_arm[6]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "right_arm",
+            "index": 6,
+            "name": "right_arm[7]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "right_gripper",
+            "index": 0,
+            "name": "right_gripper[1]",
+            "unit": "open_0_100",
+            "value": 2.53
+          }
+        ],
+        "timeout_s": 3
+      },
+      "source_page": "joints",
+      "type": "joint_targets",
+      "updated_at": "2026-08-26T11:22:26.669983Z"
+    },
+    {
+      "created_at": "2026-08-26T11:24:21.375057Z",
+      "description": "中文备注：从关节控制页保存的选中关节/夹爪目标。",
+      "id": "b3cf4d4c46411d33",
+      "name": "左手放下来",
+      "params": {
+        "targets": [
+          {
+            "group": "left_arm",
+            "index": 0,
+            "name": "left_arm[1]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "left_arm",
+            "index": 1,
+            "name": "left_arm[2]",
+            "unit": "deg",
+            "value": -0.04
+          },
+          {
+            "group": "left_arm",
+            "index": 2,
+            "name": "left_arm[3]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "left_arm",
+            "index": 3,
+            "name": "left_arm[4]",
+            "unit": "deg",
+            "value": -10
+          },
+          {
+            "group": "left_arm",
+            "index": 4,
+            "name": "left_arm[5]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "left_arm",
+            "index": 5,
+            "name": "left_arm[6]",
+            "unit": "deg",
+            "value": 0.02
+          },
+          {
+            "group": "left_arm",
+            "index": 6,
+            "name": "left_arm[7]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "left_gripper",
+            "index": 0,
+            "name": "left_gripper[1]",
+            "unit": "open_0_100",
+            "value": 97.44
+          }
+        ],
+        "timeout_s": 3
+      },
+      "source_page": "joints",
+      "type": "joint_targets",
+      "updated_at": "2026-08-26T11:24:21.375057Z"
+    },
+    {
+      "created_at": "2026-08-26T11:30:02.160606Z",
+      "description": "中文备注：从关节控制页保存的选中关节/夹爪目标。",
+      "id": "37846b2f73aeeef1",
+      "name": "最终倒水末端",
+      "params": {
+        "targets": [
+          {
+            "group": "torso",
+            "index": 0,
+            "name": "torso[1]",
+            "unit": "deg",
+            "value": 15.05
+          },
+          {
+            "group": "torso",
+            "index": 1,
+            "name": "torso[2]",
+            "unit": "deg",
+            "value": -39.94
+          },
+          {
+            "group": "torso",
+            "index": 2,
+            "name": "torso[3]",
+            "unit": "deg",
+            "value": -39.99
+          },
+          {
+            "group": "torso",
+            "index": 3,
+            "name": "torso[4]",
+            "unit": "deg",
+            "value": 0.01
+          },
+          {
+            "group": "right_arm",
+            "index": 0,
+            "name": "right_arm[1]",
+            "unit": "deg",
+            "value": -47.87
+          },
+          {
+            "group": "right_arm",
+            "index": 1,
+            "name": "right_arm[2]",
+            "unit": "deg",
+            "value": -32.06
+          },
+          {
+            "group": "right_arm",
+            "index": 2,
+            "name": "right_arm[3]",
+            "unit": "deg",
+            "value": 58
+          },
+          {
+            "group": "right_arm",
+            "index": 3,
+            "name": "right_arm[4]",
+            "unit": "deg",
+            "value": -80.35
+          },
+          {
+            "group": "right_arm",
+            "index": 4,
+            "name": "right_arm[5]",
+            "unit": "deg",
+            "value": 117.43
+          },
+          {
+            "group": "right_arm",
+            "index": 5,
+            "name": "right_arm[6]",
+            "unit": "deg",
+            "value": 23.63
+          },
+          {
+            "group": "right_arm",
+            "index": 6,
+            "name": "right_arm[7]",
+            "unit": "deg",
+            "value": 34.1
+          },
+          {
+            "group": "right_gripper",
+            "index": 0,
+            "name": "right_gripper[1]",
+            "unit": "open_0_100",
+            "value": 0
+          }
+        ],
+        "timeout_s": 3
+      },
+      "source_page": "joints",
+      "type": "joint_targets",
+      "updated_at": "2026-08-26T11:30:02.160606Z"
+    },
+    {
+      "created_at": "2026-08-26T11:45:41.800655Z",
+      "description": "中文备注：从关节控制页保存的选中关节/夹爪目标。",
+      "generated_template": false,
+      "id": "b61a5083ff3b3f0f",
+      "name": "02待夹取位姿-躯干-手臂",
+      "params": {
+        "targets": [
+          {
+            "group": "torso",
+            "index": 0,
+            "name": "torso[1]",
+            "unit": "deg",
+            "value": 15.05
+          },
+          {
+            "group": "torso",
+            "index": 1,
+            "name": "torso[2]",
+            "unit": "deg",
+            "value": -39.99
+          },
+          {
+            "group": "torso",
+            "index": 2,
+            "name": "torso[3]",
+            "unit": "deg",
+            "value": -39.99
+          },
+          {
+            "group": "torso",
+            "index": 3,
+            "name": "torso[4]",
+            "unit": "deg",
+            "value": 0.01
+          },
+          {
+            "group": "right_arm",
+            "index": 0,
+            "name": "right_arm[1]",
+            "unit": "deg",
+            "value": -32.57
+          },
+          {
+            "group": "right_arm",
+            "index": 1,
+            "name": "right_arm[2]",
+            "unit": "deg",
+            "value": -17.23
+          },
+          {
+            "group": "right_arm",
+            "index": 2,
+            "name": "right_arm[3]",
+            "unit": "deg",
+            "value": -10.11
+          },
+          {
+            "group": "right_arm",
+            "index": 3,
+            "name": "right_arm[4]",
+            "unit": "deg",
+            "value": -61.53
+          },
+          {
+            "group": "right_arm",
+            "index": 4,
+            "name": "right_arm[5]",
+            "unit": "deg",
+            "value": -12.47
+          },
+          {
+            "group": "right_arm",
+            "index": 5,
+            "name": "right_arm[6]",
+            "unit": "deg",
+            "value": -3.73
+          },
+          {
+            "group": "right_arm",
+            "index": 6,
+            "name": "right_arm[7]",
+            "unit": "deg",
+            "value": 16.81
+          },
+          {
+            "group": "right_gripper",
+            "index": 0,
+            "name": "right_gripper[1]",
+            "unit": "open_0_100",
+            "value": 100
+          }
+        ],
+        "timeout_s": 3
+      },
+      "source_page": "joints",
+      "type": "joint_targets",
+      "updated_at": "2026-08-26T11:45:41.800655Z"
+    },
+    {
+      "created_at": "2026-08-26T11:46:29.180367Z",
+      "description": "中文备注：从关节控制页保存的选中关节/夹爪目标。",
+      "generated_template": false,
+      "id": "05f05fdaa3a3542a",
+      "name": "03右爪闭合",
+      "params": {
+        "targets": [
+          {
+            "group": "right_gripper",
+            "index": 0,
+            "name": "right_gripper[1]",
+            "unit": "open_0_100",
+            "value": 0
+          }
+        ],
+        "timeout_s": 3
+      },
+      "source_page": "joints",
+      "type": "joint_targets",
+      "updated_at": "2026-08-26T11:46:29.180367Z"
+    },
+    {
+      "created_at": "2026-08-26T12:34:59.511230Z",
+      "description": "中文备注：从关节控制页保存的选中关节/夹爪目标。",
+      "id": "4d7bf1f4d7a9b832",
+      "name": "右爪打开",
+      "params": {
+        "targets": [
+          {
+            "group": "right_gripper",
+            "index": 0,
+            "name": "right_gripper[1]",
+            "unit": "open_0_100",
+            "value": 100
+          }
+        ],
+        "timeout_s": 3
+      },
+      "source_page": "joints",
+      "type": "joint_targets",
+      "updated_at": "2026-08-26T12:34:59.511230Z"
+    },
+    {
+      "created_at": "2026-08-27T11:45:34.384Z",
+      "description": "右臂末端从当前位姿绕局部 L（-Z）轴旋转 60°，速度 2°/s；不添加 base_link 直线位移，旋转轴竖向偏置为 0.014m。沿用当前反向设置（axis_rotation_direction=-1），参数可在动作编辑器中修改。",
+      "generated_template": false,
+      "id": "ee_axial_rotation_only_20260827",
+      "name": "右臂L轴原地旋转60度",
+      "params": {
+        "allow_torso_ik": false,
+        "arm": "right",
+        "axis_local_xyz": [
+          0,
+          0,
+          -1
+        ],
+        "axis_offset_lateral_m": 0.0,
+        "axis_offset_vertical_m": 0.014,
+        "axis_rotation_direction": -1,
+        "delta_xyz_m": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "end_angle_deg": 60.0,
+        "settle_s": 0.0,
+        "speed_deg_s": 2.0,
+        "start_angle_deg": 0.0,
+        "timeout_s": 35.0,
+        "wait_for_completion": true,
+        "waypoint_step_deg": 2.0
+      },
+      "source_page": "ee",
+      "type": "ee_axial_motion",
+      "updated_at": "2026-08-27T11:45:34.384Z"
+    },
+    {
+      "created_at": "2026-08-27T12:11:35.087204Z",
+      "description": "中文备注：从关节控制页保存的选中关节/夹爪目标。",
+      "id": "389ed3c3063d5bd9",
+      "name": "00躯干右手准备",
+      "params": {
+        "targets": [
+          {
+            "group": "torso",
+            "index": 0,
+            "name": "torso[1]",
+            "unit": "deg",
+            "value": 14.96
+          },
+          {
+            "group": "torso",
+            "index": 1,
+            "name": "torso[2]",
+            "unit": "deg",
+            "value": -40.03
+          },
+          {
+            "group": "torso",
+            "index": 2,
+            "name": "torso[3]",
+            "unit": "deg",
+            "value": -39.92
+          },
+          {
+            "group": "torso",
+            "index": 3,
+            "name": "torso[4]",
+            "unit": "deg",
+            "value": 0.03
+          },
+          {
+            "group": "right_arm",
+            "index": 0,
+            "name": "right_arm[1]",
+            "unit": "deg",
+            "value": 9.95
+          },
+          {
+            "group": "right_arm",
+            "index": 1,
+            "name": "right_arm[2]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "right_arm",
+            "index": 2,
+            "name": "right_arm[3]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "right_arm",
+            "index": 3,
+            "name": "right_arm[4]",
+            "unit": "deg",
+            "value": -119.64
+          },
+          {
+            "group": "right_arm",
+            "index": 4,
+            "name": "right_arm[5]",
+            "unit": "deg",
+            "value": -0.05
+          },
+          {
+            "group": "right_arm",
+            "index": 5,
+            "name": "right_arm[6]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "right_arm",
+            "index": 6,
+            "name": "right_arm[7]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "right_gripper",
+            "index": 0,
+            "name": "right_gripper[1]",
+            "unit": "open_0_100",
+            "value": 100.01
+          }
+        ],
+        "timeout_s": 3
+      },
+      "source_page": "joints",
+      "type": "joint_targets",
+      "updated_at": "2026-08-27T12:11:35.087204Z"
+    },
+    {
+      "created_at": "2026-08-27T12:15:39.131469Z",
+      "description": "中文备注：末端相对运动原子动作，左右手通过 arm 参数配置。",
+      "id": "a766fe62798b8492",
+      "name": "右手前进015m",
+      "params": {
+        "allow_torso_ik": false,
+        "arm": "right",
+        "delta_rpy_deg": [
+          0,
+          0,
+          0
+        ],
+        "delta_xyz_m": [
+          0.15,
+          0,
+          0
+        ],
+        "offset_frame": "base",
+        "orientation": "rpy",
+        "reference_source": "current",
+        "timeout_s": 3
+      },
+      "source_page": "ee",
+      "type": "ee_plan_relative",
+      "updated_at": "2026-08-27T12:15:39.131469Z"
+    },
+    {
+      "created_at": "2026-08-27T12:16:25.768621Z",
+      "description": "中文备注：从关节控制页保存的选中关节/夹爪目标。",
+      "id": "87ef9dec5198db9d",
+      "name": "01待夹取对准",
+      "params": {
+        "targets": [
+          {
+            "group": "torso",
+            "index": 0,
+            "name": "torso[1]",
+            "unit": "deg",
+            "value": 15.07
+          },
+          {
+            "group": "torso",
+            "index": 1,
+            "name": "torso[2]",
+            "unit": "deg",
+            "value": -39.96
+          },
+          {
+            "group": "torso",
+            "index": 2,
+            "name": "torso[3]",
+            "unit": "deg",
+            "value": -39.9
+          },
+          {
+            "group": "torso",
+            "index": 3,
+            "name": "torso[4]",
+            "unit": "deg",
+            "value": 0.05
+          },
+          {
+            "group": "right_arm",
+            "index": 0,
+            "name": "right_arm[1]",
+            "unit": "deg",
+            "value": -3.15
+          },
+          {
+            "group": "right_arm",
+            "index": 1,
+            "name": "right_arm[2]",
+            "unit": "deg",
+            "value": -16.63
+          },
+          {
+            "group": "right_arm",
+            "index": 2,
+            "name": "right_arm[3]",
+            "unit": "deg",
+            "value": -18.26
+          },
+          {
+            "group": "right_arm",
+            "index": 3,
+            "name": "right_arm[4]",
+            "unit": "deg",
+            "value": -90.28
+          },
+          {
+            "group": "right_arm",
+            "index": 4,
+            "name": "right_arm[5]",
+            "unit": "deg",
+            "value": -18.74
+          },
+          {
+            "group": "right_arm",
+            "index": 5,
+            "name": "right_arm[6]",
+            "unit": "deg",
+            "value": -1.93
+          },
+          {
+            "group": "right_arm",
+            "index": 6,
+            "name": "right_arm[7]",
+            "unit": "deg",
+            "value": 17.35
+          },
+          {
+            "group": "right_gripper",
+            "index": 0,
+            "name": "right_gripper[1]",
+            "unit": "open_0_100",
+            "value": 99.99
+          }
+        ],
+        "timeout_s": 3
+      },
+      "source_page": "joints",
+      "type": "joint_targets",
+      "updated_at": "2026-08-27T12:16:25.768621Z"
+    },
+    {
+      "created_at": "2026-08-27T12:26:25.915997Z",
+      "description": "中文备注：从关节控制页保存的选中关节/夹爪目标。",
+      "id": "a91ae77430584837",
+      "name": "01待夹取",
+      "params": {
+        "targets": [
+          {
+            "group": "torso",
+            "index": 0,
+            "name": "torso[1]",
+            "unit": "deg",
+            "value": 15.07
+          },
+          {
+            "group": "torso",
+            "index": 1,
+            "name": "torso[2]",
+            "unit": "deg",
+            "value": -39.92
+          },
+          {
+            "group": "torso",
+            "index": 2,
+            "name": "torso[3]",
+            "unit": "deg",
+            "value": -39.9
+          },
+          {
+            "group": "torso",
+            "index": 3,
+            "name": "torso[4]",
+            "unit": "deg",
+            "value": 0.05
+          },
+          {
+            "group": "right_arm",
+            "index": 0,
+            "name": "right_arm[1]",
+            "unit": "deg",
+            "value": -3.28
+          },
+          {
+            "group": "right_arm",
+            "index": 1,
+            "name": "right_arm[2]",
+            "unit": "deg",
+            "value": -16.42
+          },
+          {
+            "group": "right_arm",
+            "index": 2,
+            "name": "right_arm[3]",
+            "unit": "deg",
+            "value": -18.04
+          },
+          {
+            "group": "right_arm",
+            "index": 3,
+            "name": "right_arm[4]",
+            "unit": "deg",
+            "value": -88.92
+          },
+          {
+            "group": "right_arm",
+            "index": 4,
+            "name": "right_arm[5]",
+            "unit": "deg",
+            "value": -18.55
+          },
+          {
+            "group": "right_arm",
+            "index": 5,
+            "name": "right_arm[6]",
+            "unit": "deg",
+            "value": -2.93
+          },
+          {
+            "group": "right_arm",
+            "index": 6,
+            "name": "right_arm[7]",
+            "unit": "deg",
+            "value": 17.52
+          },
+          {
+            "group": "right_gripper",
+            "index": 0,
+            "name": "right_gripper[1]",
+            "unit": "open_0_100",
+            "value": 101.27
+          }
+        ],
+        "timeout_s": 3
+      },
+      "source_page": "joints",
+      "type": "joint_targets",
+      "updated_at": "2026-08-27T12:26:25.915997Z"
+    },
+    {
+      "created_at": "2026-08-27T12:31:42.282319Z",
+      "description": "中文备注：从关节控制页保存的选中关节/夹爪目标。",
+      "id": "b585c469349e9461",
+      "name": "06待放下",
+      "params": {
+        "targets": [
+          {
+            "group": "torso",
+            "index": 0,
+            "name": "torso[1]",
+            "unit": "deg",
+            "value": 15.11
+          },
+          {
+            "group": "torso",
+            "index": 1,
+            "name": "torso[2]",
+            "unit": "deg",
+            "value": -39.9
+          },
+          {
+            "group": "torso",
+            "index": 2,
+            "name": "torso[3]",
+            "unit": "deg",
+            "value": -39.92
+          },
+          {
+            "group": "torso",
+            "index": 3,
+            "name": "torso[4]",
+            "unit": "deg",
+            "value": 0.05
+          },
+          {
+            "group": "right_arm",
+            "index": 0,
+            "name": "right_arm[1]",
+            "unit": "deg",
+            "value": -32.35
+          },
+          {
+            "group": "right_arm",
+            "index": 1,
+            "name": "right_arm[2]",
+            "unit": "deg",
+            "value": -18.08
+          },
+          {
+            "group": "right_arm",
+            "index": 2,
+            "name": "right_arm[3]",
+            "unit": "deg",
+            "value": -11.23
+          },
+          {
+            "group": "right_arm",
+            "index": 3,
+            "name": "right_arm[4]",
+            "unit": "deg",
+            "value": -70.85
+          },
+          {
+            "group": "right_arm",
+            "index": 4,
+            "name": "right_arm[5]",
+            "unit": "deg",
+            "value": -12.86
+          },
+          {
+            "group": "right_arm",
+            "index": 5,
+            "name": "right_arm[6]",
+            "unit": "deg",
+            "value": 4.78
+          },
+          {
+            "group": "right_arm",
+            "index": 6,
+            "name": "right_arm[7]",
+            "unit": "deg",
+            "value": 16.13
+          },
+          {
+            "group": "right_gripper",
+            "index": 0,
+            "name": "right_gripper[1]",
+            "unit": "open_0_100",
+            "value": 0
+          }
+        ],
+        "timeout_s": 3
+      },
+      "source_page": "joints",
+      "type": "joint_targets",
+      "updated_at": "2026-08-27T12:31:42.282319Z"
+    },
+    {
+      "created_at": "2026-08-27T12:32:38.294279Z",
+      "description": "中文备注：从关节控制页保存的选中关节/夹爪目标。",
+      "id": "4ee7965a8968216a",
+      "name": "07放下",
+      "params": {
+        "targets": [
+          {
+            "group": "torso",
+            "index": 0,
+            "name": "torso[1]",
+            "unit": "deg",
+            "value": 15.09
+          },
+          {
+            "group": "torso",
+            "index": 1,
+            "name": "torso[2]",
+            "unit": "deg",
+            "value": -39.9
+          },
+          {
+            "group": "torso",
+            "index": 2,
+            "name": "torso[3]",
+            "unit": "deg",
+            "value": -39.88
+          },
+          {
+            "group": "torso",
+            "index": 3,
+            "name": "torso[4]",
+            "unit": "deg",
+            "value": 0.05
+          },
+          {
+            "group": "right_arm",
+            "index": 0,
+            "name": "right_arm[1]",
+            "unit": "deg",
+            "value": -32.51
+          },
+          {
+            "group": "right_arm",
+            "index": 1,
+            "name": "right_arm[2]",
+            "unit": "deg",
+            "value": -17.66
+          },
+          {
+            "group": "right_arm",
+            "index": 2,
+            "name": "right_arm[3]",
+            "unit": "deg",
+            "value": -8.63
+          },
+          {
+            "group": "right_arm",
+            "index": 3,
+            "name": "right_arm[4]",
+            "unit": "deg",
+            "value": -59.5
+          },
+          {
+            "group": "right_arm",
+            "index": 4,
+            "name": "right_arm[5]",
+            "unit": "deg",
+            "value": -13.6
+          },
+          {
+            "group": "right_arm",
+            "index": 5,
+            "name": "right_arm[6]",
+            "unit": "deg",
+            "value": -5.06
+          },
+          {
+            "group": "right_arm",
+            "index": 6,
+            "name": "right_arm[7]",
+            "unit": "deg",
+            "value": 16.06
+          },
+          {
+            "group": "right_gripper",
+            "index": 0,
+            "name": "right_gripper[1]",
+            "unit": "open_0_100",
+            "value": 0
+          }
+        ],
+        "timeout_s": 3
+      },
+      "source_page": "joints",
+      "type": "joint_targets",
+      "updated_at": "2026-08-27T12:32:38.294279Z"
+    },
+    {
+      "created_at": "2026-08-27T12:37:08.280676Z",
+      "description": "中文备注：末端相对运动原子动作，左右手通过 arm 参数配置。",
+      "id": "88dc660585d47dc4",
+      "name": "右手末端上移5cm",
+      "params": {
+        "allow_torso_ik": false,
+        "arm": "right",
+        "delta_rpy_deg": [
+          0,
+          0,
+          0
+        ],
+        "delta_xyz_m": [
+          0,
+          0,
+          0.05
+        ],
+        "offset_frame": "base",
+        "orientation": "rpy",
+        "reference_source": "current",
+        "timeout_s": 3
+      },
+      "source_page": "ee",
+      "type": "ee_plan_relative",
+      "updated_at": "2026-08-27T12:37:08.280676Z"
+    },
+    {
+      "created_at": "2026-08-27T12:38:30.032243Z",
+      "description": "中文备注：末端相对运动原子动作，左右手通过 arm 参数配置。",
+      "id": "0302d686fe42f2e9",
+      "name": "右手移开瓶子20cm",
+      "params": {
+        "allow_torso_ik": false,
+        "arm": "right",
+        "delta_rpy_deg": [
+          0,
+          0,
+          0
+        ],
+        "delta_xyz_m": [
+          0,
+          -0.2,
+          0
+        ],
+        "offset_frame": "base",
+        "orientation": "rpy",
+        "reference_source": "current",
+        "timeout_s": 3
+      },
+      "source_page": "ee",
+      "type": "ee_plan_relative",
+      "updated_at": "2026-08-27T12:38:30.032243Z"
+    },
+    {
+      "created_at": "2026-08-27T12:40:15.340106Z",
+      "description": "中文备注：末端相对运动原子动作，左右手通过 arm 参数配置。",
+      "id": "9636bdda386b3d50",
+      "name": "右手后退015m",
+      "params": {
+        "allow_torso_ik": false,
+        "arm": "right",
+        "delta_rpy_deg": [
+          0,
+          0,
+          0
+        ],
+        "delta_xyz_m": [
+          -0.15,
+          0,
+          0
+        ],
+        "offset_frame": "base",
+        "orientation": "rpy",
+        "reference_source": "current",
+        "timeout_s": 3
+      },
+      "source_page": "ee",
+      "type": "ee_plan_relative",
+      "updated_at": "2026-08-27T12:40:15.340106Z"
+    },
+    {
+      "created_at": "2026-08-27T12:54:08.951072Z",
+      "description": "右臂末端绕局部 L（-Z）轴 0°→+100°，5°/s；当前方向修正为反向（axis_rotation_direction=-1），旋转轴竖向偏置 0.014m（axis_offset_* 在 base_link 的垂直基底中解释，不是夹爪局部坐标）；其余末端位移与角度参数按当前动作配置。参数可在动作编辑器中修改。",
+      "generated_template": false,
+      "id": "ee_axial_yplus_zminus_20260826",
+      "name": "右臂L轴旋转并Y+Z-同步移动",
+      "params": {
+        "allow_torso_ik": false,
+        "arm": "right",
+        "axis_local_xyz": [
+          0,
+          0,
+          -1
+        ],
+        "axis_offset_lateral_m": 0,
+        "axis_offset_vertical_m": 0.014,
+        "axis_rotation_direction": -1,
+        "delta_xyz_m": [
+          0,
+          0.1,
+          -0.025
+        ],
+        "end_angle_deg": 110,
+        "settle_s": 0,
+        "speed_deg_s": 5,
+        "start_angle_deg": 0,
+        "timeout_s": 50,
+        "wait_for_completion": true,
+        "waypoint_step_deg": 2
+      },
+      "source_page": "ee",
+      "type": "ee_axial_motion",
+      "updated_at": "2026-08-27T12:54:08.951072Z"
+    },
+    {
+      "created_at": "2026-08-27T13:00:56.065023Z",
+      "description": "按保存的“倒液晶”14步动作顺序执行，每个相邻动作完成后默认等待1秒；动作参数沿用原子动作库中的当前值。",
+      "generated_template": true,
+      "id": "template_liquid_crystal_pour",
+      "name": "倒液晶（代码工作流）",
+      "params": {
+        "inter_action_delay_s": 1.0,
+        "workflow_id": "liquid_crystal_pour"
+      },
+      "source_page": "workflow",
+      "type": "code_workflow",
+      "updated_at": "2026-08-27T13:00:56.065023Z"
+    },
+    {
+      "created_at": "2026-08-27T13:01:22.021929Z",
+      "description": "中文备注：末端相对运动原子动作，左右手通过 arm 参数配置。",
+      "id": "6477e17cefc88afd",
+      "name": "下沉5mm",
+      "params": {
+        "allow_torso_ik": false,
+        "arm": "right",
+        "delta_rpy_deg": [
+          0,
+          0,
+          0
+        ],
+        "delta_xyz_m": [
+          0,
+          0,
+          -0.005
+        ],
+        "offset_frame": "base",
+        "orientation": "rpy",
+        "reference_source": "current",
+        "timeout_s": 3
+      },
+      "source_page": "ee",
+      "type": "ee_plan_relative",
+      "updated_at": "2026-08-27T13:01:22.021929Z"
+    },
+    {
+      "created_at": "2026-08-26T11:46:23.294881Z",
+      "description": "中文备注：移动到瓶子旁边；目标插值渐变时间6s（原3s），等效将运动速度降低约一半。",
+      "generated_template": false,
+      "id": "148d45c7491ba6d7",
+      "name": "04移动到瓶子旁边",
+      "params": {
+        "target_ramp_s": 6.0,
+        "targets": [
+          {
+            "group": "torso",
+            "index": 0,
+            "name": "torso[1]",
+            "unit": "deg",
+            "value": 15.05
+          },
+          {
+            "group": "torso",
+            "index": 1,
+            "name": "torso[2]",
+            "unit": "deg",
+            "value": -39.96
+          },
+          {
+            "group": "torso",
+            "index": 2,
+            "name": "torso[3]",
+            "unit": "deg",
+            "value": -39.99
+          },
+          {
+            "group": "torso",
+            "index": 3,
+            "name": "torso[4]",
+            "unit": "deg",
+            "value": 0.01
+          },
+          {
+            "group": "right_arm",
+            "index": 0,
+            "name": "right_arm[1]",
+            "unit": "deg",
+            "value": -30.34
+          },
+          {
+            "group": "right_arm",
+            "index": 1,
+            "name": "right_arm[2]",
+            "unit": "deg",
+            "value": -7.49
+          },
+          {
+            "group": "right_arm",
+            "index": 2,
+            "name": "right_arm[3]",
+            "unit": "deg",
+            "value": -4.94
+          },
+          {
+            "group": "right_arm",
+            "index": 3,
+            "name": "right_arm[4]",
+            "unit": "deg",
+            "value": -80.29
+          },
+          {
+            "group": "right_arm",
+            "index": 4,
+            "name": "right_arm[5]",
+            "unit": "deg",
+            "value": -5.89
+          },
+          {
+            "group": "right_arm",
+            "index": 5,
+            "name": "right_arm[6]",
+            "unit": "deg",
+            "value": 8.19
+          },
+          {
+            "group": "right_arm",
+            "index": 6,
+            "name": "right_arm[7]",
+            "unit": "deg",
+            "value": 6.13
+          },
+          {
+            "group": "right_gripper",
+            "index": 0,
+            "name": "right_gripper[1]",
+            "unit": "open_0_100",
+            "value": 0
+          }
+        ],
+        "timeout_s": 7.0
+      },
+      "source_page": "joints",
+      "type": "joint_targets",
+      "updated_at": "2026-08-27T13:06:31.033573Z"
+    },
+    {
+      "created_at": "2026-09-11T00:00:00Z",
+      "description": "右臂末端绕局部 L（-Z）轴 0°→-150°，5°/s；沿用当前方向设置（axis_rotation_direction=-1），旋转轴竖向偏置 0.014m（axis_offset_* 在 base_link 的垂直基底中解释，不是夹爪局部坐标），同时在 base_link 中 Y-0.2m、Z+0.1m；用于反向执行“右臂L轴旋转并Y+Z-同步移动”。参数可在动作编辑器中修改。",
+      "id": "ee_axial_yminus_zplus_20260911",
+      "name": "右臂L轴反向旋转并Y-Z+同步移动",
+      "params": {
+        "allow_torso_ik": false,
+        "arm": "right",
+        "axis_local_xyz": [
+          0.0,
+          0.0,
+          -1.0
+        ],
+        "axis_offset_lateral_m": 0.0,
+        "axis_offset_vertical_m": 0.014,
+        "axis_rotation_direction": -1,
+        "delta_xyz_m": [
+          0.0,
+          -0.2,
+          0.1
+        ],
+        "end_angle_deg": -150.0,
+        "settle_s": 0.0,
+        "speed_deg_s": 5.0,
+        "start_angle_deg": 0.0,
+        "timeout_s": 35.0,
+        "wait_for_completion": true,
+        "waypoint_step_deg": 2.0
+      },
+      "source_page": "ee",
+      "type": "ee_axial_motion",
+      "updated_at": "2026-09-11T00:00:00Z"
+    }
+  ],
+  "version": 2
+}

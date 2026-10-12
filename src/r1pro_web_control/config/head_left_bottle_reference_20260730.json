@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "reference_id": "head_left_bottle_20260730_220853",
+  "captured_at": "2026-07-30T22:08:53+08:00",
+  "camera_key": "head_left",
+  "robot_frame": "base_link",
+  "selection": {
+    "prompt": "bottle",
+    "confidence_threshold": 0.4,
+    "rule": "main foreground bottle nearest the recorded compensated xyz; reject mask area below 8000 px",
+    "confidence_median": 0.853715,
+    "sample_count": 12,
+    "first_source_stamp_ns": 1785420527334491691,
+    "last_source_stamp_ns": 1785420533267944478
+  },
+  "raw_base_xyz_m": [
+    0.7043,
+    -0.1552,
+    1.1861
+  ],
+  "raw_base_xyz_std_m": [
+    0.00023033791601810905,
+    0.00008975274678557635,
+    0.0008936115860186034
+  ],
+  "corrected_base_xyz_m": [
+    0.687044750325108,
+    -0.18177738936273694,
+    1.2295950241043063
+  ],
+  "corrected_base_xyz_std_m": [
+    0.00023555451837296534,
+    0.00012120409549739352,
+    0.0008885248527118124
+  ],
+  "coordinate_compensation": {
+    "enabled": true,
+    "matrix_version": "checker_6x6_30_plane_20260730_v1",
+    "source": "/home/motrix/galaxea/galaxea_overlay/test_results/checker_6x6_30_compare_20260730/plane_compensation_matrix.json"
+  },
+  "table_edge_reference": {
+    "captured_at": "2026-07-30T22:41:58+08:00",
+    "frame_id": "base_link",
+    "coordinate_compensation_enabled": true,
+    "edge_yaw_deg": -1.66,
+    "edge_yaw_std_deg": 0.81,
+    "edge_x_at_y0_m": 0.648,
+    "edge_x_std_m": 0.003,
+    "table_height_m": 1.088,
+    "edge_fit_rms_m": 0.006,
+    "sample_count": 10,
+    "sample_attempts": 11,
+    "roi": {
+      "x_m": [0.25, 1.4],
+      "y_abs_max_m": 0.45,
+      "z_m": [0.65, 1.3]
+    },
+    "notes": "Recorded while the user confirmed the chassis was facing the table."
+  },
+  "control_tolerances": {
+    "forward_x_m": 0.02,
+    "lateral_y_m": 0.03,
+    "table_yaw_deg": 5.0
+  },
+  "snapshots": {
+    "head_left_rgb": "/home/motrix/galaxea/galaxea_overlay/test_results/head_left_bottle_reference_20260730/head_left_rgb.jpg",
+    "yolo": "/home/motrix/galaxea/galaxea_overlay/test_results/head_left_bottle_reference_20260730/yolo_bottle.jpg"
+  },
+  "notes": [
+    "Reference is the large foreground tea bottle on the right side of the head image.",
+    "A second small bottle may appear behind the laptop; mask-area, z, and continuity gates prevent target switching.",
+    "The bottle is a point landmark, so the fine-adjust workflow controls chassis x/y only and never yaw.",
+    "The table edge is measured after applying the same head-camera coordinate compensation as the bottle."
+  ]
+}

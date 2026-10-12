@@ -1,0 +1,155 @@
+r1pro_aruco_box_pose:
+  ros__parameters:
+    image_topic: /hdas/camera_head/left_raw/image_raw_color/compressed
+    image_is_compressed: true
+    frame_id_override: ""
+    default_frame_id: camera_head_left_link
+
+    # ================= 输入模式 =================
+    # 默认 camera：订阅机器人头部相机话题并持续发布 pose。
+    # 改成 image：只读取 image_path 这一张图片，保存画出识别结果的图片后自动退出。
+    input_mode: camera
+
+    # input_mode=image 时使用；input_mode=camera 时忽略。
+    image_path: ""
+
+    # input_mode=image 时保存结果图的位置。
+    # 留空会自动保存成原图同目录下的 *_aruco_result.jpg / png。
+    output_image_path: ""
+
+    # 头部左 raw 相机内参，来自 /home/motrix/galaxea/galaxea_overlay/calibrationdata1080.tar.gz。
+    # 标定输入：/hdas/camera_head/left_raw/image_raw_color/compressed，图像尺寸 1920x1080。
+    use_camera_info: false
+    camera_info_topic: ""
+    camera_matrix: [1053.86460, 0.0, 982.42667,
+                    0.0, 1046.78350, 595.89145,
+                    0.0, 0.0, 1.0]
+    dist_coeffs: [-0.327196, 0.084977, -0.006612, -0.001204, 0.0]
+
+    # ================= ArUco 码参数 =================
+    # marker_size_bits 表示码内部是几乘几：
+    #   4 表示 4x4，5 表示 5x5，6 表示 6x6，7 表示 7x7。
+    # 如果不想按几乘几过滤字典，可以设成 0。
+    marker_size_bits: 5
+
+    # aruco_dictionaries 是码的编码/字典，支持写多个。
+    # 常用示例：
+    #   4x4: [DICT_4X4_50, DICT_4X4_100, DICT_4X4_250, DICT_4X4_1000]
+    #   5x5: [DICT_5X5_50, DICT_5X5_100, DICT_5X5_250, DICT_5X5_1000]
+    #   6x6: [DICT_6X6_50, DICT_6X6_100, DICT_6X6_250, DICT_6X6_1000]
+    # 为了降低误识别，最好只保留你实际打印的那个字典。
+    aruco_dictionaries: [DICT_5X5_50]
+
+    # aruco_dictionary 是旧版单字典参数，保留做兼容；实际优先使用上面的 aruco_dictionaries。
+    aruco_dictionary: DICT_5X5_50
+
+    # 多目标配置：支持同一画面里同时识别多个码，并且每个码可以有自己的尺寸。
+    # 下面这个例子表示：
+    #   5x5 / DICT_5X5_50 / id=0 / 边长80mm  -> 发布到 ..._0 话题
+    #   5x5 / DICT_5X5_50 / id=1 / 边长100mm -> 发布到 ..._1 话题
+    # 如果两个码用同一个字典，marker_target_dictionaries 可以只写一个值：
+    #   marker_target_dictionaries: [DICT_5X5_50]
+    # 这里显式写两个，读起来更直观。
+    marker_target_ids: [0, 1]
+    marker_target_lengths_m: [0.08, 0.10]
+    marker_target_dictionaries: [DICT_5X5_50, DICT_5X5_50]
+    marker_target_size_bits: [5, 5]
+    marker_topic_suffixes: ["0", "1"]
+
+    # 下面是旧版单目标参数，保留做兼容；实际优先使用上面的 marker_target_*。
+    # target_marker_id 是码编号。设为 -1 表示接受任意编号，不建议用于正式发布 pose。
+    target_marker_id: 0
+
+    # marker_length_m 是码黑色外边框的实际边长，单位米。
+    # 例如 100mm 写 0.10，80mm 写 0.08。
+    marker_length_m: 0.08
+
+    # axis_length_m 只影响图像/RViz 中画出的坐标轴长度，不影响 pose 计算。
+    axis_length_m: 0.10
+
+    process_period_s: 0.06666666666666667
+
+    # ================= 误识别抑制参数 =================
+    # 面积太小一般是远处噪声，面积太大一般是误检到其他黑白区域。
+    min_marker_area_px: 1500.0
+    max_marker_area_px: 60000.0
+    max_candidate_area_px: 60000.0
+
+    # 默认只用标准 ArUco 检测。下面两个调试开关打开后容易误识别，正式运行建议保持 false。
+    use_adaptive_variants: false
+    use_candidate_fallback: false
+    debug_draw_candidates: true
+
+    # false 表示未通过严格校验的识别结果只画到 annotated_image，不发布 pose。
+    publish_unverified_detections: false
+
+    # true 表示把识别到的码透视拉正后，逐格和目标字典/编号的标准图案比对。
+    # max_marker_bit_mismatches 为 0 表示必须完全匹配，误识别最低，但遮挡/模糊时可能漏检。
+    strict_marker_bit_check: true
+    max_marker_bit_mismatches: 0
+
+    # 四边形形状和位姿范围约束。
+    max_marker_side_ratio: 2.0
+    max_marker_angle_error_deg: 45.0
+    min_pose_z_m: 0.25
+    max_pose_z_m: 3.0
+    max_abs_pose_x_m: 1.5
+    max_abs_pose_y_m: 1.0
+
+    # 连续稳定识别 N 帧后才发布 pose。调大更稳但延迟更高。
+    required_stable_detections: 3
+    max_stable_center_jump_px: 60.0
+    max_stable_translation_jump_m: 0.15
+
+    # 发布前再和上一帧已发布 pose 比较，抑制 planar PnP 偶发跳到错误解。
+    # 现在实测错误分支会从 base_link x≈0.7,y≈0.3 跳到 x≈0.05,y≈-0.2，
+    # 远超下面阈值；正常微调/手动小幅移动一般只有几厘米。
+    publish_temporal_gate_enabled: true
+    max_publish_camera_translation_jump_m: 0.18
+    max_publish_target_translation_jump_m: 0.18
+    max_publish_target_yaw_jump_deg: 35.0
+
+    # 期望箱子坐标系相对于 ArUco 码中心坐标系的偏移。
+    # 如果箱子坐标系就定义在码中心，保持下面两个参数为 0。
+    box_translation_in_marker_frame_m: [0.0, 0.0, 0.0]
+    box_rpy_in_marker_frame_rad: [0.0, 0.0, 0.0]
+
+    # ================= base_link 坐标系输出 =================
+    # 机器人坐标系目标 frame。这里按你的需求使用 base_link。
+    # 注意：必须系统里已经存在 base_link <- camera_head_left_link 的 TF。
+    target_frame_id: base_link
+
+    # 查询 TF 的超时时间，单位秒。太小可能偶发查不到，太大可能拖慢图像回调。
+    tf_lookup_timeout_s: 0.05
+
+    # 图像时间戳比 TF 最新时间略超前时，回退使用最新 TF。
+    # 你的日志里 "extrapolation into the future" 就是这种情况；头相机外参基本固定，建议保持 true。
+    use_latest_tf_on_extrapolation: true
+
+    # true 时发布 marker/box 在 target_frame_id 下的 6D pose。
+    # 如果 TF 查不到，会继续发布相机坐标系 pose，只节流打印 warn。
+    publish_base_poses: true
+
+    # 计算相对位姿：source 这个码在 reference 这个码坐标系下的 pose。
+    # 当前表示发布 aruco id 0 在 aruco id 1 坐标系下的 6D pose。
+    relative_source_marker_id: 0
+    relative_reference_marker_id: 1
+
+    # pose_topic / marker_pose_topic 是基础话题名。
+    # 节点会自动加 marker_topic_suffixes 后缀，例如：
+    #   /r1pro_aruco_box_pose/box_pose_camera_0
+    #   /r1pro_aruco_box_pose/box_pose_camera_1
+    #   /r1pro_aruco_box_pose/marker_pose_camera_0
+    #   /r1pro_aruco_box_pose/marker_pose_camera_1
+    pose_topic: /r1pro_aruco_box_pose/box_pose_camera
+    marker_pose_topic: /r1pro_aruco_box_pose/marker_pose_camera
+    base_pose_topic: /r1pro_aruco_box_pose/box_pose_base_link
+    marker_base_pose_topic: /r1pro_aruco_box_pose/marker_pose_base_link
+    relative_pose_topic: /r1pro_aruco_box_pose/aruco_0_pose_in_aruco_1
+    annotated_topic: /r1pro_aruco_box_pose/annotated_image
+    marker_array_topic: /r1pro_aruco_box_pose/markers
+    publish_marker_pose: true
+    publish_annotated_image: true
+    publish_visualization_markers: true
+    publish_tf: false
+    tf_child_frame_id: aruco_box

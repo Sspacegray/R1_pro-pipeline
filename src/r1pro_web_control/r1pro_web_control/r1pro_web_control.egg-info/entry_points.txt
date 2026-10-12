@@ -1,0 +1,6 @@
+[console_scripts]
+r1pro_map_editor = r1pro_web_control.map_editor:main
+r1pro_web_head_depth_worker = r1pro_web_control.head_depth_worker:main
+r1pro_web_server = r1pro_web_control.server_node:main
+r1pro_web_vision_worker = r1pro_web_control.vision_worker:main
+

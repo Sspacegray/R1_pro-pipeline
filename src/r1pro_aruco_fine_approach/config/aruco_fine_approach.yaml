@@ -1,0 +1,39 @@
+r1pro_aruco_fine_approach:
+  ros__parameters:
+    pose_topic: /r1pro_aruco_box_pose/marker_pose_base_link_1
+    enable_topic: /r1pro_aruco_fine_approach/enable
+    command_topic: /motion_target/target_speed_chassis
+    in_tolerance_topic: /r1pro_aruco_fine_approach/in_tolerance
+    status_topic: /r1pro_aruco_fine_approach/status
+
+    target_frame_id: base_link
+    require_target_frame: true
+    command_frame_id: body
+
+    target_x_m: 0.616
+    target_y_m: 0.007
+    x_tolerance_m: 0.01
+    y_tolerance_m: 0.01
+
+    kp_x: 0.6
+    kp_y: 0.5
+    kp_yaw: 0.0
+    max_linear_x_mps: 0.03
+    max_linear_y_mps: 0.02
+    max_angular_z_radps: 0.08
+    min_bearing_x_m: 0.05
+    x_command_sign: 1.0
+    y_command_sign: 1.0
+    yaw_command_sign: 1.0
+    enable_yaw_control: false
+    max_start_error_x_m: 0.25
+    max_start_error_y_m: 0.15
+
+    control_rate_hz: 20.0
+    pose_timeout_s: 1.0
+    max_runtime_s: 4.0
+    success_hold_s: 0.5
+    auto_disable_on_success: true
+    divergence_check_enabled: true
+    divergence_grace_s: 0.8
+    divergence_error_increase_m: 0.03

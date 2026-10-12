@@ -1,0 +1,1942 @@
+#!/usr/bin/env python3
+
+import math
+from array import array
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Dict, List, Optional, Sequence, Tuple
+
+import cv2
+import numpy as np
+import rclpy
+from rclpy.executors import MultiThreadedExecutor
+from geometry_msgs.msg import Point, PoseStamped, Quaternion, TransformStamped
+from rclpy.duration import Duration
+from rclpy.node import Node
+from rclpy.time import Time
+from sensor_msgs.msg import CameraInfo, CompressedImage, Image
+from tf2_ros import Buffer, TransformBroadcaster, TransformException, TransformListener
+from visualization_msgs.msg import Marker, MarkerArray
+
+
+@dataclass
+class DictionarySpec:
+    name: str
+    dictionary: object
+    detector: Optional[object]
+    marker_size_bits: int
+
+
+@dataclass
+class MarkerTarget:
+    name: str
+    dictionary_name: str
+    marker_size_bits: int
+    marker_id: int
+    marker_length_m: float
+    topic_suffix: str
+    reference_bits: Optional[np.ndarray]
+
+
+@dataclass
+class MarkerDetection:
+    area: float
+    marker_id: int
+    corners: np.ndarray
+    source: str
+    dictionary_name: str
+    target: MarkerTarget
+
+
+@dataclass
+class VerifiedMarkerPose:
+    target: MarkerTarget
+    marker_id: int
+    dictionary_name: str
+    marker_matrix_camera: np.ndarray
+    box_matrix_camera: np.ndarray
+
+
+def normalize_quaternion(values: Sequence[float]) -> np.ndarray:
+    q = np.asarray(values, dtype=np.float64)
+    norm = float(np.linalg.norm(q))
+    if norm <= 0.0:
+        return np.array([0.0, 0.0, 0.0, 1.0], dtype=np.float64)
+    return q / norm
+
+
+def quaternion_from_rotation_matrix(rotation: np.ndarray) -> Quaternion:
+    trace = float(np.trace(rotation))
+    if trace > 0.0:
+        scale = math.sqrt(trace + 1.0) * 2.0
+        qw = 0.25 * scale
+        qx = (rotation[2, 1] - rotation[1, 2]) / scale
+        qy = (rotation[0, 2] - rotation[2, 0]) / scale
+        qz = (rotation[1, 0] - rotation[0, 1]) / scale
+    else:
+        diagonal = np.diag(rotation)
+        index = int(np.argmax(diagonal))
+        if index == 0:
+            scale = math.sqrt(1.0 + rotation[0, 0] - rotation[1, 1] - rotation[2, 2]) * 2.0
+            qw = (rotation[2, 1] - rotation[1, 2]) / scale
+            qx = 0.25 * scale
+            qy = (rotation[0, 1] + rotation[1, 0]) / scale
+            qz = (rotation[0, 2] + rotation[2, 0]) / scale
+        elif index == 1:
+            scale = math.sqrt(1.0 + rotation[1, 1] - rotation[0, 0] - rotation[2, 2]) * 2.0
+            qw = (rotation[0, 2] - rotation[2, 0]) / scale
+            qx = (rotation[0, 1] + rotation[1, 0]) / scale
+            qy = 0.25 * scale
+            qz = (rotation[1, 2] + rotation[2, 1]) / scale
+        else:
+            scale = math.sqrt(1.0 + rotation[2, 2] - rotation[0, 0] - rotation[1, 1]) * 2.0
+            qw = (rotation[1, 0] - rotation[0, 1]) / scale
+            qx = (rotation[0, 2] + rotation[2, 0]) / scale
+            qy = (rotation[1, 2] + rotation[2, 1]) / scale
+            qz = 0.25 * scale
+
+    qx, qy, qz, qw = normalize_quaternion([qx, qy, qz, qw])
+    msg = Quaternion()
+    msg.x = float(qx)
+    msg.y = float(qy)
+    msg.z = float(qz)
+    msg.w = float(qw)
+    return msg
+
+
+def rotation_matrix_from_quaternion(values: Sequence[float]) -> np.ndarray:
+    qx, qy, qz, qw = normalize_quaternion(values)
+    xx = qx * qx
+    yy = qy * qy
+    zz = qz * qz
+    xy = qx * qy
+    xz = qx * qz
+    yz = qy * qz
+    wx = qw * qx
+    wy = qw * qy
+    wz = qw * qz
+    return np.array(
+        [
+            [1.0 - 2.0 * (yy + zz), 2.0 * (xy - wz), 2.0 * (xz + wy)],
+            [2.0 * (xy + wz), 1.0 - 2.0 * (xx + zz), 2.0 * (yz - wx)],
+            [2.0 * (xz - wy), 2.0 * (yz + wx), 1.0 - 2.0 * (xx + yy)],
+        ],
+        dtype=np.float64,
+    )
+
+
+def rotation_matrix_from_rpy(roll: float, pitch: float, yaw: float) -> np.ndarray:
+    cr = math.cos(roll)
+    sr = math.sin(roll)
+    cp = math.cos(pitch)
+    sp = math.sin(pitch)
+    cy = math.cos(yaw)
+    sy = math.sin(yaw)
+
+    rx = np.array([[1.0, 0.0, 0.0], [0.0, cr, -sr], [0.0, sr, cr]], dtype=np.float64)
+    ry = np.array([[cp, 0.0, sp], [0.0, 1.0, 0.0], [-sp, 0.0, cp]], dtype=np.float64)
+    rz = np.array([[cy, -sy, 0.0], [sy, cy, 0.0], [0.0, 0.0, 1.0]], dtype=np.float64)
+    return rz @ ry @ rx
+
+
+def rpy_from_rotation_matrix(rotation: np.ndarray) -> Tuple[float, float, float]:
+    sy = math.sqrt(rotation[0, 0] * rotation[0, 0] + rotation[1, 0] * rotation[1, 0])
+    singular = sy < 1e-6
+    if not singular:
+        roll = math.atan2(rotation[2, 1], rotation[2, 2])
+        pitch = math.atan2(-rotation[2, 0], sy)
+        yaw = math.atan2(rotation[1, 0], rotation[0, 0])
+    else:
+        roll = math.atan2(-rotation[1, 2], rotation[1, 1])
+        pitch = math.atan2(-rotation[2, 0], sy)
+        yaw = 0.0
+    return roll, pitch, yaw
+
+
+def normalize_angle_rad(angle: float) -> float:
+    return math.atan2(math.sin(angle), math.cos(angle))
+
+
+def point_msg(values: Sequence[float]) -> Point:
+    msg = Point()
+    msg.x = float(values[0])
+    msg.y = float(values[1])
+    msg.z = float(values[2])
+    return msg
+
+
+def order_points(points: np.ndarray) -> np.ndarray:
+    pts = np.asarray(points, dtype=np.float32).reshape(-1, 2)
+    total = pts.sum(axis=1)
+    diff = np.diff(pts, axis=1).reshape(-1)
+    ordered = np.zeros((4, 2), dtype=np.float32)
+    ordered[0] = pts[np.argmin(total)]
+    ordered[2] = pts[np.argmax(total)]
+    ordered[1] = pts[np.argmin(diff)]
+    ordered[3] = pts[np.argmax(diff)]
+    return ordered
+
+
+def expand_quad(quad: np.ndarray, scale: float) -> np.ndarray:
+    center = quad.mean(axis=0)
+    return (quad - center) * float(scale) + center
+
+
+def marker_area(corners: np.ndarray) -> float:
+    return abs(float(cv2.contourArea(corners.reshape(4, 2).astype(np.float32))))
+
+
+def marker_center(corners: np.ndarray) -> np.ndarray:
+    return corners.reshape(4, 2).mean(axis=0)
+
+
+def quad_aspect_ratio(quad: np.ndarray) -> float:
+    top = np.linalg.norm(quad[1] - quad[0])
+    bottom = np.linalg.norm(quad[2] - quad[3])
+    left = np.linalg.norm(quad[3] - quad[0])
+    right = np.linalg.norm(quad[2] - quad[1])
+    return float((0.5 * (top + bottom)) / max(1e-6, 0.5 * (left + right)))
+
+
+def image_variants(image_bgr: np.ndarray):
+    gray = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2GRAY)
+    yield "bgr", image_bgr
+    yield "gray", cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
+    clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8)).apply(gray)
+    yield "clahe", cv2.cvtColor(clahe, cv2.COLOR_GRAY2BGR)
+    _, otsu = cv2.threshold(clahe, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    yield "otsu", cv2.cvtColor(otsu, cv2.COLOR_GRAY2BGR)
+    for block_size in (31, 51, 71, 91, 121):
+        adaptive = cv2.adaptiveThreshold(
+            clahe,
+            255,
+            cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+            cv2.THRESH_BINARY,
+            block_size,
+            3,
+        )
+        yield f"adaptive{block_size}", cv2.cvtColor(adaptive, cv2.COLOR_GRAY2BGR)
+
+
+class ArucoBoxPose(Node):
+    def __init__(self) -> None:
+        super().__init__("r1pro_aruco_box_pose")
+
+        self.image_topic = self.declare_parameter(
+            "image_topic", "/hdas/camera_head/left_raw/image_raw_color/compressed"
+        ).value
+        self.image_is_compressed = bool(self.declare_parameter("image_is_compressed", True).value)
+        self.camera_info_topic = self.declare_parameter("camera_info_topic", "").value
+        self.use_camera_info = bool(self.declare_parameter("use_camera_info", False).value)
+        self.frame_id_override = self.declare_parameter("frame_id_override", "").value
+        self.default_frame_id = self.declare_parameter("default_frame_id", "camera_head_left_link").value
+        self.input_mode = str(self.declare_parameter("input_mode", "camera").value).strip().lower()
+        self.image_path = str(self.declare_parameter("image_path", "").value).strip()
+        self.output_image_path = str(self.declare_parameter("output_image_path", "").value).strip()
+        if self.input_mode not in ("camera", "image"):
+            raise ValueError("input_mode must be 'camera' or 'image'")
+
+        self.aruco_dictionary_name = self.declare_parameter("aruco_dictionary", "DICT_5X5_50").value
+        self.aruco_dictionary_names = self._string_list_parameter(
+            "aruco_dictionaries", [self.aruco_dictionary_name]
+        )
+        self.configured_marker_size_bits = int(self.declare_parameter("marker_size_bits", 5).value)
+        self.target_marker_id = int(self.declare_parameter("target_marker_id", 0).value)
+        self.marker_length_m = float(self.declare_parameter("marker_length_m", 0.10).value)
+        self.marker_target_ids = self._int_list_parameter("marker_target_ids", [self.target_marker_id])
+        self.marker_target_lengths_m = self._float_list_parameter(
+            "marker_target_lengths_m", [self.marker_length_m]
+        )
+        self.marker_target_dictionaries = self._string_list_parameter(
+            "marker_target_dictionaries", self.aruco_dictionary_names
+        )
+        self.marker_target_size_bits = self._int_list_parameter(
+            "marker_target_size_bits", [self.configured_marker_size_bits]
+        )
+        self.marker_topic_suffixes = self._string_list_parameter("marker_topic_suffixes", [])
+        self.aruco_dictionary_names = self.unique_strings(
+            list(self.aruco_dictionary_names) + list(self.marker_target_dictionaries)
+        )
+        self.axis_length_m = float(self.declare_parameter("axis_length_m", 0.10).value)
+        self.process_period_s = float(self.declare_parameter("process_period_s", 0.5).value)
+        self.min_marker_area_px = float(self.declare_parameter("min_marker_area_px", 250.0).value)
+        self.max_marker_area_px = float(self.declare_parameter("max_marker_area_px", 60000.0).value)
+        self.max_candidate_area_px = float(
+            self.declare_parameter("max_candidate_area_px", 120000.0).value
+        )
+        self.use_adaptive_variants = bool(self.declare_parameter("use_adaptive_variants", False).value)
+        self.use_candidate_fallback = bool(self.declare_parameter("use_candidate_fallback", False).value)
+        self.debug_draw_candidates = bool(self.declare_parameter("debug_draw_candidates", True).value)
+        self.publish_unverified_detections = bool(
+            self.declare_parameter("publish_unverified_detections", False).value
+        )
+        self.strict_marker_bit_check = bool(self.declare_parameter("strict_marker_bit_check", True).value)
+        self.max_marker_bit_mismatches = int(self.declare_parameter("max_marker_bit_mismatches", 0).value)
+        self.max_marker_side_ratio = float(self.declare_parameter("max_marker_side_ratio", 2.0).value)
+        self.max_marker_angle_error_deg = float(
+            self.declare_parameter("max_marker_angle_error_deg", 45.0).value
+        )
+        self.min_pose_z_m = float(self.declare_parameter("min_pose_z_m", 0.25).value)
+        self.max_pose_z_m = float(self.declare_parameter("max_pose_z_m", 3.0).value)
+        self.max_abs_pose_x_m = float(self.declare_parameter("max_abs_pose_x_m", 1.5).value)
+        self.max_abs_pose_y_m = float(self.declare_parameter("max_abs_pose_y_m", 1.0).value)
+        self.required_stable_detections = int(
+            self.declare_parameter("required_stable_detections", 3).value
+        )
+        self.max_stable_center_jump_px = float(
+            self.declare_parameter("max_stable_center_jump_px", 60.0).value
+        )
+        self.max_stable_translation_jump_m = float(
+            self.declare_parameter("max_stable_translation_jump_m", 0.15).value
+        )
+        self.publish_temporal_gate_enabled = bool(
+            self.declare_parameter("publish_temporal_gate_enabled", True).value
+        )
+        self.max_publish_camera_translation_jump_m = float(
+            self.declare_parameter("max_publish_camera_translation_jump_m", 0.18).value
+        )
+        self.max_publish_target_translation_jump_m = float(
+            self.declare_parameter("max_publish_target_translation_jump_m", 0.18).value
+        )
+        self.max_publish_target_yaw_jump_deg = float(
+            self.declare_parameter("max_publish_target_yaw_jump_deg", 35.0).value
+        )
+
+        self.box_translation_in_marker_frame_m = np.asarray(
+            self._float_list_parameter("box_translation_in_marker_frame_m", [0.0, 0.0, 0.0], 3),
+            dtype=np.float64,
+        )
+        box_rpy = self._float_list_parameter("box_rpy_in_marker_frame_rad", [0.0, 0.0, 0.0], 3)
+        self.box_rotation_in_marker_frame = rotation_matrix_from_rpy(box_rpy[0], box_rpy[1], box_rpy[2])
+
+        self.pose_topic = self.declare_parameter(
+            "pose_topic", "/r1pro_aruco_box_pose/box_pose_camera"
+        ).value
+        self.marker_pose_topic = self.declare_parameter(
+            "marker_pose_topic", "/r1pro_aruco_box_pose/marker_pose_camera"
+        ).value
+        self.annotated_topic = self.declare_parameter(
+            "annotated_topic", "/r1pro_aruco_box_pose/annotated_image"
+        ).value
+        self.marker_array_topic = self.declare_parameter(
+            "marker_array_topic", "/r1pro_aruco_box_pose/markers"
+        ).value
+        self.publish_marker_pose = bool(self.declare_parameter("publish_marker_pose", True).value)
+        self.publish_annotated_image = bool(self.declare_parameter("publish_annotated_image", True).value)
+        self.publish_visualization_markers = bool(
+            self.declare_parameter("publish_visualization_markers", True).value
+        )
+        self.publish_tf = bool(self.declare_parameter("publish_tf", False).value)
+        self.tf_child_frame_id = self.declare_parameter("tf_child_frame_id", "aruco_box").value
+        self.target_frame_id = self.declare_parameter("target_frame_id", "base_link").value
+        self.tf_lookup_timeout_s = float(self.declare_parameter("tf_lookup_timeout_s", 0.05).value)
+        self.use_latest_tf_on_extrapolation = bool(
+            self.declare_parameter("use_latest_tf_on_extrapolation", True).value
+        )
+        self.publish_base_poses = bool(self.declare_parameter("publish_base_poses", True).value)
+        self.relative_source_marker_id = int(
+            self.declare_parameter("relative_source_marker_id", 0).value
+        )
+        self.relative_reference_marker_id = int(
+            self.declare_parameter("relative_reference_marker_id", 1).value
+        )
+        self.base_pose_topic = self.declare_parameter(
+            "base_pose_topic", "/r1pro_aruco_box_pose/box_pose_base_link"
+        ).value
+        self.marker_base_pose_topic = self.declare_parameter(
+            "marker_base_pose_topic", "/r1pro_aruco_box_pose/marker_pose_base_link"
+        ).value
+        self.relative_pose_topic = self.declare_parameter(
+            "relative_pose_topic", "/r1pro_aruco_box_pose/aruco_0_pose_in_aruco_1"
+        ).value
+
+        self.camera_matrix: Optional[np.ndarray] = None
+        self.dist_coeffs: Optional[np.ndarray] = None
+        self._load_intrinsics_from_parameters()
+
+        self.detector_parameters = self._make_detector_parameters()
+        self.dictionary_specs = self._make_dictionary_specs()
+        self.marker_targets = self._make_marker_targets()
+
+        image_type = CompressedImage if self.image_is_compressed else Image
+        if self.input_mode == "camera":
+            self.create_subscription(image_type, self.image_topic, self.on_image, 10)
+        if self.use_camera_info and self.camera_info_topic:
+            self.create_subscription(CameraInfo, self.camera_info_topic, self.on_camera_info, 10)
+
+        self.pose_pubs = {
+            target.name: self.create_publisher(
+                PoseStamped, self.topic_with_suffix(self.pose_topic, target.topic_suffix), 10
+            )
+            for target in self.marker_targets
+        }
+        self.marker_pose_pubs = {
+            target.name: self.create_publisher(
+                PoseStamped, self.topic_with_suffix(self.marker_pose_topic, target.topic_suffix), 10
+            )
+            for target in self.marker_targets
+        }
+        self.annotated_pub = self.create_publisher(Image, self.annotated_topic, 10)
+        self.marker_array_pub = self.create_publisher(MarkerArray, self.marker_array_topic, 10)
+        self.tf_broadcaster = TransformBroadcaster(self) if self.publish_tf else None
+        self.tf_buffer = Buffer() if self.publish_base_poses else None
+        self.tf_listener = (
+            TransformListener(self.tf_buffer, self) if self.tf_buffer is not None else None
+        )
+        self.base_pose_pubs = {
+            target.name: self.create_publisher(
+                PoseStamped, self.topic_with_suffix(self.base_pose_topic, target.topic_suffix), 10
+            )
+            for target in self.marker_targets
+        }
+        self.marker_base_pose_pubs = {
+            target.name: self.create_publisher(
+                PoseStamped,
+                self.topic_with_suffix(self.marker_base_pose_topic, target.topic_suffix),
+                10,
+            )
+            for target in self.marker_targets
+        }
+        self.relative_pose_pub = self.create_publisher(PoseStamped, self.relative_pose_topic, 10)
+
+        self.last_process_time = self.get_clock().now() - Duration(seconds=10.0)
+        self.last_visible_ids: List[str] = []
+        self.last_candidate_quads: List[np.ndarray] = []
+        self.last_candidate_search_ran = False
+        self.stable_detection_counts: Dict[str, int] = {}
+        self.last_verified_centers_px: Dict[str, np.ndarray] = {}
+        self.last_verified_translations_m: Dict[str, np.ndarray] = {}
+        self.last_published_camera_translations_m: Dict[str, np.ndarray] = {}
+        self.last_published_target_translations_m: Dict[str, np.ndarray] = {}
+        self.last_published_target_yaws_rad: Dict[str, float] = {}
+
+        self.get_logger().info(
+            "ArUco box pose ready: mode=%s image=%s compressed=%s targets=%s "
+            "pose_base=%s target_frame=%s"
+            % (
+                self.input_mode,
+                self.image_topic,
+                self.image_is_compressed,
+                ";".join(
+                    "%s:id%d:%.3fm->%s"
+                    % (
+                        target.dictionary_name,
+                        target.marker_id,
+                        target.marker_length_m,
+                        self.topic_with_suffix(self.pose_topic, target.topic_suffix),
+                    )
+                    for target in self.marker_targets
+                ),
+                self.pose_topic,
+                self.target_frame_id,
+            )
+        )
+        if not self.has_intrinsics():
+            self.get_logger().warn(
+                "camera intrinsics are not set yet. Fill camera_matrix/dist_coeffs in the YAML "
+                "or enable use_camera_info with a valid CameraInfo topic."
+            )
+
+    def _float_list_parameter(
+        self, name: str, default_value: Sequence[float], expected_length: Optional[int] = None
+    ) -> List[float]:
+        value = self.declare_parameter(name, list(default_value)).value
+        values = [float(item) for item in value]
+        if expected_length is not None and len(values) != expected_length:
+            raise ValueError(f"{name} must contain {expected_length} values")
+        return values
+
+    def _string_list_parameter(self, name: str, default_value: Sequence[str]) -> List[str]:
+        declare_default = list(default_value) if default_value else [""]
+        value = self.declare_parameter(name, declare_default).value
+        if isinstance(value, str):
+            values = [item.strip() for item in value.split(",")]
+        else:
+            values = [str(item).strip() for item in value]
+        unique: List[str] = []
+        for item in values:
+            if item and item not in unique:
+                unique.append(item)
+        return unique
+
+    def _int_list_parameter(self, name: str, default_value: Sequence[int]) -> List[int]:
+        value = self.declare_parameter(name, list(default_value)).value
+        if isinstance(value, str):
+            values = [int(item.strip()) for item in value.split(",") if item.strip()]
+        else:
+            values = [int(item) for item in value]
+        return values
+
+    @staticmethod
+    def unique_strings(values: Sequence[str]) -> List[str]:
+        unique: List[str] = []
+        for value in values:
+            if value and value not in unique:
+                unique.append(value)
+        return unique
+
+    @staticmethod
+    def repeated_or_index(values: Sequence, index: int, count: int, name: str):
+        if len(values) == count:
+            return values[index]
+        if len(values) == 1:
+            return values[0]
+        raise ValueError(f"{name} must contain 1 value or {count} values")
+
+    @staticmethod
+    def topic_with_suffix(base_topic: str, suffix: str) -> str:
+        return f"{base_topic.rstrip('/')}_{suffix}"
+
+    @staticmethod
+    def safe_topic_suffix(text: str) -> str:
+        suffix = "".join(char if char.isalnum() or char == "_" else "_" for char in text)
+        return suffix.strip("_") or "marker"
+
+    def _load_intrinsics_from_parameters(self) -> None:
+        camera_matrix_values = self._float_list_parameter(
+            "camera_matrix",
+            [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+            9,
+        )
+        dist_values = self._float_list_parameter("dist_coeffs", [0.0, 0.0, 0.0, 0.0, 0.0])
+
+        matrix = np.asarray(camera_matrix_values, dtype=np.float64).reshape(3, 3)
+        if self._valid_camera_matrix(matrix):
+            self.camera_matrix = matrix
+            self.dist_coeffs = np.asarray(dist_values, dtype=np.float64).reshape(-1, 1)
+        else:
+            self.camera_matrix = None
+            self.dist_coeffs = None
+
+    @staticmethod
+    def _valid_camera_matrix(matrix: np.ndarray) -> bool:
+        if matrix.shape != (3, 3):
+            return False
+        return (
+            np.isfinite(matrix).all()
+            and abs(float(matrix[0, 0])) > 1e-9
+            and abs(float(matrix[1, 1])) > 1e-9
+            and abs(float(matrix[2, 2])) > 1e-9
+        )
+
+    def has_intrinsics(self) -> bool:
+        return self.camera_matrix is not None and self.dist_coeffs is not None
+
+    def _make_dictionary(self, name: str):
+        dictionary_name = self.normalized_dictionary_name(name)
+        if not hasattr(cv2.aruco, dictionary_name):
+            known = sorted(item for item in dir(cv2.aruco) if item.startswith("DICT_"))
+            raise ValueError(f"unknown ArUco dictionary '{name}'. Known dictionaries: {known}")
+        dictionary_id = getattr(cv2.aruco, dictionary_name)
+        if hasattr(cv2.aruco, "getPredefinedDictionary"):
+            return cv2.aruco.getPredefinedDictionary(dictionary_id)
+        return cv2.aruco.Dictionary_get(dictionary_id)
+
+    def _make_dictionary_specs(self) -> List[DictionarySpec]:
+        specs: List[DictionarySpec] = []
+        names = self.aruco_dictionary_names or [self.aruco_dictionary_name]
+        allowed_marker_sizes = {int(value) for value in self.marker_target_size_bits if int(value) > 0}
+        if not allowed_marker_sizes and self.configured_marker_size_bits > 0:
+            allowed_marker_sizes.add(self.configured_marker_size_bits)
+        for name in names:
+            dictionary_name = self.normalized_dictionary_name(name)
+            dictionary = self._make_dictionary(dictionary_name)
+            marker_size_bits = self.dictionary_marker_size_bits(dictionary_name, dictionary)
+            if (
+                allowed_marker_sizes
+                and marker_size_bits > 0
+                and marker_size_bits not in allowed_marker_sizes
+            ):
+                self.get_logger().warn(
+                    "skip ArUco dictionary %s: allowed marker sizes=%s but dictionary is %dx%d"
+                    % (
+                        dictionary_name,
+                        sorted(allowed_marker_sizes),
+                        marker_size_bits,
+                        marker_size_bits,
+                    )
+                )
+                continue
+            detector = self._make_detector(dictionary)
+            specs.append(
+                DictionarySpec(
+                    name=dictionary_name,
+                    dictionary=dictionary,
+                    detector=detector,
+                    marker_size_bits=marker_size_bits,
+                )
+            )
+
+        if not specs:
+            raise ValueError(
+                "no usable ArUco dictionaries. Check aruco_dictionaries and marker_size_bits in the YAML."
+            )
+        return specs
+
+    def _make_marker_targets(self) -> List[MarkerTarget]:
+        count = len(self.marker_target_ids)
+        if count <= 0:
+            raise ValueError("marker_target_ids must contain at least one marker id")
+
+        id_counts: Dict[int, int] = {}
+        for marker_id in self.marker_target_ids:
+            id_counts[marker_id] = id_counts.get(marker_id, 0) + 1
+
+        targets: List[MarkerTarget] = []
+        for index, marker_id in enumerate(self.marker_target_ids):
+            dictionary_name = self.normalized_dictionary_name(
+                self.repeated_or_index(
+                    self.marker_target_dictionaries,
+                    index,
+                    count,
+                    "marker_target_dictionaries",
+                )
+            )
+            dictionary_spec = self.dictionary_spec_by_name(dictionary_name)
+            if dictionary_spec is None:
+                raise ValueError(f"marker target {index} uses unavailable dictionary {dictionary_name}")
+
+            marker_size_bits = int(
+                self.repeated_or_index(
+                    self.marker_target_size_bits,
+                    index,
+                    count,
+                    "marker_target_size_bits",
+                )
+            )
+            if marker_size_bits <= 0:
+                marker_size_bits = dictionary_spec.marker_size_bits
+            if (
+                marker_size_bits > 0
+                and dictionary_spec.marker_size_bits > 0
+                and marker_size_bits != dictionary_spec.marker_size_bits
+            ):
+                raise ValueError(
+                    "marker target %d uses marker_size_bits=%d but dictionary %s is %dx%d"
+                    % (index, marker_size_bits, dictionary_name, dictionary_spec.marker_size_bits, dictionary_spec.marker_size_bits)
+                )
+
+            marker_length_m = float(
+                self.repeated_or_index(
+                    self.marker_target_lengths_m,
+                    index,
+                    count,
+                    "marker_target_lengths_m",
+                )
+            )
+            if marker_length_m <= 0.0:
+                raise ValueError(f"marker_target_lengths_m[{index}] must be > 0")
+
+            if self.marker_topic_suffixes:
+                topic_suffix = self.safe_topic_suffix(
+                    str(self.repeated_or_index(self.marker_topic_suffixes, index, count, "marker_topic_suffixes"))
+                )
+            elif id_counts.get(marker_id, 0) == 1:
+                topic_suffix = str(marker_id)
+            else:
+                topic_suffix = self.safe_topic_suffix(f"{dictionary_name.lower()}_{marker_id}")
+
+            reference_bits = self.make_reference_marker_bits(
+                dictionary_name,
+                dictionary_spec.dictionary,
+                marker_size_bits,
+                marker_id,
+            )
+            targets.append(
+                MarkerTarget(
+                    name=f"{dictionary_name}:{marker_id}:{index}",
+                    dictionary_name=dictionary_name,
+                    marker_size_bits=marker_size_bits,
+                    marker_id=marker_id,
+                    marker_length_m=marker_length_m,
+                    topic_suffix=topic_suffix,
+                    reference_bits=reference_bits,
+                )
+            )
+
+        return targets
+
+    @staticmethod
+    def normalized_dictionary_name(name: str) -> str:
+        return name if name.startswith("DICT_") else f"DICT_{name}"
+
+    @staticmethod
+    def _make_detector_parameters():
+        if hasattr(cv2.aruco, "DetectorParameters_create"):
+            params = cv2.aruco.DetectorParameters_create()
+        else:
+            params = cv2.aruco.DetectorParameters()
+        if hasattr(cv2.aruco, "CORNER_REFINE_SUBPIX"):
+            params.cornerRefinementMethod = cv2.aruco.CORNER_REFINE_SUBPIX
+        params.adaptiveThreshWinSizeMin = 3
+        params.adaptiveThreshWinSizeMax = 83
+        params.adaptiveThreshWinSizeStep = 10
+        params.cornerRefinementWinSize = 5
+        params.cornerRefinementMaxIterations = 30
+        return params
+
+    def _make_detector(self, dictionary):
+        if hasattr(cv2.aruco, "ArucoDetector"):
+            return cv2.aruco.ArucoDetector(dictionary, self.detector_parameters)
+        return None
+
+    def on_camera_info(self, msg: CameraInfo) -> None:
+        matrix = np.asarray(msg.k, dtype=np.float64).reshape(3, 3)
+        if not self._valid_camera_matrix(matrix):
+            self.get_logger().warn("received CameraInfo with invalid K matrix", throttle_duration_sec=2.0)
+            return
+        self.camera_matrix = matrix
+        self.dist_coeffs = np.asarray(msg.d, dtype=np.float64).reshape(-1, 1)
+
+    def on_image(self, msg) -> None:
+        now = self.get_clock().now()
+        if self.process_period_s > 0.0:
+            elapsed_s = (now - self.last_process_time).nanoseconds * 1e-9
+            # Keep a fixed cadence instead of restarting the interval on each
+            # arrival. Allow up to 10 ms of input jitter at the rate boundary.
+            jitter_margin_s = min(0.01, self.process_period_s * 0.15)
+            if elapsed_s < self.process_period_s - jitter_margin_s:
+                return
+            elapsed_periods = max(1, int(elapsed_s / self.process_period_s))
+            self.last_process_time += Duration(
+                seconds=elapsed_periods * self.process_period_s
+            )
+        else:
+            self.last_process_time = now
+
+        if not self.has_intrinsics():
+            self.get_logger().warn("waiting for camera intrinsics", throttle_duration_sec=2.0)
+            return
+
+        image = self.decode_image(msg)
+        if image is None:
+            return
+
+        header = msg.header
+        frame_id = self.frame_id_override or header.frame_id or self.default_frame_id
+        header.frame_id = frame_id
+        self.process_image(
+            image,
+            header,
+            publish_ros=True,
+            save_image_path="",
+            require_stability=True,
+        )
+
+    def run_image_once(self) -> int:
+        if not self.image_path:
+            self.get_logger().error("input_mode=image requires image_path")
+            return 2
+
+        if not self.has_intrinsics():
+            self.get_logger().error(
+                "input_mode=image requires valid camera_matrix/dist_coeffs to compute and draw 6D pose"
+            )
+            return 2
+
+        image = cv2.imread(self.image_path)
+        if image is None:
+            self.get_logger().error(f"failed to read image_path: {self.image_path}")
+            return 2
+
+        header = Image().header
+        header.stamp = self.get_clock().now().to_msg()
+        header.frame_id = self.frame_id_override or self.default_frame_id
+        output_path = self.output_image_path or self.default_output_image_path(self.image_path)
+        self.process_image(
+            image,
+            header,
+            publish_ros=False,
+            save_image_path=output_path,
+            require_stability=False,
+        )
+        return 0
+
+    @staticmethod
+    def default_output_image_path(image_path: str) -> str:
+        path = Path(image_path).expanduser()
+        return str(path.with_name(f"{path.stem}_aruco_result{path.suffix}"))
+
+    def process_image(
+        self,
+        image: np.ndarray,
+        header,
+        publish_ros: bool,
+        save_image_path: str,
+        require_stability: bool,
+    ) -> None:
+        frame_id = header.frame_id or self.default_frame_id
+        annotated = image.copy()
+        detections = self.detect_target_markers(image)
+        if not detections:
+            self.reset_stability()
+            if publish_ros:
+                self.publish_delete_markers(frame_id)
+            if self.debug_draw_candidates:
+                self.draw_candidate_quads(annotated, self.last_candidate_quads)
+            self.draw_failure_debug(annotated)
+            if publish_ros:
+                self.publish_annotated(annotated, header)
+            if save_image_path:
+                self.save_annotated_image(annotated, save_image_path)
+            self.get_logger().warn(
+                "target ArUco marker id %d not detected; visible_ids=%s square_candidates=%s "
+                "adaptive=%s fallback=%s"
+                % (
+                    self.target_marker_id,
+                    self.last_visible_ids[:20],
+                    len(self.last_candidate_quads) if self.last_candidate_search_ran else "not_searched",
+                    self.use_adaptive_variants,
+                    self.use_candidate_fallback,
+                ),
+                throttle_duration_sec=2.0,
+            )
+            return
+
+        detected_target_names = {detection.target.name for detection in detections}
+        for target in self.marker_targets:
+            if target.name not in detected_target_names:
+                self.reset_stability(target.name)
+
+        target_from_camera = (
+            self.lookup_target_from_camera_matrix(frame_id, header.stamp)
+            if self.publish_base_poses
+            else None
+        )
+        published_any = False
+        pose_label_index = 0
+        verified_poses: List[VerifiedMarkerPose] = []
+        for detection in detections:
+            target = detection.target
+            marker_id = detection.marker_id
+            marker_corners = detection.corners
+            detection_source = detection.source
+            dictionary_name = detection.dictionary_name
+
+            self.draw_detected_marker(annotated, marker_id, marker_corners)
+            rvec, tvec = self.estimate_marker_pose(marker_corners, target.marker_length_m)
+            if rvec is None or tvec is None:
+                self.reset_stability(target.name)
+                continue
+
+            marker_rotation, _ = cv2.Rodrigues(rvec)
+            marker_translation = tvec.reshape(3).astype(np.float64)
+            box_translation, box_rotation = self.marker_pose_to_box_pose(marker_translation, marker_rotation)
+            marker_matrix_camera = self.pose_matrix(marker_translation, marker_rotation)
+            box_matrix_camera = self.pose_matrix(box_translation, box_rotation)
+
+            marker_pose = self.make_pose(marker_translation, marker_rotation, header, frame_id)
+            box_pose = self.make_pose(box_translation, box_rotation, header, frame_id)
+
+            rejection_reasons = self.verification_rejection_reasons(
+                image, detection_source, target, marker_corners, box_translation
+            )
+            if rejection_reasons:
+                self.reset_stability(target.name)
+            elif require_stability:
+                stability_reason = self.update_stability(target.name, marker_corners, box_translation)
+                if stability_reason:
+                    rejection_reasons.append(stability_reason)
+
+            verified = not rejection_reasons
+            target_translation = None
+            target_rotation = None
+            if verified and target_from_camera is not None:
+                box_matrix_target = target_from_camera @ box_matrix_camera
+                target_translation, target_rotation = self.matrix_translation_rotation(box_matrix_target)
+            if verified:
+                rejection_reasons.extend(
+                    self.publish_temporal_rejection_reasons(
+                        target.name,
+                        box_translation,
+                        target_translation,
+                        target_rotation,
+                    )
+                )
+                verified = not rejection_reasons
+            if verified:
+                verified_poses.append(
+                    VerifiedMarkerPose(
+                        target=target,
+                        marker_id=marker_id,
+                        dictionary_name=dictionary_name,
+                        marker_matrix_camera=marker_matrix_camera,
+                        box_matrix_camera=box_matrix_camera,
+                    )
+                )
+            self.draw_pose_axis(annotated, rvec, tvec)
+            self.draw_pose_label(
+                annotated,
+                marker_id,
+                box_translation,
+                box_rotation,
+                f"{dictionary_name}:{detection_source}:{target.marker_length_m:.3f}m",
+                verified,
+                pose_label_index,
+                self.target_frame_id if self.publish_base_poses else "",
+                target_translation,
+                target_rotation,
+            )
+            pose_label_index += 1
+
+            if publish_ros and not verified and not self.publish_unverified_detections:
+                self.get_logger().warn(
+                    "unverified ArUco detection suppressed: marker_id=%d source=%s reasons=%s. "
+                    "No pose was published on %s"
+                    % (
+                        marker_id,
+                        f"{dictionary_name}:{detection_source}",
+                        ",".join(rejection_reasons),
+                        self.topic_with_suffix(self.pose_topic, target.topic_suffix),
+                    ),
+                    throttle_duration_sec=2.0,
+                )
+                continue
+
+            if publish_ros:
+                self.pose_pubs[target.name].publish(box_pose)
+                if self.publish_marker_pose:
+                    self.marker_pose_pubs[target.name].publish(marker_pose)
+                if self.publish_tf:
+                    self.publish_box_tf(box_pose)
+                if self.publish_visualization_markers:
+                    self.marker_array_pub.publish(
+                        self.make_markers(box_translation, box_rotation, frame_id, target.topic_suffix)
+                    )
+                self.remember_published_pose(
+                    target.name,
+                    box_translation,
+                    target_translation,
+                    target_rotation,
+                )
+            published_any = True
+
+            roll, pitch, yaw = rpy_from_rotation_matrix(box_rotation)
+            self.get_logger().info(
+                "box pose in %s: marker_id=%d dictionary=%s length=%.3fm topic=%s xyz=(%.3f, %.3f, %.3f)m "
+                "rpy=(%.1f, %.1f, %.1f)deg"
+                % (
+                    frame_id,
+                    marker_id,
+                    dictionary_name,
+                    target.marker_length_m,
+                    self.topic_with_suffix(self.pose_topic, target.topic_suffix),
+                    box_translation[0],
+                    box_translation[1],
+                    box_translation[2],
+                    math.degrees(roll),
+                    math.degrees(pitch),
+                    math.degrees(yaw),
+                ),
+                throttle_duration_sec=1.0,
+            )
+
+        if publish_ros and not published_any:
+            self.publish_delete_markers(frame_id)
+        if publish_ros:
+            self.publish_transformed_poses(verified_poses, header, frame_id, target_from_camera)
+            self.publish_relative_marker_pose(verified_poses, header)
+            self.publish_annotated(annotated, header)
+        if save_image_path:
+            self.save_annotated_image(annotated, save_image_path)
+
+    @staticmethod
+    def detection_is_verified(source: str) -> bool:
+        return source in ("direct:standard:bgr", "direct:standard:gray")
+
+    def verification_rejection_reasons(
+        self,
+        image_bgr: np.ndarray,
+        source: str,
+        target: MarkerTarget,
+        marker_corners: np.ndarray,
+        translation_m: np.ndarray,
+    ) -> List[str]:
+        reasons: List[str] = []
+        if not self.detection_is_verified(source):
+            reasons.append(f"source:{source}")
+
+        area = marker_area(marker_corners)
+        if area < self.min_marker_area_px:
+            reasons.append(f"area_low:{area:.0f}")
+        if self.max_marker_area_px > 0.0 and area > self.max_marker_area_px:
+            reasons.append(f"area_high:{area:.0f}")
+
+        side_ratio = self.marker_side_ratio(marker_corners)
+        if side_ratio > self.max_marker_side_ratio:
+            reasons.append(f"side_ratio:{side_ratio:.2f}")
+
+        angle_error = self.marker_max_angle_error_deg(marker_corners)
+        if angle_error > self.max_marker_angle_error_deg:
+            reasons.append(f"angle_error:{angle_error:.1f}")
+
+        if self.strict_marker_bit_check:
+            mismatches = self.marker_bit_mismatches(image_bgr, marker_corners, target)
+            if mismatches is None:
+                reasons.append("bit_check_unavailable")
+            elif mismatches > self.max_marker_bit_mismatches:
+                reasons.append(f"bit_mismatch:{mismatches}")
+
+        x, y, z = translation_m.reshape(3)
+        if self.min_pose_z_m > 0.0 and z < self.min_pose_z_m:
+            reasons.append(f"z_low:{z:.2f}")
+        if self.max_pose_z_m > 0.0 and z > self.max_pose_z_m:
+            reasons.append(f"z_high:{z:.2f}")
+        if self.max_abs_pose_x_m > 0.0 and abs(x) > self.max_abs_pose_x_m:
+            reasons.append(f"x_out:{x:.2f}")
+        if self.max_abs_pose_y_m > 0.0 and abs(y) > self.max_abs_pose_y_m:
+            reasons.append(f"y_out:{y:.2f}")
+
+        return reasons
+
+    def update_stability(self, target_name: str, marker_corners: np.ndarray, translation_m: np.ndarray) -> str:
+        center_px = marker_center(marker_corners).astype(np.float64)
+        translation = translation_m.reshape(3).astype(np.float64)
+        stable_with_previous = True
+        previous_center = self.last_verified_centers_px.get(target_name)
+        previous_translation = self.last_verified_translations_m.get(target_name)
+        if previous_center is not None:
+            center_jump = float(np.linalg.norm(center_px - previous_center))
+            if center_jump > self.max_stable_center_jump_px:
+                stable_with_previous = False
+        if previous_translation is not None:
+            translation_jump = float(np.linalg.norm(translation - previous_translation))
+            if translation_jump > self.max_stable_translation_jump_m:
+                stable_with_previous = False
+
+        previous_count = self.stable_detection_counts.get(target_name, 0)
+        self.stable_detection_counts[target_name] = previous_count + 1 if stable_with_previous else 1
+        self.last_verified_centers_px[target_name] = center_px
+        self.last_verified_translations_m[target_name] = translation
+
+        required = max(1, self.required_stable_detections)
+        current_count = self.stable_detection_counts[target_name]
+        if current_count < required:
+            return f"stabilizing:{current_count}/{required}"
+        return ""
+
+    def reset_stability(self, target_name: Optional[str] = None) -> None:
+        if target_name is None:
+            self.stable_detection_counts.clear()
+            self.last_verified_centers_px.clear()
+            self.last_verified_translations_m.clear()
+            return
+        self.stable_detection_counts.pop(target_name, None)
+        self.last_verified_centers_px.pop(target_name, None)
+        self.last_verified_translations_m.pop(target_name, None)
+
+    def publish_temporal_rejection_reasons(
+        self,
+        target_name: str,
+        camera_translation_m: np.ndarray,
+        target_translation_m: Optional[np.ndarray],
+        target_rotation: Optional[np.ndarray],
+    ) -> List[str]:
+        if not self.publish_temporal_gate_enabled:
+            return []
+
+        reasons: List[str] = []
+        camera_translation = camera_translation_m.reshape(3).astype(np.float64)
+        previous_camera = self.last_published_camera_translations_m.get(target_name)
+        if previous_camera is not None and self.max_publish_camera_translation_jump_m > 0.0:
+            jump = float(np.linalg.norm(camera_translation - previous_camera))
+            if jump > self.max_publish_camera_translation_jump_m:
+                reasons.append(f"publish_camera_jump:{jump:.3f}")
+
+        if target_translation_m is not None:
+            target_translation = target_translation_m.reshape(3).astype(np.float64)
+            previous_target = self.last_published_target_translations_m.get(target_name)
+            if previous_target is not None and self.max_publish_target_translation_jump_m > 0.0:
+                jump = float(np.linalg.norm(target_translation - previous_target))
+                if jump > self.max_publish_target_translation_jump_m:
+                    reasons.append(f"publish_base_jump:{jump:.3f}")
+
+        if target_rotation is not None:
+            _, _, yaw = rpy_from_rotation_matrix(target_rotation)
+            previous_yaw = self.last_published_target_yaws_rad.get(target_name)
+            if previous_yaw is not None and self.max_publish_target_yaw_jump_deg > 0.0:
+                jump_deg = abs(math.degrees(normalize_angle_rad(yaw - previous_yaw)))
+                if jump_deg > self.max_publish_target_yaw_jump_deg:
+                    reasons.append(f"publish_yaw_jump:{jump_deg:.1f}")
+
+        return reasons
+
+    def remember_published_pose(
+        self,
+        target_name: str,
+        camera_translation_m: np.ndarray,
+        target_translation_m: Optional[np.ndarray],
+        target_rotation: Optional[np.ndarray],
+    ) -> None:
+        self.last_published_camera_translations_m[target_name] = (
+            camera_translation_m.reshape(3).astype(np.float64).copy()
+        )
+        if target_translation_m is not None:
+            self.last_published_target_translations_m[target_name] = (
+                target_translation_m.reshape(3).astype(np.float64).copy()
+            )
+        if target_rotation is not None:
+            _, _, yaw = rpy_from_rotation_matrix(target_rotation)
+            self.last_published_target_yaws_rad[target_name] = float(yaw)
+
+    @staticmethod
+    def marker_side_ratio(marker_corners: np.ndarray) -> float:
+        pts = marker_corners.reshape(4, 2).astype(np.float64)
+        sides = np.linalg.norm(np.roll(pts, -1, axis=0) - pts, axis=1)
+        min_side = max(1e-6, float(np.min(sides)))
+        return float(np.max(sides) / min_side)
+
+    @staticmethod
+    def marker_max_angle_error_deg(marker_corners: np.ndarray) -> float:
+        pts = marker_corners.reshape(4, 2).astype(np.float64)
+        errors = []
+        for index in range(4):
+            previous_vec = pts[(index - 1) % 4] - pts[index]
+            next_vec = pts[(index + 1) % 4] - pts[index]
+            denom = max(1e-9, float(np.linalg.norm(previous_vec) * np.linalg.norm(next_vec)))
+            cosine = float(np.dot(previous_vec, next_vec) / denom)
+            cosine = min(1.0, max(-1.0, cosine))
+            angle_deg = math.degrees(math.acos(cosine))
+            errors.append(abs(angle_deg - 90.0))
+        return float(max(errors))
+
+    def make_reference_marker_bits(
+        self, name: str, dictionary, marker_size_bits: int, marker_id: int
+    ) -> Optional[np.ndarray]:
+        if marker_size_bits <= 0 or marker_id < 0:
+            return None
+        cells = marker_size_bits + 2
+        render_size = cells * 80
+        marker_image = np.zeros((render_size, render_size), dtype=np.uint8)
+        try:
+            if hasattr(cv2.aruco, "generateImageMarker"):
+                marker_image = cv2.aruco.generateImageMarker(
+                    dictionary, marker_id, render_size
+                )
+            else:
+                cv2.aruco.drawMarker(dictionary, marker_id, render_size, marker_image, 1)
+        except cv2.error as exc:
+            self.get_logger().warn(
+                f"failed to render reference marker for {name}: {exc}",
+                throttle_duration_sec=2.0,
+            )
+            return None
+        return self.sample_marker_bits(marker_image, cells)
+
+    @staticmethod
+    def dictionary_marker_size_bits(name: str, dictionary) -> int:
+        if hasattr(dictionary, "markerSize"):
+            return int(dictionary.markerSize)
+        parts = name.split("_")
+        if len(parts) >= 2 and "X" in parts[1]:
+            return int(parts[1].split("X", 1)[0])
+        return 0
+
+    def marker_bit_mismatches(
+        self, image_bgr: np.ndarray, marker_corners: np.ndarray, target: MarkerTarget
+    ) -> Optional[int]:
+        if target.reference_bits is None:
+            return None
+        cells = int(target.reference_bits.shape[0])
+        canonical_size = cells * 80
+        dst = np.float32(
+            [
+                [0.0, 0.0],
+                [canonical_size - 1.0, 0.0],
+                [canonical_size - 1.0, canonical_size - 1.0],
+                [0.0, canonical_size - 1.0],
+            ]
+        )
+        gray = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2GRAY)
+        transform = cv2.getPerspectiveTransform(marker_corners.astype(np.float32), dst)
+        warp = cv2.warpPerspective(gray, transform, (canonical_size, canonical_size))
+        observed_bits = self.sample_marker_bits(warp, cells)
+        return int(np.count_nonzero(observed_bits != target.reference_bits))
+
+    def dictionary_spec_by_name(self, dictionary_name: str) -> Optional[DictionarySpec]:
+        for spec in self.dictionary_specs:
+            if spec.name == dictionary_name:
+                return spec
+        return None
+
+    @staticmethod
+    def sample_marker_bits(marker_image: np.ndarray, cells: int) -> np.ndarray:
+        if marker_image.ndim == 3:
+            gray = cv2.cvtColor(marker_image, cv2.COLOR_BGR2GRAY)
+        else:
+            gray = marker_image
+        _, binary = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        height, width = binary.shape[:2]
+        bits = np.zeros((cells, cells), dtype=np.uint8)
+        for y in range(cells):
+            for x in range(cells):
+                x0 = int(round(x * width / cells))
+                x1 = int(round((x + 1) * width / cells))
+                y0 = int(round(y * height / cells))
+                y1 = int(round((y + 1) * height / cells))
+                margin_x = max(1, int(round((x1 - x0) * 0.25)))
+                margin_y = max(1, int(round((y1 - y0) * 0.25)))
+                roi = binary[y0 + margin_y : y1 - margin_y, x0 + margin_x : x1 - margin_x]
+                bits[y, x] = 1 if float(np.mean(roi)) < 128.0 else 0
+        return bits
+
+    def decode_image(self, msg) -> Optional[np.ndarray]:
+        if isinstance(msg, CompressedImage):
+            encoded = np.frombuffer(msg.data, dtype=np.uint8)
+            image = cv2.imdecode(encoded, cv2.IMREAD_COLOR)
+            if image is None:
+                self.get_logger().warn("failed to decode compressed image", throttle_duration_sec=2.0)
+                return None
+            return image
+
+        try:
+            encoding = msg.encoding.lower()
+            if encoding in ("bgr8", "rgb8"):
+                arr = np.frombuffer(msg.data, dtype=np.uint8).reshape(msg.height, msg.step)
+                arr = arr[:, : msg.width * 3].reshape(msg.height, msg.width, 3)
+                if encoding == "rgb8":
+                    arr = cv2.cvtColor(arr, cv2.COLOR_RGB2BGR)
+                return np.ascontiguousarray(arr)
+            if encoding in ("bgra8", "rgba8"):
+                arr = np.frombuffer(msg.data, dtype=np.uint8).reshape(msg.height, msg.step)
+                arr = arr[:, : msg.width * 4].reshape(msg.height, msg.width, 4)
+                code = cv2.COLOR_BGRA2BGR if encoding == "bgra8" else cv2.COLOR_RGBA2BGR
+                return np.ascontiguousarray(cv2.cvtColor(arr, code))
+            if encoding in ("mono8", "8uc1"):
+                arr = np.frombuffer(msg.data, dtype=np.uint8).reshape(msg.height, msg.step)
+                gray = arr[:, : msg.width]
+                return cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
+        except ValueError as exc:
+            self.get_logger().warn(f"failed to decode image: {exc}", throttle_duration_sec=2.0)
+            return None
+
+        self.get_logger().warn(f"unsupported image encoding: {msg.encoding}", throttle_duration_sec=2.0)
+        return None
+
+    def detect_markers(self, image: np.ndarray, spec: DictionarySpec, relaxed: bool = False):
+        if relaxed:
+            params = cv2.aruco.DetectorParameters_create()
+            params.cornerRefinementMethod = cv2.aruco.CORNER_REFINE_SUBPIX
+            params.cornerRefinementWinSize = 5
+            params.cornerRefinementMaxIterations = 30
+            params.adaptiveThreshWinSizeMin = 3
+            params.adaptiveThreshWinSizeMax = 101
+            params.adaptiveThreshWinSizeStep = 10
+            params.errorCorrectionRate = 1.0
+            params.minOtsuStdDev = 0.0
+            params.minMarkerPerimeterRate = 0.01
+            params.minCornerDistanceRate = 0.005
+            params.minDistanceToBorder = 1
+            if hasattr(params, "detectInvertedMarker"):
+                params.detectInvertedMarker = True
+            return cv2.aruco.detectMarkers(image, spec.dictionary, parameters=params)
+
+        if spec.detector is not None:
+            return spec.detector.detectMarkers(image)
+        return cv2.aruco.detectMarkers(image, spec.dictionary, parameters=self.detector_parameters)
+
+    def detect_target_markers(self, image_bgr: np.ndarray) -> List[MarkerDetection]:
+        self.last_visible_ids = []
+        self.last_candidate_quads = []
+        self.last_candidate_search_ran = False
+        direct = self.detect_target_marker_direct(image_bgr)
+        if direct:
+            return direct
+        if self.use_candidate_fallback or self.debug_draw_candidates:
+            candidates = self.find_square_candidates(image_bgr)
+            self.last_candidate_search_ran = True
+            self.last_candidate_quads = [candidate[0] for candidate in candidates]
+        if not self.use_candidate_fallback:
+            return []
+        return self.detect_target_marker_from_candidates(image_bgr, candidates)
+
+    def target_for(self, dictionary_name: str, marker_id: int) -> Optional[MarkerTarget]:
+        for target in self.marker_targets:
+            if target.dictionary_name == dictionary_name and target.marker_id == int(marker_id):
+                return target
+        return None
+
+    @staticmethod
+    def deduplicate_detections(detections: Sequence[MarkerDetection]) -> List[MarkerDetection]:
+        unique: List[MarkerDetection] = []
+        for detection in sorted(detections, key=lambda item: item.area, reverse=True):
+            if any(existing.target.name == detection.target.name for existing in unique):
+                continue
+            unique.append(detection)
+        return unique
+
+    def detect_target_marker_direct(self, image_bgr: np.ndarray) -> List[MarkerDetection]:
+        detections: List[MarkerDetection] = []
+        variants = list(image_variants(image_bgr)) if self.use_adaptive_variants else self.basic_image_variants(image_bgr)
+        relaxed_modes = (False, True) if self.use_adaptive_variants else (False,)
+        for spec in self.dictionary_specs:
+            for relaxed in relaxed_modes:
+                for variant_name, variant in variants:
+                    corners, ids, _ = self.detect_markers(variant, spec, relaxed=relaxed)
+                    if ids is None:
+                        continue
+                    for index, marker_id in enumerate(ids.flatten().astype(int)):
+                        marker_id = int(marker_id)
+                        visible_label = f"{spec.name}:{marker_id}"
+                        if visible_label not in self.last_visible_ids:
+                            self.last_visible_ids.append(visible_label)
+                        marker_corners = corners[index].reshape(4, 2).astype(np.float32)
+                        area = marker_area(marker_corners)
+                        target = self.target_for(spec.name, marker_id)
+                        if area < self.min_marker_area_px or target is None:
+                            continue
+                        if self.max_marker_area_px > 0.0 and area > self.max_marker_area_px:
+                            continue
+                        if self.marker_side_ratio(marker_corners) > self.max_marker_side_ratio:
+                            continue
+                        if self.marker_max_angle_error_deg(marker_corners) > self.max_marker_angle_error_deg:
+                            continue
+                        if self.strict_marker_bit_check:
+                            mismatches = self.marker_bit_mismatches(image_bgr, marker_corners, target)
+                            if mismatches is None or mismatches > self.max_marker_bit_mismatches:
+                                continue
+                        mode = "relaxed" if relaxed else "standard"
+                        detections.append(
+                            MarkerDetection(
+                                area=area,
+                                marker_id=marker_id,
+                                corners=marker_corners,
+                                source=f"direct:{mode}:{variant_name}",
+                                dictionary_name=spec.name,
+                                target=target,
+                            )
+                        )
+        return self.deduplicate_detections(detections)
+
+    @staticmethod
+    def basic_image_variants(image_bgr: np.ndarray):
+        gray = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2GRAY)
+        return [
+            ("bgr", image_bgr),
+            ("gray", cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)),
+        ]
+
+    def detect_target_marker_from_candidates(self, image_bgr: np.ndarray, candidates):
+        detections: List[MarkerDetection] = []
+        warp_size = 420
+        pad = 90
+        dst = np.float32(
+            [
+                [0.0, 0.0],
+                [warp_size - 1.0, 0.0],
+                [warp_size - 1.0, warp_size - 1.0],
+                [0.0, warp_size - 1.0],
+            ]
+        )
+        for spec in self.dictionary_specs:
+            for candidate_quad, candidate_area, threshold in candidates:
+                for scale in (0.96, 1.0, 1.03, 1.06, 1.10, 1.15, 1.20):
+                    quad = expand_quad(candidate_quad, scale).astype(np.float32)
+                    transform = cv2.getPerspectiveTransform(quad, dst)
+                    inverse_transform = np.linalg.inv(transform)
+                    warp = cv2.warpPerspective(image_bgr, transform, (warp_size, warp_size))
+                    padded = cv2.copyMakeBorder(
+                        warp, pad, pad, pad, pad, cv2.BORDER_CONSTANT, value=(255, 255, 255)
+                    )
+                    for variant_name, variant in image_variants(padded):
+                        corners, ids, _ = self.detect_markers(variant, spec, relaxed=True)
+                        if ids is None:
+                            continue
+                        for index, marker_id in enumerate(ids.flatten().astype(int)):
+                            marker_id = int(marker_id)
+                            visible_label = f"{spec.name}:{marker_id}"
+                            if visible_label not in self.last_visible_ids:
+                                self.last_visible_ids.append(visible_label)
+                            target = self.target_for(spec.name, marker_id)
+                            if target is None:
+                                continue
+                            padded_corners = corners[index].reshape(4, 2).astype(np.float32)
+                            warp_corners = padded_corners - np.float32([pad, pad])
+                            original_corners = cv2.perspectiveTransform(
+                                warp_corners.reshape(1, 4, 2), inverse_transform
+                            ).reshape(4, 2)
+                            original_corners = order_points(original_corners)
+                            decoded_area = marker_area(original_corners)
+                            if decoded_area < self.min_marker_area_px:
+                                continue
+                            source = f"candidate:t{threshold}:scale{scale:.2f}:{variant_name}"
+                            detections.append(
+                                MarkerDetection(
+                                    area=decoded_area,
+                                    marker_id=marker_id,
+                                    corners=original_corners,
+                                    source=source,
+                                    dictionary_name=spec.name,
+                                    target=target,
+                                )
+                            )
+        return self.deduplicate_detections(detections)
+
+    def find_square_candidates(self, image_bgr: np.ndarray):
+        gray = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2GRAY)
+        kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
+        candidates = []
+        for threshold in (40, 50, 60, 70, 80, 90, 100, 120, 140, 160):
+            mask = np.where(gray < threshold, 255, 0).astype(np.uint8)
+            mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel, iterations=1)
+            contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            for contour in contours:
+                area = float(cv2.contourArea(contour))
+                if area < self.min_marker_area_px or area > self.max_candidate_area_px:
+                    continue
+                perimeter = cv2.arcLength(contour, True)
+                approx = cv2.approxPolyDP(contour, 0.04 * perimeter, True)
+                if len(approx) != 4:
+                    continue
+                quad = order_points(approx.reshape(-1, 2))
+                aspect = quad_aspect_ratio(quad)
+                if aspect < 0.65 or aspect > 1.55:
+                    continue
+                if not cv2.isContourConvex(quad.astype(np.float32)):
+                    continue
+                candidates.append((quad, area, threshold))
+
+        unique = []
+        for candidate in sorted(candidates, key=lambda item: item[1], reverse=True):
+            center = candidate[0].mean(axis=0)
+            if any(np.linalg.norm(center - kept[0].mean(axis=0)) < 20.0 for kept in unique):
+                continue
+            unique.append(candidate)
+        return unique
+
+    @staticmethod
+    def draw_candidate_quads(image: np.ndarray, quads: Sequence[np.ndarray]) -> None:
+        for quad in quads[:50]:
+            points = quad.astype(np.int32).reshape(-1, 1, 2)
+            cv2.polylines(image, [points], True, (0, 220, 255), 1, cv2.LINE_AA)
+
+    def draw_failure_debug(self, image: np.ndarray) -> None:
+        lines = [
+            f"target id {self.target_marker_id} not detected",
+            f"visible ids {self.last_visible_ids[:10]}",
+            "square candidates %s min_area %.0f"
+            % (
+                len(self.last_candidate_quads) if self.last_candidate_search_ran else "not searched",
+                self.min_marker_area_px,
+            ),
+            f"adaptive {self.use_adaptive_variants} fallback {self.use_candidate_fallback}",
+        ]
+        for index, line in enumerate(lines):
+            y = 32 + index * 28
+            cv2.putText(
+                image,
+                line,
+                (16, y),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.72,
+                (0, 0, 0),
+                4,
+                cv2.LINE_AA,
+            )
+            cv2.putText(
+                image,
+                line,
+                (16, y),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.72,
+                (0, 220, 255),
+                2,
+                cv2.LINE_AA,
+            )
+
+    @staticmethod
+    def draw_detected_marker(image: np.ndarray, marker_id: int, marker_corners: np.ndarray) -> None:
+        corners_i = marker_corners.astype(np.int32).reshape(-1, 1, 2)
+        cv2.polylines(image, [corners_i], True, (0, 255, 0), 3, cv2.LINE_AA)
+        center = marker_center(marker_corners)
+        cv2.circle(image, (int(center[0]), int(center[1])), 6, (255, 0, 255), -1, cv2.LINE_AA)
+        label = f"ArUco id {marker_id}"
+        cv2.putText(
+            image,
+            label,
+            (int(marker_corners[0, 0]), max(24, int(marker_corners[0, 1]) - 12)),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            0.75,
+            (0, 0, 0),
+            4,
+            cv2.LINE_AA,
+        )
+        cv2.putText(
+            image,
+            label,
+            (int(marker_corners[0, 0]), max(24, int(marker_corners[0, 1]) - 12)),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            0.75,
+            (0, 255, 0),
+            2,
+            cv2.LINE_AA,
+        )
+
+    def select_marker(self, corners, ids_flat: np.ndarray) -> Optional[int]:
+        indices = list(range(len(ids_flat)))
+        if self.target_marker_id >= 0:
+            indices = [index for index in indices if int(ids_flat[index]) == self.target_marker_id]
+        if not indices:
+            return None
+        return max(indices, key=lambda index: abs(cv2.contourArea(corners[index].reshape(4, 2))))
+
+    def estimate_marker_pose(
+        self, marker_corners, marker_length_m: Optional[float] = None
+    ) -> Tuple[Optional[np.ndarray], Optional[np.ndarray]]:
+        length_m = self.marker_length_m if marker_length_m is None else float(marker_length_m)
+        corners = np.asarray(marker_corners, dtype=np.float32).reshape(4, 2)
+        try:
+            if hasattr(cv2.aruco, "estimatePoseSingleMarkers"):
+                rvecs, tvecs, _ = cv2.aruco.estimatePoseSingleMarkers(
+                    [corners.reshape(1, 4, 2)],
+                    length_m,
+                    self.camera_matrix,
+                    self.dist_coeffs,
+                )
+                return rvecs[0].reshape(3, 1), tvecs[0].reshape(3, 1)
+
+            half = 0.5 * length_m
+            object_points = np.asarray(
+                [
+                    [-half, half, 0.0],
+                    [half, half, 0.0],
+                    [half, -half, 0.0],
+                    [-half, -half, 0.0],
+                ],
+                dtype=np.float32,
+            )
+            flag = getattr(cv2, "SOLVEPNP_IPPE_SQUARE", cv2.SOLVEPNP_ITERATIVE)
+            ok, rvec, tvec = cv2.solvePnP(
+                object_points,
+                corners,
+                self.camera_matrix,
+                self.dist_coeffs,
+                flags=flag,
+            )
+            if not ok:
+                self.get_logger().warn("ArUco pose estimation failed: solvePnP returned false", throttle_duration_sec=2.0)
+                return None, None
+            return rvec.reshape(3, 1), tvec.reshape(3, 1)
+        except (AttributeError, cv2.error) as exc:
+            self.get_logger().warn(f"ArUco pose estimation failed: {exc}", throttle_duration_sec=2.0)
+            return None, None
+
+    def marker_pose_to_box_pose(
+        self, marker_translation: np.ndarray, marker_rotation: np.ndarray
+    ) -> Tuple[np.ndarray, np.ndarray]:
+        box_rotation = marker_rotation @ self.box_rotation_in_marker_frame
+        box_translation = marker_translation + marker_rotation @ self.box_translation_in_marker_frame_m
+        return box_translation, box_rotation
+
+    def make_pose(
+        self, translation: np.ndarray, rotation: np.ndarray, header, frame_id: str
+    ) -> PoseStamped:
+        pose = PoseStamped()
+        pose.header.stamp = header.stamp
+        pose.header.frame_id = frame_id
+        pose.pose.position.x = float(translation[0])
+        pose.pose.position.y = float(translation[1])
+        pose.pose.position.z = float(translation[2])
+        pose.pose.orientation = quaternion_from_rotation_matrix(rotation)
+        return pose
+
+    @staticmethod
+    def pose_matrix(translation: np.ndarray, rotation: np.ndarray) -> np.ndarray:
+        matrix = np.eye(4, dtype=np.float64)
+        matrix[:3, :3] = np.asarray(rotation, dtype=np.float64).reshape(3, 3)
+        matrix[:3, 3] = np.asarray(translation, dtype=np.float64).reshape(3)
+        return matrix
+
+    @staticmethod
+    def matrix_translation_rotation(matrix: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+        transform = np.asarray(matrix, dtype=np.float64).reshape(4, 4)
+        return transform[:3, 3].copy(), transform[:3, :3].copy()
+
+    @staticmethod
+    def invert_pose_matrix(matrix: np.ndarray) -> np.ndarray:
+        transform = np.asarray(matrix, dtype=np.float64).reshape(4, 4)
+        inverse = np.eye(4, dtype=np.float64)
+        rotation = transform[:3, :3]
+        translation = transform[:3, 3]
+        inverse[:3, :3] = rotation.T
+        inverse[:3, 3] = -rotation.T @ translation
+        return inverse
+
+    @staticmethod
+    def transform_to_matrix(transform) -> np.ndarray:
+        translation = transform.translation
+        rotation = transform.rotation
+        matrix = np.eye(4, dtype=np.float64)
+        matrix[:3, :3] = rotation_matrix_from_quaternion(
+            [rotation.x, rotation.y, rotation.z, rotation.w]
+        )
+        matrix[:3, 3] = [translation.x, translation.y, translation.z]
+        return matrix
+
+    @staticmethod
+    def ros_stamp_to_time(stamp) -> Time:
+        if stamp.sec == 0 and stamp.nanosec == 0:
+            return Time()
+        return Time.from_msg(stamp)
+
+    def lookup_target_from_camera_matrix(self, camera_frame_id: str, stamp) -> Optional[np.ndarray]:
+        if not self.target_frame_id:
+            self.get_logger().warn("target_frame_id is empty; base_link pose is disabled", throttle_duration_sec=2.0)
+            return None
+        if not camera_frame_id:
+            self.get_logger().warn("image frame_id is empty; cannot transform pose to base_link", throttle_duration_sec=2.0)
+            return None
+        if camera_frame_id == self.target_frame_id:
+            return np.eye(4, dtype=np.float64)
+        if self.tf_buffer is None:
+            return None
+
+        try:
+            transform = self.tf_buffer.lookup_transform(
+                self.target_frame_id,
+                camera_frame_id,
+                self.ros_stamp_to_time(stamp),
+                Duration(seconds=max(0.0, self.tf_lookup_timeout_s)),
+            )
+            return self.transform_to_matrix(transform.transform)
+        except TransformException as exc:
+            if self.use_latest_tf_on_extrapolation:
+                try:
+                    transform = self.tf_buffer.lookup_transform(
+                        self.target_frame_id,
+                        camera_frame_id,
+                        Time(),
+                        Duration(seconds=max(0.0, self.tf_lookup_timeout_s)),
+                    )
+                    self.get_logger().warn(
+                        "timestamped TF from %s to %s was unavailable, using latest TF instead: %s"
+                        % (camera_frame_id, self.target_frame_id, exc),
+                        throttle_duration_sec=2.0,
+                    )
+                    return self.transform_to_matrix(transform.transform)
+                except TransformException as latest_exc:
+                    self.get_logger().warn(
+                        "cannot transform ArUco pose from %s to %s: "
+                        "timestamped lookup failed: %s; latest lookup failed: %s"
+                        % (
+                            camera_frame_id,
+                            self.target_frame_id,
+                            exc,
+                            latest_exc,
+                        ),
+                        throttle_duration_sec=2.0,
+                    )
+                    return None
+            self.get_logger().warn(
+                "cannot transform ArUco pose from %s to %s yet: %s"
+                % (camera_frame_id, self.target_frame_id, exc),
+                throttle_duration_sec=2.0,
+            )
+            return None
+
+    def publish_transformed_poses(
+        self,
+        verified_poses: Sequence[VerifiedMarkerPose],
+        header,
+        camera_frame_id: str,
+        target_from_camera: Optional[np.ndarray] = None,
+    ) -> None:
+        if not self.publish_base_poses or not verified_poses:
+            return
+
+        if target_from_camera is None:
+            return
+
+        for verified_pose in verified_poses:
+            marker_matrix_target = target_from_camera @ verified_pose.marker_matrix_camera
+            box_matrix_target = target_from_camera @ verified_pose.box_matrix_camera
+            marker_translation, marker_rotation = self.matrix_translation_rotation(marker_matrix_target)
+            box_translation, box_rotation = self.matrix_translation_rotation(box_matrix_target)
+
+            self.marker_base_pose_pubs[verified_pose.target.name].publish(
+                self.make_pose(marker_translation, marker_rotation, header, self.target_frame_id)
+            )
+            self.base_pose_pubs[verified_pose.target.name].publish(
+                self.make_pose(box_translation, box_rotation, header, self.target_frame_id)
+            )
+
+            roll, pitch, yaw = rpy_from_rotation_matrix(box_rotation)
+            self.get_logger().info(
+                "box pose in %s: marker_id=%d dictionary=%s topic=%s xyz=(%.3f, %.3f, %.3f)m "
+                "rpy=(%.1f, %.1f, %.1f)deg"
+                % (
+                    self.target_frame_id,
+                    verified_pose.marker_id,
+                    verified_pose.dictionary_name,
+                    self.topic_with_suffix(self.base_pose_topic, verified_pose.target.topic_suffix),
+                    box_translation[0],
+                    box_translation[1],
+                    box_translation[2],
+                    math.degrees(roll),
+                    math.degrees(pitch),
+                    math.degrees(yaw),
+                ),
+                throttle_duration_sec=1.0,
+            )
+
+    def publish_relative_marker_pose(
+        self, verified_poses: Sequence[VerifiedMarkerPose], header
+    ) -> None:
+        if not verified_poses:
+            return
+
+        poses_by_id: Dict[int, VerifiedMarkerPose] = {
+            verified_pose.marker_id: verified_pose for verified_pose in verified_poses
+        }
+        source = poses_by_id.get(self.relative_source_marker_id)
+        reference = poses_by_id.get(self.relative_reference_marker_id)
+        if source is None or reference is None:
+            return
+
+        reference_from_source = (
+            self.invert_pose_matrix(reference.marker_matrix_camera) @ source.marker_matrix_camera
+        )
+        translation, rotation = self.matrix_translation_rotation(reference_from_source)
+        reference_frame_id = f"aruco_{self.relative_reference_marker_id}"
+        self.relative_pose_pub.publish(self.make_pose(translation, rotation, header, reference_frame_id))
+
+        roll, pitch, yaw = rpy_from_rotation_matrix(rotation)
+        self.get_logger().info(
+            "relative marker pose: aruco_%d in aruco_%d xyz=(%.3f, %.3f, %.3f)m "
+            "rpy=(%.1f, %.1f, %.1f)deg topic=%s"
+            % (
+                self.relative_source_marker_id,
+                self.relative_reference_marker_id,
+                translation[0],
+                translation[1],
+                translation[2],
+                math.degrees(roll),
+                math.degrees(pitch),
+                math.degrees(yaw),
+                self.relative_pose_topic,
+            ),
+            throttle_duration_sec=1.0,
+        )
+
+    def publish_box_tf(self, pose: PoseStamped) -> None:
+        if self.tf_broadcaster is None:
+            return
+        transform = TransformStamped()
+        transform.header = pose.header
+        transform.child_frame_id = self.tf_child_frame_id
+        transform.transform.translation.x = pose.pose.position.x
+        transform.transform.translation.y = pose.pose.position.y
+        transform.transform.translation.z = pose.pose.position.z
+        transform.transform.rotation = pose.pose.orientation
+        self.tf_broadcaster.sendTransform(transform)
+
+    def make_markers(
+        self, translation: np.ndarray, rotation: np.ndarray, frame_id: str, topic_suffix: str
+    ) -> MarkerArray:
+        markers = MarkerArray()
+        colors = [(1.0, 0.1, 0.1, 1.0), (0.1, 1.0, 0.2, 1.0), (0.2, 0.45, 1.0, 1.0)]
+        names = [
+            f"aruco_box_{topic_suffix}_axis_x",
+            f"aruco_box_{topic_suffix}_axis_y",
+            f"aruco_box_{topic_suffix}_axis_z",
+        ]
+        for axis_index in range(3):
+            marker = self.base_marker(names[axis_index], axis_index, Marker.ARROW, frame_id)
+            marker.scale.x = 0.01
+            marker.scale.y = 0.02
+            marker.scale.z = 0.03
+            marker.color.r, marker.color.g, marker.color.b, marker.color.a = colors[axis_index]
+            axis = rotation[:, axis_index]
+            marker.points.append(point_msg(translation))
+            marker.points.append(point_msg(translation + self.axis_length_m * axis))
+            markers.markers.append(marker)
+        return markers
+
+    def base_marker(self, namespace: str, marker_id: int, marker_type: int, frame_id: str) -> Marker:
+        marker = Marker()
+        marker.header.stamp = self.get_clock().now().to_msg()
+        marker.header.frame_id = frame_id
+        marker.ns = namespace
+        marker.id = marker_id
+        marker.type = marker_type
+        marker.action = Marker.ADD
+        marker.pose.orientation.w = 1.0
+        marker.lifetime = Duration(seconds=0.5).to_msg()
+        return marker
+
+    def publish_delete_markers(self, frame_id: str) -> None:
+        if not self.publish_visualization_markers:
+            return
+        markers = MarkerArray()
+        for target_index, target in enumerate(self.marker_targets):
+            for marker_id, namespace in [
+                (target_index * 10 + 0, f"aruco_box_{target.topic_suffix}_axis_x"),
+                (target_index * 10 + 1, f"aruco_box_{target.topic_suffix}_axis_y"),
+                (target_index * 10 + 2, f"aruco_box_{target.topic_suffix}_axis_z"),
+            ]:
+                marker = self.base_marker(namespace, marker_id, Marker.ARROW, frame_id)
+                marker.action = Marker.DELETE
+                markers.markers.append(marker)
+        self.marker_array_pub.publish(markers)
+
+    def draw_pose_axis(self, image: np.ndarray, rvec: np.ndarray, tvec: np.ndarray) -> None:
+        try:
+            if hasattr(cv2.aruco, "drawAxis"):
+                cv2.aruco.drawAxis(image, self.camera_matrix, self.dist_coeffs, rvec, tvec, self.axis_length_m)
+            else:
+                cv2.drawFrameAxes(image, self.camera_matrix, self.dist_coeffs, rvec, tvec, self.axis_length_m)
+        except cv2.error as exc:
+            self.get_logger().warn(f"failed to draw pose axis: {exc}", throttle_duration_sec=2.0)
+
+    @staticmethod
+    def draw_pose_label(
+        image: np.ndarray,
+        marker_id: int,
+        translation: np.ndarray,
+        rotation: np.ndarray,
+        detection_source: str,
+        verified: bool,
+        label_index: int = 0,
+        target_frame_id: str = "",
+        target_translation: Optional[np.ndarray] = None,
+        target_rotation: Optional[np.ndarray] = None,
+    ) -> None:
+        roll, pitch, yaw = rpy_from_rotation_matrix(rotation)
+        source_parts = detection_source.split(":")
+        source_short = ":".join(source_parts[:4])
+        length_text = source_parts[-1] if source_parts and source_parts[-1].endswith("m") else ""
+        lines = [
+            f"id {marker_id} {'ok' if verified else 'reject'} {length_text}",
+            f"src {source_short}",
+            "cam xyz %.3f %.3f %.3f m" % (translation[0], translation[1], translation[2]),
+            "cam rpy %.1f %.1f %.1f deg"
+            % (math.degrees(roll), math.degrees(pitch), math.degrees(yaw)),
+        ]
+        if verified and target_frame_id:
+            if target_translation is not None and target_rotation is not None:
+                target_roll, target_pitch, target_yaw = rpy_from_rotation_matrix(target_rotation)
+                lines.extend(
+                    [
+                        "%s xyz %.3f %.3f %.3f m"
+                        % (
+                            target_frame_id,
+                            target_translation[0],
+                            target_translation[1],
+                            target_translation[2],
+                        ),
+                        "%s rpy %.1f %.1f %.1f deg"
+                        % (
+                            target_frame_id,
+                            math.degrees(target_roll),
+                            math.degrees(target_pitch),
+                            math.degrees(target_yaw),
+                        ),
+                    ]
+                )
+            else:
+                lines.append(f"{target_frame_id} no TF")
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        font_scale = 0.66
+        line_height = 26
+        margin = 10
+        block_gap = 10
+        text_sizes = [cv2.getTextSize(line, font, font_scale, 2)[0] for line in lines]
+        block_width = max(width for width, _ in text_sizes) + margin * 2
+        block_height = line_height * len(lines) + margin
+        x = 12
+        y0 = 12 + int(label_index) * (block_height + block_gap)
+        if y0 + block_height + 4 > image.shape[0]:
+            y0 = 12
+            x = max(12, min(image.shape[1] - block_width - 12, 12 + block_width + block_gap))
+
+        x1 = max(0, x)
+        y1 = max(0, y0)
+        x2 = min(image.shape[1], x + block_width)
+        y2 = min(image.shape[0], y0 + block_height)
+        if x2 > x1 and y2 > y1:
+            overlay = image.copy()
+            cv2.rectangle(overlay, (x1, y1), (x2, y2), (0, 0, 0), -1)
+            cv2.addWeighted(overlay, 0.38, image, 0.62, 0.0, image)
+
+        for index, line in enumerate(lines):
+            yy = y0 + margin + 18 + index * line_height
+            cv2.putText(
+                image,
+                line,
+                (x + margin, yy),
+                font,
+                font_scale,
+                (0, 0, 0),
+                3,
+                cv2.LINE_AA,
+            )
+            cv2.putText(
+                image,
+                line,
+                (x + margin, yy),
+                font,
+                font_scale,
+                (0, 255, 255),
+                2,
+                cv2.LINE_AA,
+            )
+
+    def publish_annotated(self, image_bgr: np.ndarray, header) -> None:
+        if not self.publish_annotated_image:
+            return
+        msg = Image()
+        msg.header = header
+        msg.height = int(image_bgr.shape[0])
+        msg.width = int(image_bgr.shape[1])
+        msg.encoding = "bgr8"
+        msg.is_bigendian = False
+        msg.step = int(image_bgr.shape[1] * 3)
+        # Typed arrays avoid ROS byte-sequence validation for every pixel byte.
+        msg.data = array("B", np.ascontiguousarray(image_bgr).tobytes())
+        self.annotated_pub.publish(msg)
+
+    def save_annotated_image(self, image_bgr: np.ndarray, output_path: str) -> None:
+        path = Path(output_path).expanduser()
+        if not path.suffix:
+            path = path.with_suffix(".jpg")
+        path.parent.mkdir(parents=True, exist_ok=True)
+        if not cv2.imwrite(str(path), image_bgr):
+            self.get_logger().error(f"failed to save annotated image: {path}")
+            return
+        self.get_logger().info(f"saved annotated image: {path}")
+
+
+def main() -> int:
+    rclpy.init()
+    node = ArucoBoxPose()
+    executor = None
+    exit_code = 0
+    try:
+        if node.input_mode == "image":
+            exit_code = node.run_image_once()
+        else:
+            # Image decoding/detection can take longer than the TF update
+            # period. Keep the TransformListener's reentrant callback group on
+            # a second executor thread while image processing is running.
+            executor = MultiThreadedExecutor(num_threads=2)
+            executor.add_node(node)
+            executor.spin()
+    except (KeyboardInterrupt, RuntimeError):
+        pass
+    finally:
+        if executor is not None:
+            try:
+                executor.shutdown(timeout_sec=1.0)
+            except (KeyboardInterrupt, RuntimeError):
+                pass
+        try:
+            node.destroy_node()
+        except (KeyboardInterrupt, RuntimeError):
+            pass
+        if rclpy.ok():
+            rclpy.shutdown()
+    return exit_code
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

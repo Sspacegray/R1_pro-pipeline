@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<profiles xmlns="http://www.eprosima.com/XMLSchemas/fastRTPS_Profiles">
+  <!--
+    Workstation counterpart of the robot's fastdds_robot_udp.xml profile.
+
+    Keep R1Pro Web, HDAS and navigation on the 192.168.3.x robot LAN using
+    UDPv4 only. LARGE_DATA advertises TCP/SHM locators that are incompatible
+    with the robot-side UDP-only participant and hides HDAS feedback remotely.
+  -->
+  <transport_descriptors>
+    <transport_descriptor>
+      <transport_id>r1pro_workstation_udp</transport_id>
+      <type>UDPv4</type>
+      <!--
+        The robot can deliver more than 50 MiB/s of fragmented image and
+        point-cloud traffic.  The Linux default (~208 KiB on Ubuntu 22.04)
+        overflows before Fast DDS can reassemble those samples.
+      -->
+      <sendBufferSize>4194304</sendBufferSize>
+      <receiveBufferSize>16777216</receiveBufferSize>
+      <non_blocking_send>true</non_blocking_send>
+      <interfaceWhiteList>
+        <address>192.168.3.23</address>
+      </interfaceWhiteList>
+    </transport_descriptor>
+  </transport_descriptors>
+
+  <participant profile_name="r1pro_workstation_udp_participant" is_default_profile="true">
+    <rtps>
+      <name>r1pro_workstation_udp</name>
+      <useBuiltinTransports>false</useBuiltinTransports>
+      <userTransports>
+        <transport_id>r1pro_workstation_udp</transport_id>
+      </userTransports>
+      <builtin>
+        <discovery_config>
+          <discoveryProtocol>SIMPLE</discoveryProtocol>
+          <leaseDuration>
+            <sec>3</sec>
+            <nanosec>0</nanosec>
+          </leaseDuration>
+          <leaseAnnouncement>
+            <sec>1</sec>
+            <nanosec>0</nanosec>
+          </leaseAnnouncement>
+        </discovery_config>
+      </builtin>
+    </rtps>
+  </participant>
+
+  <publisher profile_name="r1pro_workstation_udp_writer" is_default_profile="true">
+    <qos>
+      <publishMode>
+        <kind>ASYNCHRONOUS</kind>
+      </publishMode>
+      <data_sharing>
+        <kind>OFF</kind>
+      </data_sharing>
+    </qos>
+    <historyMemoryPolicy>PREALLOCATED_WITH_REALLOC</historyMemoryPolicy>
+  </publisher>
+
+  <subscriber profile_name="r1pro_workstation_udp_reader" is_default_profile="true">
+    <qos>
+      <data_sharing>
+        <kind>OFF</kind>
+      </data_sharing>
+    </qos>
+    <historyMemoryPolicy>DYNAMIC_REUSABLE</historyMemoryPolicy>
+  </subscriber>
+</profiles>

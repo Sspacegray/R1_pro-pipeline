@@ -1,0 +1,538 @@
+from __future__ import annotations
+
+import math
+import time
+from typing import Any
+
+
+def _as_bool(value: Any, default: bool = False) -> bool:
+    if value is None:
+        return bool(default)
+    if isinstance(value, str):
+        return value.strip().lower() in ("1", "true", "yes", "on")
+    return bool(value)
+
+
+def _clamp(value: float, limit: float) -> float:
+    limit = abs(float(limit))
+    if limit <= 0.0:
+        return 0.0
+    return max(-limit, min(limit, float(value)))
+
+
+def _normalize_degrees(value: float) -> float:
+    result = (float(value) + 180.0) % 360.0 - 180.0
+    return 180.0 if result == -180.0 else result
+
+
+def _within(value: float, low: float, high: float) -> bool:
+    return float(low) <= float(value) <= float(high)
+
+
+class ArucoId1ChassisFineAdjustWorkflow:
+    id = "aruco_id1_chassis_fine_adjust"
+    name = "ArUco id1 底盘离散微调"
+    description = "用 ArUco id=1 在 base_link 下的 x/y/yaw 反馈，按离散底盘速度动作逐轮微调。"
+    resources = ["camera:head_left", "chassis"]
+    # ArUco uses the head RGB image plus camera intrinsics/TF.  It does not
+    # consume the head depth processor output, so a stale/disabled depth
+    # worker must not block or stop this chassis-only approach workflow.
+    uses_head_depth = False
+    produces = ["workflow_pose", "workflow_adjust_result"]
+    requires: list[str] = []
+    video_stream = {
+        "key": "code_workflow_aruco_id1_chassis_fine_adjust",
+        "label": "ArUco id1 底盘微调",
+        "source_stream": "aruco",
+        "type": "code_workflow",
+    }
+
+    default_params: dict[str, Any] = {
+        "target_x_m": 0.60,
+        "target_y_m": 0.0,
+        "target_yaw_deg": -90.0,
+        "x_min_m": 0.56,
+        "x_max_m": 0.64,
+        "y_min_m": -0.02,
+        "y_max_m": 0.02,
+        "yaw_min_deg": -92.0,
+        "yaw_max_deg": -89.0,
+        "max_iterations": 24,
+        "pose_max_age_s": 1.0,
+        "pose_wait_timeout_s": 10.0,
+        "pose_retry_count": 5,
+        "settle_s": 1.0,
+        "dry_run": False,
+        "start_aruco_pose": True,
+        "restart_aruco_on_stale_pose": True,
+        "restart_pose_wait_timeout_s": 10.0,
+        "disable_continuous_fine": True,
+        "x_duration_s": 2.0,
+        "y_duration_s": 1.0,
+        "yaw_duration_s": 1.0,
+        "max_vx_mps": 0.05,
+        "max_vy_mps": 0.02,
+        "max_omega_radps": 0.1745329252,
+        "max_x_step_m": 0.09,
+        "max_y_step_m": 0.025,
+        "max_yaw_step_deg": 10.0,
+        "x_motion_scale": 0.9,
+        "y_motion_scale": 1.0,
+        "yaw_motion_scale": 1.0,
+        "yaw_command_sign": 1.0,
+        "yaw_priority_threshold_deg": 3.0,
+    }
+
+    params_schema: dict[str, dict[str, Any]] = {
+        "target_x_m": {"type": "number", "label": "目标 x m"},
+        "target_y_m": {"type": "number", "label": "目标 y m"},
+        "target_yaw_deg": {"type": "number", "label": "目标 yaw deg"},
+        "x_min_m": {"type": "number", "label": "x 最小 m"},
+        "x_max_m": {"type": "number", "label": "x 最大 m"},
+        "y_min_m": {"type": "number", "label": "y 最小 m"},
+        "y_max_m": {"type": "number", "label": "y 最大 m"},
+        "yaw_min_deg": {"type": "number", "label": "yaw 最小 deg"},
+        "yaw_max_deg": {"type": "number", "label": "yaw 最大 deg"},
+        "max_iterations": {"type": "number", "label": "最大微调轮数"},
+        "pose_max_age_s": {"type": "number", "label": "pose 最大年龄 s"},
+        "pose_wait_timeout_s": {"type": "number", "label": "等待 pose 超时 s"},
+        "pose_retry_count": {
+            "type": "number",
+            "label": "pose 未刷新时额外重试次数",
+        },
+        "settle_s": {"type": "number", "label": "动作后等待 s"},
+        "dry_run": {"type": "boolean", "label": "只打印不运动"},
+        "start_aruco_pose": {"type": "boolean", "label": "启动 ArUco 识别"},
+        "restart_aruco_on_stale_pose": {
+            "type": "boolean",
+            "label": "pose 陈旧时重启 ArUco 识别",
+        },
+        "restart_pose_wait_timeout_s": {
+            "type": "number",
+            "label": "重启后等待 pose 超时 s",
+        },
+        "disable_continuous_fine": {"type": "boolean", "label": "关闭连续微调节点"},
+        "x_duration_s": {"type": "number", "label": "前后动作时长 s"},
+        "y_duration_s": {"type": "number", "label": "左右动作时长 s"},
+        "yaw_duration_s": {"type": "number", "label": "转向动作时长 s"},
+        "max_vx_mps": {"type": "number", "label": "最大 vx m/s"},
+        "max_vy_mps": {"type": "number", "label": "最大 vy m/s"},
+        "max_omega_radps": {"type": "number", "label": "最大 omega rad/s"},
+        "x_motion_scale": {"type": "number", "label": "前后位移比例"},
+        "y_motion_scale": {"type": "number", "label": "左右位移比例"},
+        "yaw_motion_scale": {"type": "number", "label": "转向角度比例"},
+        "yaw_command_sign": {"type": "number", "label": "yaw 命令方向"},
+    }
+
+    def metadata(self) -> dict[str, Any]:
+        return {
+            "id": self.id,
+            "name": self.name,
+            "description": self.description,
+            "resources": list(self.resources),
+            "produces": list(self.produces),
+            "requires": list(self.requires),
+            "video_stream": dict(self.video_stream),
+            "default_params": dict(self.default_params),
+            "params_schema": dict(self.params_schema),
+        }
+
+    def resources_for_params(self, _params: dict[str, Any]) -> list[str]:
+        return list(self.resources)
+
+    def execute(self, ctx: Any, params: dict[str, Any]) -> dict[str, Any]:
+        values = self._values(params)
+        dry_run = _as_bool(values.get("dry_run"), True)
+        min_pose_time = 0.0
+        iterations: list[dict[str, Any]] = []
+        pose_retry_count = int(values["pose_retry_count"])
+        pose_retries_used = 0
+        aruco_restarts_used = 0
+        final_status: dict[str, Any] | None = None
+
+        if _as_bool(values.get("start_aruco_pose"), True):
+            start_result = ctx.node.start_aruco_box_pose({})
+            if not start_result.get("ok", False):
+                raise RuntimeError(str(start_result.get("message") or "failed to start ArUco pose"))
+            ctx.log(f"ArUco 识别: {start_result.get('message', 'started')}")
+
+        if _as_bool(values.get("disable_continuous_fine"), True):
+            if hasattr(ctx.node, "set_aruco_fine_enabled"):
+                fine_result = ctx.node.set_aruco_fine_enabled(False, {})
+                ctx.log(f"连续微调关闭: {fine_result.get('message', fine_result)}")
+
+        try:
+            if not dry_run:
+                self._prepare_chassis(ctx)
+            for index in range(1, int(values["max_iterations"]) + 1):
+                pose = self._get_aruco_pose(
+                    ctx,
+                    values,
+                    min_pose_time,
+                    max_restart_attempts=pose_retry_count - pose_retries_used,
+                )
+                pose_retries_used += int(pose.pop("_aruco_retry_count", 0))
+                aruco_restarts_used += int(pose.pop("_aruco_restart_count", 0))
+                status = self._status_from_pose(pose, values)
+                ctx.set_workflow_value("workflow_pose", status)
+                ctx.log(self._status_line(index, status))
+
+                if status["reached"]:
+                    result = {
+                        "ok": True,
+                        "message": f"ArUco id1 微调到位: iteration={index}",
+                        "status": "reached",
+                        "iterations": iterations,
+                        "pose": status,
+                        "pose_retries_used": pose_retries_used,
+                        "aruco_restarts_used": aruco_restarts_used,
+                    }
+                    ctx.set_workflow_value("workflow_adjust_result", result)
+                    return result
+
+                motion = self._plan_motion(status, values)
+                iterations.append({"iteration": index, "pose": status, "motion": motion})
+                ctx.log(self._motion_line(motion, dry_run))
+
+                if dry_run:
+                    result = {
+                        "ok": True,
+                        "message": "dry_run: 已计算第一轮 ArUco 底盘微调动作，未下发速度",
+                        "status": "dry_run",
+                        "iterations": iterations,
+                        "pose": status,
+                        "pose_retries_used": pose_retries_used,
+                        "aruco_restarts_used": aruco_restarts_used,
+                    }
+                    ctx.set_workflow_value("workflow_adjust_result", result)
+                    return result
+
+                move_result = ctx.move_chassis_velocity(
+                    motion["vx_mps"],
+                    motion["vy_mps"],
+                    motion["omega_radps"],
+                    motion["duration_s"],
+                )
+                if not move_result.get("ok", False):
+                    raise RuntimeError(str(move_result.get("message") or "chassis motion failed"))
+                min_pose_time = time.monotonic()
+                if not ctx.sleep(float(values["settle_s"])):
+                    raise RuntimeError("workflow stopped")
+
+            final_pose = self._get_aruco_pose(
+                ctx,
+                values,
+                min_pose_time,
+                max_restart_attempts=pose_retry_count - pose_retries_used,
+            )
+            pose_retries_used += int(final_pose.pop("_aruco_retry_count", 0))
+            aruco_restarts_used += int(final_pose.pop("_aruco_restart_count", 0))
+            final_status = self._status_from_pose(final_pose, values)
+            ctx.set_workflow_value("workflow_pose", final_status)
+            ctx.log(
+                "最终验收 "
+                + self._status_line(int(values["max_iterations"]) + 1, final_status)
+            )
+            if final_status["reached"]:
+                result = {
+                    "ok": True,
+                    "message": "ArUco id1 微调到位: final verification",
+                    "status": "reached",
+                    "iterations": iterations,
+                    "pose": final_status,
+                    "pose_retries_used": pose_retries_used,
+                    "aruco_restarts_used": aruco_restarts_used,
+                }
+                ctx.set_workflow_value("workflow_adjust_result", result)
+                return result
+        finally:
+            if not dry_run:
+                ctx.stop_chassis()
+
+        result = {
+            "ok": False,
+            "message": f"ArUco id1 微调未到位: reached max_iterations={int(values['max_iterations'])}",
+            "status": "max_iterations",
+            "iterations": iterations,
+            "pose": final_status,
+            "pose_retries_used": pose_retries_used,
+            "aruco_restarts_used": aruco_restarts_used,
+        }
+        ctx.set_workflow_value("workflow_adjust_result", result)
+        return result
+
+    @staticmethod
+    def _prepare_chassis(ctx: Any) -> None:
+        """Hand chassis control over from navigation before real fine motion."""
+        ctx.check_stop()
+        switched = ctx.node.switch_navigation_mode(
+            {"mode": "manual", "timeout_s": 5.0}
+        )
+        if not switched.get("ok", False):
+            raise RuntimeError(
+                "ArUco 微调控制权交接失败: "
+                + str(switched.get("message") or "manual mode switch failed")
+            )
+        ctx.log("ArUco 微调: 已切换手动模式，等待底盘停稳")
+        stationary = ctx.wait_for_chassis_stationary()
+        if not stationary.get("ok", False):
+            raise RuntimeError(
+                "ArUco 微调停稳检查失败: "
+                + str(stationary.get("message") or "chassis stationary check failed")
+            )
+        ctx.log("ArUco 微调: 导航输出已关闭，底盘停稳检查通过")
+
+    def _values(self, params: dict[str, Any]) -> dict[str, Any]:
+        values = dict(self.default_params)
+        values.update(params or {})
+        numeric_keys = [
+            "target_x_m",
+            "target_y_m",
+            "target_yaw_deg",
+            "x_min_m",
+            "x_max_m",
+            "y_min_m",
+            "y_max_m",
+            "yaw_min_deg",
+            "yaw_max_deg",
+            "pose_max_age_s",
+            "pose_wait_timeout_s",
+            "restart_pose_wait_timeout_s",
+            "settle_s",
+            "x_duration_s",
+            "y_duration_s",
+            "yaw_duration_s",
+            "max_vx_mps",
+            "max_vy_mps",
+            "max_omega_radps",
+            "max_x_step_m",
+            "max_y_step_m",
+            "max_yaw_step_deg",
+            "x_motion_scale",
+            "y_motion_scale",
+            "yaw_motion_scale",
+            "yaw_command_sign",
+            "yaw_priority_threshold_deg",
+        ]
+        for key in numeric_keys:
+            values[key] = float(values[key])
+        if (
+            abs(values["target_x_m"] - 0.56) < 1e-6
+            and (
+                (abs(values["x_min_m"] - 0.52) < 1e-6 and abs(values["x_max_m"] - 0.58) < 1e-6)
+                or (abs(values["x_min_m"] - 0.54) < 1e-6 and abs(values["x_max_m"] - 0.60) < 1e-6)
+            )
+        ):
+            values["target_x_m"] = 0.60
+            values["x_min_m"] = 0.56
+            values["x_max_m"] = 0.64
+        if (
+            abs(_normalize_degrees(values["target_yaw_deg"] - 90.0)) < 1e-6
+            and values["yaw_min_deg"] > 0.0
+            and values["yaw_max_deg"] > 0.0
+        ):
+            values["target_yaw_deg"] = -90.0
+            values["yaw_min_deg"] = -92.0
+            values["yaw_max_deg"] = -89.0
+        if values["yaw_command_sign"] < 0.0:
+            values["yaw_command_sign"] = 1.0
+        values["pose_retry_count"] = int(values["pose_retry_count"])
+        if not 0 <= values["pose_retry_count"] <= 10:
+            raise RuntimeError("pose_retry_count 必须在 [0,10]")
+        values["max_iterations"] = max(1, int(values["max_iterations"]))
+        return values
+
+    def _get_aruco_pose(
+        self,
+        ctx: Any,
+        values: dict[str, Any],
+        min_pose_time: float,
+        *,
+        max_restart_attempts: int,
+    ) -> dict[str, Any]:
+        retry_limit = max(0, int(max_restart_attempts))
+        retry_attempts = 0
+        restart_attempts = 0
+        newer_than_monotonic = float(min_pose_time)
+        wait_timeout_s = float(values["pose_wait_timeout_s"])
+
+        while True:
+            ctx.check_stop()
+            try:
+                pose = ctx.get_aruco_pose(
+                    float(values["pose_max_age_s"]),
+                    wait_timeout_s=wait_timeout_s,
+                    newer_than_monotonic=newer_than_monotonic,
+                    required_frame=ctx.base_frame,
+                )
+                pose["_aruco_retry_count"] = retry_attempts
+                pose["_aruco_restart_count"] = restart_attempts
+                return pose
+            except RuntimeError as exc:
+                ctx.check_stop()
+                message = str(exc)
+                retryable_pose_error = (
+                    "stale" in message
+                    or "no ArUco pose" in message
+                    or "older than requested" in message
+                    or "base_link TF 不可用" in message
+                )
+                if not retryable_pose_error or retry_attempts >= retry_limit:
+                    raise
+
+                retry_attempts += 1
+                running_check = getattr(ctx.node, "aruco_box_pose_running", None)
+                process_running = None
+                if callable(running_check):
+                    try:
+                        process_running = bool(running_check())
+                    except Exception:
+                        process_running = None
+
+                # A live detector may still be accumulating stable detections or
+                # waiting for TF. Restarting here clears both states and can make a
+                # valid marker miss every short workflow deadline.
+                if process_running is not False:
+                    ctx.log(
+                        "ArUco pose 尚未发布，保持当前识别进程继续等待 "
+                        f"{retry_attempts}/{retry_limit}: {message}"
+                    )
+                    wait_timeout_s = float(values["restart_pose_wait_timeout_s"])
+                    continue
+
+                should_restart = (
+                    restart_attempts == 0
+                    and _as_bool(values.get("start_aruco_pose"), True)
+                    and _as_bool(values.get("restart_aruco_on_stale_pose"), True)
+                )
+                if not should_restart:
+                    raise RuntimeError(
+                        f"ArUco 识别进程已退出，且无法继续重启: {message}"
+                    )
+
+                restart_attempts = 1
+                ctx.log(
+                    "ArUco 识别进程已退出，执行一次干净重启: "
+                    f"{message}"
+                )
+                if hasattr(ctx.node, "stop_aruco_box_pose"):
+                    stop_result = ctx.node.stop_aruco_box_pose()
+                    ctx.log(
+                        f"ArUco 识别停止: {stop_result.get('message', stop_result)}"
+                    )
+                start_result = ctx.node.start_aruco_box_pose({})
+                if not start_result.get("ok", False):
+                    raise RuntimeError(
+                        str(
+                            start_result.get("message")
+                            or "failed to restart ArUco pose"
+                        )
+                    )
+                ctx.log(
+                    f"ArUco 识别重启: {start_result.get('message', 'started')}"
+                )
+                newer_than_monotonic = time.monotonic()
+                wait_timeout_s = float(values["restart_pose_wait_timeout_s"])
+
+    def _status_from_pose(self, pose: dict[str, Any], values: dict[str, Any]) -> dict[str, Any]:
+        position = pose.get("position")
+        rpy_deg = pose.get("rpy_deg")
+        if not isinstance(position, list) or len(position) < 2:
+            raise RuntimeError("ArUco pose has no position")
+        if not isinstance(rpy_deg, list) or len(rpy_deg) < 3:
+            raise RuntimeError("ArUco pose has no rpy_deg")
+
+        x_m = float(position[0])
+        y_m = float(position[1])
+        z_m = float(position[2]) if len(position) >= 3 else 0.0
+        yaw_deg = _normalize_degrees(float(rpy_deg[2]))
+        target_yaw = _normalize_degrees(values["target_yaw_deg"])
+        error_x = x_m - values["target_x_m"]
+        error_y = y_m - values["target_y_m"]
+        error_yaw = _normalize_degrees(yaw_deg - target_yaw)
+        in_x = _within(x_m, values["x_min_m"], values["x_max_m"])
+        in_y = _within(y_m, values["y_min_m"], values["y_max_m"])
+        in_yaw = _within(yaw_deg, values["yaw_min_deg"], values["yaw_max_deg"])
+        return {
+            "frame_id": pose.get("frame_id", ""),
+            "position": [x_m, y_m, z_m],
+            "rpy_deg": [float(rpy_deg[0]), float(rpy_deg[1]), yaw_deg],
+            "age_s": pose.get("age_s"),
+            "error_x_m": error_x,
+            "error_y_m": error_y,
+            "error_yaw_deg": error_yaw,
+            "in_x": in_x,
+            "in_y": in_y,
+            "in_yaw": in_yaw,
+            "reached": in_x and in_y and in_yaw,
+        }
+
+    def _plan_motion(self, status: dict[str, Any], values: dict[str, Any]) -> dict[str, Any]:
+        yaw_error = float(status["error_yaw_deg"])
+        xy_reached = bool(status["in_x"] and status["in_y"])
+        yaw_reached = bool(status["in_yaw"])
+
+        if not yaw_reached and abs(yaw_error) > values["yaw_priority_threshold_deg"]:
+            return self._yaw_motion(yaw_error, values, "yaw_priority")
+
+        vx = 0.0
+        vy = 0.0
+        duration = max(values["x_duration_s"], values["y_duration_s"])
+        if not status["in_x"]:
+            step_x = math.copysign(
+                min(abs(float(status["error_x_m"])), values["max_x_step_m"]),
+                float(status["error_x_m"]),
+            )
+            vx = _clamp(step_x / max(1e-6, values["x_motion_scale"] * values["x_duration_s"]), values["max_vx_mps"])
+        if not status["in_y"]:
+            step_y = math.copysign(
+                min(abs(float(status["error_y_m"])), values["max_y_step_m"]),
+                float(status["error_y_m"]),
+            )
+            vy = _clamp(step_y / max(1e-6, values["y_motion_scale"] * values["y_duration_s"]), values["max_vy_mps"])
+        if not xy_reached and (abs(vx) > 0.0 or abs(vy) > 0.0):
+            return {
+                "kind": "translate",
+                "vx_mps": vx,
+                "vy_mps": vy,
+                "omega_radps": 0.0,
+                "duration_s": duration,
+            }
+        if not yaw_reached:
+            return self._yaw_motion(yaw_error, values, "yaw_after_xy")
+        return {"kind": "none", "vx_mps": 0.0, "vy_mps": 0.0, "omega_radps": 0.0, "duration_s": 0.05}
+
+    def _yaw_motion(self, yaw_error_deg: float, values: dict[str, Any], kind: str) -> dict[str, Any]:
+        step_deg = math.copysign(
+            min(abs(float(yaw_error_deg)), values["max_yaw_step_deg"]),
+            float(yaw_error_deg),
+        )
+        omega = (
+            values["yaw_command_sign"]
+            * math.radians(step_deg)
+            / max(1e-6, values["yaw_motion_scale"] * values["yaw_duration_s"])
+        )
+        return {
+            "kind": kind,
+            "vx_mps": 0.0,
+            "vy_mps": 0.0,
+            "omega_radps": _clamp(omega, values["max_omega_radps"]),
+            "duration_s": values["yaw_duration_s"],
+        }
+
+    def _status_line(self, iteration: int, status: dict[str, Any]) -> str:
+        x, y, z = status["position"]
+        yaw = status["rpy_deg"][2]
+        return (
+            f"第{iteration}轮 ArUco pose: xyz=({x:.3f},{y:.3f},{z:.3f})m "
+            f"yaw={yaw:.1f}deg err=({status['error_x_m']:.3f},{status['error_y_m']:.3f},"
+            f"{status['error_yaw_deg']:.1f}deg) reached={status['reached']}"
+        )
+
+    def _motion_line(self, motion: dict[str, Any], dry_run: bool) -> str:
+        prefix = "dry_run 计划" if dry_run else "执行"
+        return (
+            f"{prefix}: {motion['kind']} "
+            f"vx={motion['vx_mps']:.3f} vy={motion['vy_mps']:.3f} "
+            f"omega={motion['omega_radps']:.3f} duration={motion['duration_s']:.2f}s"
+        )

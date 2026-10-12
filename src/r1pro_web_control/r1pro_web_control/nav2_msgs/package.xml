@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>nav2_msgs</name>
+  <version>1.0.0</version>
+  <description>Minimal Nav2 service interface needed by the R1 Pro web bridge.</description>
+  <maintainer email="motrix@todo.todo">motrix</maintainer>
+  <license>Apache-2.0</license>
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <buildtool_depend>rosidl_default_generators</buildtool_depend>
+  <exec_depend>rosidl_default_runtime</exec_depend>
+  <member_of_group>rosidl_interface_packages</member_of_group>
+</package>
