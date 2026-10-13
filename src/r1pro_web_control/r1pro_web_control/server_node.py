@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from r1pro_web_control.resident_control import command_worker, submit_worker, wait_worker
+
 import json
 import base64
 import math
@@ -1900,7 +1902,7 @@ class R1ProWebNode(Node):
             "foundation_pose_debug_dir",
             "/home/pc10/桌面/r1pro-web-control-stack/src/FoundationPose/FoundationPose/debug_lays",
         )
-        self.declare_parameter("foundation_pose_debug_level", 2)
+        self.declare_parameter("foundation_pose_debug_level", 0)
         self.declare_parameter("foundation_pose_est_refine_iter", 5)
         self.declare_parameter("foundation_pose_track_refine_iter", 2)
         self.declare_parameter(
@@ -3720,6 +3722,7 @@ class R1ProWebNode(Node):
             "left_frames",
             "right_frames",
             "output_age_s",
+            "paused",
             "last_error",
             "pid",
             "session_id",
@@ -3953,6 +3956,11 @@ class R1ProWebNode(Node):
             ):
                 return
             self._foundation["debug"] = payload
+            failed = any(token in str(payload.get("status") or "").casefold()
+                         for token in ("failed", "error", "cuda_oom"))
+            if failed and str(payload.get("status")) != "robot_pose_exact_tf_failed":
+                self._foundation["object_pose"] = {}
+                self._foundation["camera_pose"] = {}
             status = self._foundation["debug"].get("status") if isinstance(self._foundation["debug"], dict) else None
             if status:
                 self._foundation["status"] = str(status)
@@ -7063,13 +7071,19 @@ class R1ProWebNode(Node):
                             self._navigation_state_condition.notify_all()
         except Exception as exc:
             primary = {"ok": False, "message": f"navigation action error: {exc}"}
-        finally:
+        # Keep navigation output enabled while a goal is being diagnosed or
+        # retried.  Switching to MANUAL here unconditionally used to disable
+        # the chassis whenever Nav2 returned ABORTED/CANCELED or timed out,
+        # making the robot appear to stop immediately after selecting a
+        # grasp/place point.  Only a goal that actually reached its target
+        # should hand control back to the manipulation/manual workflow.
+        if primary.get("ok", False):
             manual_switch = self.switch_navigation_mode(
                 {"mode": "manual", "timeout_s": switch_timeout_s}
             )
 
-        manual_message = str(manual_switch.get("message") or "")
-        if not manual_switch.get("ok", False):
+        manual_message = str((manual_switch or {}).get("message") or "")
+        if manual_switch is not None and not manual_switch.get("ok", False):
             return {
                 **primary,
                 "ok": False,
@@ -7101,7 +7115,11 @@ class R1ProWebNode(Node):
                 }
         return {
             **primary,
-            "message": f"{primary.get('message', '')}; switched back to manual control"
+            "message": (
+                f"{primary.get('message', '')}; switched back to manual control"
+                if manual_switch is not None
+                else f"{primary.get('message', '')}; navigation output remains enabled for retry"
+            )
             + (f" ({manual_message})" if manual_message and manual_message != "switched to manual mode" else "")
             + (
                 f"; {chassis_stationary.get('message', '')}"
@@ -9362,6 +9380,9 @@ class R1ProWebNode(Node):
         if not requested:
             phase = "stopped"
             ready = False
+        elif getattr(self, "_recognition_head_depth_paused", False):
+            phase = "paused_for_foundation_registration"
+            ready = False
         elif running and depth_stamp > 0.0 and not output_fresh:
             phase = "input_interrupted"
             ready = False
@@ -9809,6 +9830,8 @@ class R1ProWebNode(Node):
                         error, stop_consumers=True, asynchronous=True
                     )
             return
+        if getattr(self, '_recognition_head_depth_paused', False):
+            return
         if not requested or process is None or output_stamp <= 0.0:
             return
         age = time.monotonic() - output_stamp
@@ -10139,7 +10162,7 @@ class R1ProWebNode(Node):
                     "message": "vision worker already running with the same configuration",
                     "config": current_config,
                 }
-            if self.foundation_pose_running():
+            if self.foundation_pose_running() and not getattr(self, "_foundation_resident_held", False):
                 return {
                     "ok": False,
                     "phase": "blocked",
@@ -10186,8 +10209,11 @@ class R1ProWebNode(Node):
             self.vision_config_pub.publish(msg)
 
         def burst() -> None:
-            for _ in range(11):
-                time.sleep(0.1)
+            # ROS discovery can take longer than the old 1.1 second burst.
+            # Retry until this session/config produces output, bounded below
+            # the recognition workflow's target timeout.
+            for _ in range(100):
+                time.sleep(0.2)
                 with self._lock:
                     is_current = (
                         int(getattr(self, "_vision_config_id", 0) or 0)
@@ -10200,6 +10226,16 @@ class R1ProWebNode(Node):
                         == camera_key
                     )
                 if not is_current or not self.vision_worker_running():
+                    return
+                with self._lock:
+                    received = self._vision.get("detections_payload", {})
+                    acknowledged = (
+                        isinstance(received, dict)
+                        and received.get("config_id") == config_id
+                        and received.get("worker_session_id") == session_id
+                        and received.get("camera_key") == camera_key
+                    )
+                if acknowledged:
                     return
                 self.vision_config_pub.publish(msg)
 
@@ -10289,7 +10325,7 @@ class R1ProWebNode(Node):
                 payload.get("clean_restart", False)
             )
             if clean_restart_requested:
-                if self.foundation_pose_running():
+                if self.foundation_pose_running() and not getattr(self, "_foundation_resident_held", False):
                     return {
                         "ok": False,
                         "phase": "blocked",
@@ -10716,21 +10752,6 @@ class R1ProWebNode(Node):
         yolo_running = self.vision_worker_running()
         foundation_running = self.foundation_pose_running()
         with self._recognition_process_lock:
-            if (
-                self._recognition_workflow.get("active")
-                and self._recognition_workflow.get("phase") == "tracking"
-                and not foundation_running
-            ):
-                self._recognition_workflow.update(
-                    {
-                        "active": False,
-                        "busy": False,
-                        "phase": "error",
-                        "status": "FoundationPose 跟踪已中断",
-                        "error": "FoundationPose 实时跟踪进程已退出",
-                        "updated_monotonic": now,
-                    }
-                )
             snapshot = deepcopy(self._recognition_workflow)
         started = float(snapshot.get("started_monotonic", 0.0) or 0.0)
         updated = float(snapshot.get("updated_monotonic", 0.0) or 0.0)
@@ -10738,6 +10759,12 @@ class R1ProWebNode(Node):
         snapshot["update_age_s"] = round(now - updated, 3) if updated > 0.0 else None
         snapshot["yolo_running"] = yolo_running
         snapshot["foundation_running"] = foundation_running
+        recovery_deadline = float(snapshot.get("recovery_deadline_monotonic", 0.0) or 0.0)
+        snapshot["recovery_remaining_s"] = (
+            round(max(0.0, recovery_deadline - now), 1)
+            if snapshot.get("recovering") and not snapshot.get("recovery_target_found")
+            else None
+        )
         with self._lock:
             latched = deepcopy(self._latched_yolo)
         if isinstance(latched, dict):
@@ -10792,6 +10819,24 @@ class R1ProWebNode(Node):
             return True, action()
 
     def _pause_head_depth_for_foundation_registration(self) -> bool:
+        """Acknowledge inference pause while retaining the warmed stereo model."""
+        if not getattr(self, '_resident_force_cold_depth', False):
+            with self._head_depth_process_lock:
+                process = self.head_depth_process
+                if not self._head_depth_requested or process is None or process.poll() is not None:
+                    return False
+                with self._lock:
+                    self._recognition_head_depth_paused = True
+                try:
+                    command_worker(process, 'pause', timeout_s=5.0)
+                    self._head_depth_resident_paused = True
+                    return True
+                except Exception as exc:
+                    self.get_logger().warning(f'Resident depth pause failed; using restart fallback: {exc}')
+        self._head_depth_resident_paused = False
+        return self._cold_pause_head_depth_for_foundation_registration()
+
+    def _cold_pause_head_depth_for_foundation_registration(self) -> bool:
         """Release Fast stereo GPU memory while FP registers from its bundle."""
         with self._head_depth_process_lock:
             process = self.head_depth_process
@@ -10818,6 +10863,34 @@ class R1ProWebNode(Node):
 
     def _resume_head_depth_after_foundation_registration(self) -> bool:
         """Resume Fast stereo without invalidating the active FP process."""
+        if getattr(self, '_head_depth_resident_paused', False):
+            # ROS output callbacks also need _head_depth_process_lock; never
+            # wait for their fresh frame while holding that lock.
+            with self._head_depth_process_lock:
+                process = self.head_depth_process
+                if not self._head_depth_requested:
+                    self._recognition_head_depth_paused = False
+                    self._head_depth_resident_paused = False
+                    return False
+                try:
+                    command_worker(process, 'resume', timeout_s=5.0)
+                    acknowledged = True
+                except Exception as exc:
+                    acknowledged = False
+                    self.get_logger().warning(f'Resident depth resume failed; using restart: {exc}')
+            resumed_at = time.monotonic()
+            deadline = resumed_at + 5.0
+            while acknowledged and time.monotonic() < deadline:
+                with self._lock:
+                    fresh = float(self._head_depth.get('stamp_monotonic', 0.0)) > resumed_at
+                if fresh:
+                    self._head_depth_resident_paused = False
+                    self._recognition_head_depth_paused = False
+                    return True
+                time.sleep(0.05)
+            # A resident resume failure must still leave restart recovery usable.
+            self._head_depth_resident_paused = False
+            self._cold_pause_head_depth_for_foundation_registration()
         with self._head_depth_process_lock:
             with self._lock:
                 requested = bool(self._head_depth_requested)
@@ -11096,7 +11169,85 @@ class R1ProWebNode(Node):
             "match": match_result,
         }
 
+    @staticmethod
+    def _foundation_tracking_problem(foundation: dict[str, Any]) -> str:
+        if not foundation.get("running"):
+            return "FoundationPose 跟踪进程已退出"
+        debug = foundation.get("debug") or {}
+        status = " ".join(str(value or "") for value in (
+            foundation.get("status"), debug.get("status"), debug.get("phase")
+        )).casefold()
+        if "robot_pose_exact_tf_failed" not in status and any(token in status for token in ("failed", "error", "cuda_oom")):
+            return str(debug.get("error") or foundation.get("status") or "跟踪失败")
+        pose = foundation.get("object_pose") or {}
+        try:
+            valid = len(pose.get("position", [])) == 3 and all(
+                math.isfinite(float(value)) for value in pose["position"]
+            )
+            age = float(pose.get("age_s", float("inf")))
+        except (TypeError, ValueError):
+            valid, age = False, float("inf")
+        if not valid or age > 2.0:
+            return "FoundationPose 未产生新的有效位姿"
+        return ""
+
     def _run_recognition_workflow(
+        self, generation: int, stop_event: threading.Event, config: dict[str, Any]
+    ) -> None:
+        self._run_recognition_attempt(generation, stop_event, config)
+        with self._recognition_process_lock:
+            if self._recognition_workflow.get("phase") != "tracking":
+                return
+        while not self._recognition_cancelled(generation, stop_event):
+            reason = self._foundation_tracking_problem(self.foundation_state_snapshot())
+            if not reason:
+                stop_event.wait(0.2)
+                continue
+            deadline = time.monotonic() + 30.0
+            self._set_recognition_workflow(
+                generation, active=False, busy=True, phase="retrying", recovering=True,
+                status="跟踪丢失，正在重新检测目标（30 秒）", error="",
+                recovery_reason=reason, recovery_target_found=False,
+                recovery_deadline_monotonic=deadline,
+            )
+            with self._recognition_process_lock:
+                if generation != self._recognition_generation or stop_event.is_set():
+                    return
+                with self._lock:
+                    self._foundation["object_pose"] = {}
+                    self._foundation["camera_pose"] = {}
+            recovered = False
+            last_error = reason
+            while time.monotonic() < deadline:
+                if self._recognition_cancelled(generation, stop_event):
+                    return
+                retry_config = dict(config, _auto_recovery=True, _recovery_deadline=deadline)
+                try:
+                    self._run_recognition_attempt(generation, stop_event, retry_config)
+                except Exception as exc:
+                    last_error = str(exc)
+                    self._set_recognition_workflow(
+                        generation, active=False, busy=True, phase="retrying",
+                        status="正在重新检测目标", error="", recovery_reason=last_error,
+                        recovery_target_found=False,
+                    )
+                    stop_event.wait(0.5)
+                    continue
+                if self._recognition_cancelled(generation, stop_event):
+                    return
+                with self._recognition_process_lock:
+                    recovered = self._recognition_workflow.get("phase") == "tracking"
+                if recovered:
+                    break
+            if not recovered:
+                self._set_recognition_workflow(
+                    generation, active=False, busy=False, phase="error", recovering=False,
+                    status="目标恢复超时",
+                    error=f"30 秒内未恢复目标跟踪：{last_error}",
+                )
+                return
+
+    def _run_recognition_attempt(
         self,
         generation: int,
         stop_event: threading.Event,
@@ -11104,9 +11255,21 @@ class R1ProWebNode(Node):
     ) -> None:
         head_depth_paused = False
         head_depth_resume_started = False
+        resident_registration_command = None
+        attempt_started = time.monotonic()
+        resident = bool(config.get('_auto_recovery') and not config.get('_force_cold')
+                        and self.foundation_pose_running()
+                        and self._foundation_camera_key == config['camera_key']
+                        and self._foundation_run_config.get('asset_id') == config['asset_id'])
+        self._resident_force_cold_depth = bool(config.get('_force_cold'))
         try:
             def start_yolo() -> dict[str, Any]:
-                self.stop_foundation_pose()
+                if resident:
+                    command_worker(self.foundation_pose_process, 'hold', timeout_s=5.0,
+                                   cancelled=lambda: self._recognition_cancelled(generation, stop_event))
+                    self._foundation_resident_held = True
+                else:
+                    self.stop_foundation_pose()
                 self.stop_vision_worker(preserve_latched=False)
                 return self.handle_vision(
                     "start_yolo",
@@ -11140,7 +11303,14 @@ class R1ProWebNode(Node):
                 phase="detecting",
                 status="YOLO 运行中，等待目标",
             )
-            deadline = time.monotonic() + float(config["detection_timeout_s"])
+            deadline = float(config.get("_recovery_deadline") or (
+                time.monotonic() + float(config["detection_timeout_s"])
+            ))
+            if config.get("_auto_recovery"):
+                self._set_recognition_workflow(
+                    generation, phase="retrying", status="跟踪丢失，等待目标重新出现",
+                    recovery_target_found=False,
+                )
             last_latch_error = "尚未检测到目标"
             while time.monotonic() < deadline:
                 if self._recognition_cancelled(generation, stop_event):
@@ -11161,6 +11331,8 @@ class R1ProWebNode(Node):
             else:
                 raise RuntimeError(f"等待 YOLO 目标超时：{last_latch_error}")
 
+            if config.get("_auto_recovery"):
+                self._set_recognition_workflow(generation, recovery_target_found=True)
             with self._lock:
                 latched = deepcopy(self._latched_yolo)
             if not isinstance(latched, dict) or not latched.get("bundle_manifest_file"):
@@ -11176,27 +11348,45 @@ class R1ProWebNode(Node):
                 latched_source_stamp_ns=int(latched.get("source_stamp_ns", 0) or 0),
             )
             def handoff_to_foundation() -> dict[str, Any]:
-                nonlocal head_depth_paused
+                nonlocal head_depth_paused, resident_registration_command
                 self.stop_vision_worker(preserve_latched=True)
                 if self.vision_worker_running():
-                    raise RuntimeError(
-                        "YOLO 进程未能退出，拒绝启动 FoundationPose"
-                    )
+                    raise RuntimeError("YOLO 进程未能退出，拒绝启动 FoundationPose")
                 self._set_recognition_workflow(
                     generation,
                     phase="loading_foundation",
                     status="YOLO GPU 已释放，正在加载 FoundationPose",
                 )
-                result = self.start_foundation_pose(
-                    {
-                        "camera_key": config["camera_key"],
-                        "target_classes": config["yolo_prompts"],
-                        "segmentation_mode": "external_mask",
-                        "asset_id": config["asset_id"],
-                    }
-                )
+                if resident:
+                    if config['camera_key'] == 'head_left':
+                        head_depth_paused = self._pause_head_depth_for_foundation_registration()
+                        if not head_depth_paused:
+                            raise RuntimeError('resident registration requires paused depth')
+                    session = self._next_process_session_id(self._foundation_session_id)
+                    with self._lock:
+                        self._foundation_session_id = session
+                        self._foundation.update(dict(foundation_session_id=session,
+                            vision_config_id=int(latched['config_id']),
+                            vision_worker_session_id=int(latched['worker_session_id']),
+                            debug={}, status='registering', phase='registering',
+                            object_pose={}, camera_pose={}))
+                    process = self.foundation_pose_process
+                    nonce = submit_worker(process, 'reregister',
+                        {'manifest': latched['bundle_manifest_file'], 'foundation_session_id': session})
+                    resident_registration_command = (process, nonce)
+                    result = {'ok': True}
+                else:
+                    result = self.start_foundation_pose(
+                        {
+                            "camera_key": config["camera_key"],
+                            "target_classes": config["yolo_prompts"],
+                            "segmentation_mode": "external_mask",
+                            "asset_id": config["asset_id"],
+                        }
+                    )
                 if (
                     result.get("ok", False)
+                    and not resident
                     and config["camera_key"] == "head_left"
                 ):
                     head_depth_paused = (
@@ -11225,6 +11415,16 @@ class R1ProWebNode(Node):
                 phase="registering",
                 status="FoundationPose 正在使用锁存帧注册",
             )
+            if resident_registration_command:
+                process, nonce = resident_registration_command
+                ack = wait_worker(process, nonce, 'reregister',
+                    timeout_s=float(config['registration_timeout_s']),
+                    cancelled=lambda: self._recognition_cancelled(generation, stop_event))
+                self._set_recognition_workflow(generation, resident_recovery=True,
+                    registration_elapsed_s=round(ack['elapsed_s'], 3), registration_cuda=ack.get('cuda'))
+            if resident and config['camera_key'] != 'head_left':
+                command_worker(self.foundation_pose_process, 'resume', timeout_s=5.0)
+                self._foundation_resident_held = False
             deadline = time.monotonic() + float(config["registration_timeout_s"])
             while time.monotonic() < deadline:
                 if self._recognition_cancelled(generation, stop_event):
@@ -11235,7 +11435,7 @@ class R1ProWebNode(Node):
                 debug = foundation.get("debug") or {}
                 debug_status = str(debug.get("status") or foundation.get("status") or "")
                 debug_phase = str(debug.get("phase") or foundation.get("phase") or "")
-                if any(
+                if debug_status != "robot_pose_exact_tf_failed" and any(
                     token in f"{debug_status} {debug_phase}".casefold()
                     for token in ("failed", "error", "cuda_oom", "out of memory")
                 ):
@@ -11256,6 +11456,9 @@ class R1ProWebNode(Node):
                         raise RuntimeError("FoundationPose 注册后无法恢复头部深度处理")
                     head_depth_resume_started = True
                     head_depth_paused = False
+                    if resident:
+                        command_worker(self.foundation_pose_process, 'resume', timeout_s=5.0)
+                        self._foundation_resident_held = False
                 if head_depth_resume_started and not self.head_depth_ready():
                     self._set_recognition_workflow(
                         generation,
@@ -11272,7 +11475,12 @@ class R1ProWebNode(Node):
                         busy=False,
                         phase="tracking",
                         status="FoundationPose 实时跟踪中",
+                        recovery_elapsed_s=round(time.monotonic()-attempt_started, 3),
+                        resident_recovery=resident,
                         error="",
+                        recovering=False,
+                        recovery_target_found=False,
+                        recovery_deadline_monotonic=0.0,
                         head_depth_paused=False,
                     )
                     return
@@ -11284,20 +11492,25 @@ class R1ProWebNode(Node):
             )
             with transition_lock:
                 with self._recognition_process_lock:
-                    if generation != self._recognition_generation:
+                    if generation != self._recognition_generation or stop_event.is_set():
                         return
                 self.stop_vision_worker(preserve_latched=False)
                 self.stop_foundation_pose()
                 if head_depth_paused:
                     self._resume_head_depth_after_foundation_registration()
-                self._set_recognition_workflow(
-                    generation,
-                    active=False,
-                    busy=False,
-                    phase="error",
-                    status="完整识别失败",
-                    error=str(exc),
-                )
+            # Recovery may take tens of seconds.  Release the transition lock
+            # first so stop/camera-switch can cancel it throughout the fallback.
+            if resident or (not config.get('_force_cold') and 'out of memory' in str(exc).casefold()):
+                self._set_recognition_workflow(generation, resident_fallback_reason=str(exc),
+                    status='模型驻留恢复失败，正在回退到重启恢复')
+                self._run_recognition_attempt(generation, stop_event, dict(config, _force_cold=True))
+                return
+            if config.get("_auto_recovery"):
+                raise
+            self._set_recognition_workflow(
+                generation, active=False, busy=False, phase="error",
+                status="完整识别失败", error=str(exc),
+            )
 
     def _foundation_initial_registration_complete(
         self, foundation: dict[str, Any]
@@ -11347,6 +11560,9 @@ class R1ProWebNode(Node):
                         "phase": "stopped",
                         "status": message,
                         "error": "",
+                        "recovering": False,
+                        "recovery_target_found": False,
+                        "recovery_deadline_monotonic": 0.0,
                         "generation": generation,
                         "updated_monotonic": now,
                     }
@@ -11933,6 +12149,7 @@ class R1ProWebNode(Node):
         return text in ("1", "true", "yes", "y", "on")
 
     def stop_foundation_pose(self) -> dict[str, Any]:
+        self._foundation_resident_held = False
         with self._foundation_process_lock:
             process = self.foundation_pose_process
             self.foundation_pose_process = None

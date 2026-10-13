@@ -4395,60 +4395,6 @@
       "updated_at": "2026-09-29T09:19:36.232879Z"
     },
     {
-      "created_at": "2026-09-29T09:51:53.590355Z",
-      "description": "中文备注：开始时自动切换到导航控制，到达目标位姿后自动切回手动控制；失败、超时或停止也会尝试恢复手动控制。",
-      "id": "d28251ccf0356922",
-      "name": "抓取点",
-      "params": {
-        "position_tolerance_m": 0.1,
-        "stable_s": 0.5,
-        "timeout_s": 120,
-        "x_m": -1.45,
-        "y_m": -10.69,
-        "yaw_deg": -84.1,
-        "yaw_tolerance_deg": 10
-      },
-      "source_page": "navigation",
-      "type": "navigate_to_pose",
-      "updated_at": "2026-09-30T04:41:04.200006Z"
-    },
-    {
-      "created_at": "2026-09-30T04:41:04.200006Z",
-      "description": "中文备注：夹取抬起后驶离工作区域，便于带载导航到放置点；开始时自动切换到导航控制，到达后自动切回手动控制。",
-      "id": "8cf53cda4b994ef1",
-      "name": "退出点",
-      "params": {
-        "position_tolerance_m": 0.1,
-        "stable_s": 0.5,
-        "timeout_s": 120,
-        "x_m": -1.49489,
-        "y_m": -10.021963,
-        "yaw_deg": -85.296,
-        "yaw_tolerance_deg": 10
-      },
-      "source_page": "navigation",
-      "type": "navigate_to_pose",
-      "updated_at": "2026-09-30T04:41:04.200006Z"
-    },
-    {
-      "created_at": "2026-09-29T09:52:29.598836Z",
-      "description": "中文备注：开始时自动切换到导航控制，到达目标位姿后自动切回手动控制；失败、超时或停止也会尝试恢复手动控制。",
-      "id": "fffa91cb0a536d01",
-      "name": "放置点",
-      "params": {
-        "position_tolerance_m": 0.1,
-        "stable_s": 0.5,
-        "timeout_s": 120,
-        "x_m": -5.931476,
-        "y_m": -11.517275,
-        "yaw_deg": 0.07,
-        "yaw_tolerance_deg": 10
-      },
-      "source_page": "navigation",
-      "type": "navigate_to_pose",
-      "updated_at": "2026-09-30T06:17:10.696134Z"
-    },
-    {
       "created_at": "2026-09-30T08:18:18.231698Z",
       "description": "中文备注：从关节控制页保存的选中关节/夹爪目标。",
       "id": "447335dc4989f4ba",
@@ -4601,6 +4547,650 @@
       "source_page": "joints",
       "type": "joint_targets",
       "updated_at": "2026-09-30T08:18:18.231698Z"
+    },
+    {
+      "created_at": "2026-10-09T07:10:51.453533+00:00",
+      "description": "钩子姿态待现场调整：复制自 预备抓取位置(抓取上方)，仅控制双臂；请标定关节角度后执行。",
+      "id": "hook_atomic_1",
+      "name": "钩子准备抱夹",
+      "params": {
+        "targets": [
+          {
+            "group": "left_arm",
+            "index": 0,
+            "name": "left_arm[1]",
+            "unit": "deg",
+            "value": -80
+          },
+          {
+            "group": "left_arm",
+            "index": 1,
+            "name": "left_arm[2]",
+            "unit": "deg",
+            "value": 0
+          },
+          {
+            "group": "left_arm",
+            "index": 2,
+            "name": "left_arm[3]",
+            "unit": "deg",
+            "value": -4.07
+          },
+          {
+            "group": "left_arm",
+            "index": 3,
+            "name": "left_arm[4]",
+            "unit": "deg",
+            "value": 0.15
+          },
+          {
+            "group": "left_arm",
+            "index": 4,
+            "name": "left_arm[5]",
+            "unit": "deg",
+            "value": -1.72
+          },
+          {
+            "group": "left_arm",
+            "index": 5,
+            "name": "left_arm[6]",
+            "unit": "deg",
+            "value": 50.8
+          },
+          {
+            "group": "left_arm",
+            "index": 6,
+            "name": "left_arm[7]",
+            "unit": "deg",
+            "value": -6.31
+          },
+          {
+            "group": "right_arm",
+            "index": 0,
+            "name": "right_arm[1]",
+            "unit": "deg",
+            "value": -80
+          },
+          {
+            "group": "right_arm",
+            "index": 1,
+            "name": "right_arm[2]",
+            "unit": "deg",
+            "value": -4.35
+          },
+          {
+            "group": "right_arm",
+            "index": 2,
+            "name": "right_arm[3]",
+            "unit": "deg",
+            "value": 3.6
+          },
+          {
+            "group": "right_arm",
+            "index": 3,
+            "name": "right_arm[4]",
+            "unit": "deg",
+            "value": 0.35
+          },
+          {
+            "group": "right_arm",
+            "index": 4,
+            "name": "right_arm[5]",
+            "unit": "deg",
+            "value": 1.57
+          },
+          {
+            "group": "right_arm",
+            "index": 5,
+            "name": "right_arm[6]",
+            "unit": "deg",
+            "value": 49.07
+          },
+          {
+            "group": "right_arm",
+            "index": 6,
+            "name": "right_arm[7]",
+            "unit": "deg",
+            "value": 5.84
+          }
+        ],
+        "timeout_s": 15.0,
+        "target_ramp_s": 3.0,
+        "wait_for_feedback": true,
+        "stable_s": 0.5,
+        "joint_stable_velocity_deg_s": 3.0
+      },
+      "source_page": "joints",
+      "type": "joint_targets",
+      "updated_at": "2026-10-09T07:10:51.453533+00:00"
+    },
+    {
+      "created_at": "2026-10-09T07:10:51.453533+00:00",
+      "description": "钩子姿态待现场调整：复制自 夹取待闭合，仅控制双臂；请标定关节角度后执行。",
+      "id": "hook_atomic_2",
+      "name": "钩子收拢挂入",
+      "params": {
+        "joint_stable_velocity_deg_s": 3.0,
+        "stable_s": 0.5,
+        "targets": [
+          {
+            "group": "left_arm",
+            "index": 0,
+            "name": "left_arm[1]",
+            "unit": "deg",
+            "value": -89.84
+          },
+          {
+            "group": "left_arm",
+            "index": 1,
+            "name": "left_arm[2]",
+            "unit": "deg",
+            "value": 4.35
+          },
+          {
+            "group": "left_arm",
+            "index": 2,
+            "name": "left_arm[3]",
+            "unit": "deg",
+            "value": -4.05
+          },
+          {
+            "group": "left_arm",
+            "index": 3,
+            "name": "left_arm[4]",
+            "unit": "deg",
+            "value": 10
+          },
+          {
+            "group": "left_arm",
+            "index": 4,
+            "name": "left_arm[5]",
+            "unit": "deg",
+            "value": -1.71
+          },
+          {
+            "group": "left_arm",
+            "index": 5,
+            "name": "left_arm[6]",
+            "unit": "deg",
+            "value": 50.88
+          },
+          {
+            "group": "left_arm",
+            "index": 6,
+            "name": "left_arm[7]",
+            "unit": "deg",
+            "value": -6.24
+          },
+          {
+            "group": "right_arm",
+            "index": 0,
+            "name": "right_arm[1]",
+            "unit": "deg",
+            "value": -89.92
+          },
+          {
+            "group": "right_arm",
+            "index": 1,
+            "name": "right_arm[2]",
+            "unit": "deg",
+            "value": -4.44
+          },
+          {
+            "group": "right_arm",
+            "index": 2,
+            "name": "right_arm[3]",
+            "unit": "deg",
+            "value": 3.61
+          },
+          {
+            "group": "right_arm",
+            "index": 3,
+            "name": "right_arm[4]",
+            "unit": "deg",
+            "value": 10
+          },
+          {
+            "group": "right_arm",
+            "index": 4,
+            "name": "right_arm[5]",
+            "unit": "deg",
+            "value": 1.51
+          },
+          {
+            "group": "right_arm",
+            "index": 5,
+            "name": "right_arm[6]",
+            "unit": "deg",
+            "value": 49.07
+          },
+          {
+            "group": "right_arm",
+            "index": 6,
+            "name": "right_arm[7]",
+            "unit": "deg",
+            "value": 5.84
+          }
+        ],
+        "timeout_s": 15.0,
+        "target_ramp_s": 3.0,
+        "wait_for_feedback": true
+      },
+      "source_page": "joints",
+      "type": "joint_targets",
+      "updated_at": "2026-10-09T07:10:51.453533+00:00"
+    },
+    {
+      "created_at": "2026-10-09T07:10:51.453533+00:00",
+      "description": "钩子姿态待现场调整：复制自 夹取-抬起，仅控制双臂；请标定关节角度后执行。",
+      "id": "hook_atomic_3",
+      "name": "钩子抱夹完成",
+      "params": {
+        "targets": [
+          {
+            "group": "left_arm",
+            "index": 0,
+            "name": "left_arm[1]",
+            "unit": "deg",
+            "value": -90
+          },
+          {
+            "group": "left_arm",
+            "index": 1,
+            "name": "left_arm[2]",
+            "unit": "deg",
+            "value": 4.47
+          },
+          {
+            "group": "left_arm",
+            "index": 2,
+            "name": "left_arm[3]",
+            "unit": "deg",
+            "value": -4.06
+          },
+          {
+            "group": "left_arm",
+            "index": 3,
+            "name": "left_arm[4]",
+            "unit": "deg",
+            "value": 0.3
+          },
+          {
+            "group": "left_arm",
+            "index": 4,
+            "name": "left_arm[5]",
+            "unit": "deg",
+            "value": -1.71
+          },
+          {
+            "group": "left_arm",
+            "index": 5,
+            "name": "left_arm[6]",
+            "unit": "deg",
+            "value": 59.99
+          },
+          {
+            "group": "left_arm",
+            "index": 6,
+            "name": "left_arm[7]",
+            "unit": "deg",
+            "value": -6.29
+          },
+          {
+            "group": "right_arm",
+            "index": 0,
+            "name": "right_arm[1]",
+            "unit": "deg",
+            "value": -90
+          },
+          {
+            "group": "right_arm",
+            "index": 1,
+            "name": "right_arm[2]",
+            "unit": "deg",
+            "value": -4.49
+          },
+          {
+            "group": "right_arm",
+            "index": 2,
+            "name": "right_arm[3]",
+            "unit": "deg",
+            "value": 3.67
+          },
+          {
+            "group": "right_arm",
+            "index": 3,
+            "name": "right_arm[4]",
+            "unit": "deg",
+            "value": 0.22
+          },
+          {
+            "group": "right_arm",
+            "index": 4,
+            "name": "right_arm[5]",
+            "unit": "deg",
+            "value": 1.56
+          },
+          {
+            "group": "right_arm",
+            "index": 5,
+            "name": "right_arm[6]",
+            "unit": "deg",
+            "value": 59.95
+          },
+          {
+            "group": "right_arm",
+            "index": 6,
+            "name": "right_arm[7]",
+            "unit": "deg",
+            "value": 5.84
+          }
+        ],
+        "timeout_s": 15.0,
+        "target_ramp_s": 3.0,
+        "wait_for_feedback": true,
+        "stable_s": 0.5,
+        "joint_stable_velocity_deg_s": 3.0
+      },
+      "source_page": "joints",
+      "type": "joint_targets",
+      "updated_at": "2026-10-09T07:10:51.453533+00:00"
+    },
+    {
+      "created_at": "2026-10-09T07:10:51.453533+00:00",
+      "description": "钩子姿态待现场调整：复制自 夹取放置位，仅控制双臂；请标定关节角度后执行。",
+      "id": "hook_atomic_4",
+      "name": "钩子放置下降",
+      "params": {
+        "targets": [
+          {
+            "group": "left_arm",
+            "index": 0,
+            "name": "left_arm[1]",
+            "unit": "deg",
+            "value": -69.34
+          },
+          {
+            "group": "left_arm",
+            "index": 1,
+            "name": "left_arm[2]",
+            "unit": "deg",
+            "value": 4.52
+          },
+          {
+            "group": "left_arm",
+            "index": 2,
+            "name": "left_arm[3]",
+            "unit": "deg",
+            "value": -4.08
+          },
+          {
+            "group": "left_arm",
+            "index": 3,
+            "name": "left_arm[4]",
+            "unit": "deg",
+            "value": 0.1
+          },
+          {
+            "group": "left_arm",
+            "index": 4,
+            "name": "left_arm[5]",
+            "unit": "deg",
+            "value": -1.71
+          },
+          {
+            "group": "left_arm",
+            "index": 5,
+            "name": "left_arm[6]",
+            "unit": "deg",
+            "value": 50.81
+          },
+          {
+            "group": "left_arm",
+            "index": 6,
+            "name": "left_arm[7]",
+            "unit": "deg",
+            "value": -6.34
+          },
+          {
+            "group": "right_arm",
+            "index": 0,
+            "name": "right_arm[1]",
+            "unit": "deg",
+            "value": -69.05
+          },
+          {
+            "group": "right_arm",
+            "index": 1,
+            "name": "right_arm[2]",
+            "unit": "deg",
+            "value": -4.49
+          },
+          {
+            "group": "right_arm",
+            "index": 2,
+            "name": "right_arm[3]",
+            "unit": "deg",
+            "value": 3.69
+          },
+          {
+            "group": "right_arm",
+            "index": 3,
+            "name": "right_arm[4]",
+            "unit": "deg",
+            "value": 0.1
+          },
+          {
+            "group": "right_arm",
+            "index": 4,
+            "name": "right_arm[5]",
+            "unit": "deg",
+            "value": 1.57
+          },
+          {
+            "group": "right_arm",
+            "index": 5,
+            "name": "right_arm[6]",
+            "unit": "deg",
+            "value": 49.07
+          },
+          {
+            "group": "right_arm",
+            "index": 6,
+            "name": "right_arm[7]",
+            "unit": "deg",
+            "value": 5.84
+          }
+        ],
+        "timeout_s": 15.0,
+        "target_ramp_s": 3.0,
+        "wait_for_feedback": true,
+        "stable_s": 0.5,
+        "joint_stable_velocity_deg_s": 3.0
+      },
+      "source_page": "joints",
+      "type": "joint_targets",
+      "updated_at": "2026-10-09T07:10:51.453533+00:00"
+    },
+    {
+      "created_at": "2026-10-09T07:10:51.453533+00:00",
+      "description": "钩子姿态待现场调整：复制自 待夹取0，仅控制双臂；请标定关节角度后执行。",
+      "id": "hook_atomic_5",
+      "name": "钩子脱钩",
+      "params": {
+        "targets": [
+          {
+            "group": "left_arm",
+            "index": 0,
+            "name": "left_arm[1]",
+            "unit": "deg",
+            "value": -69.38
+          },
+          {
+            "group": "left_arm",
+            "index": 1,
+            "name": "left_arm[2]",
+            "unit": "deg",
+            "value": 4.57
+          },
+          {
+            "group": "left_arm",
+            "index": 2,
+            "name": "left_arm[3]",
+            "unit": "deg",
+            "value": -4.1
+          },
+          {
+            "group": "left_arm",
+            "index": 3,
+            "name": "left_arm[4]",
+            "unit": "deg",
+            "value": 0.06
+          },
+          {
+            "group": "left_arm",
+            "index": 4,
+            "name": "left_arm[5]",
+            "unit": "deg",
+            "value": -1.72
+          },
+          {
+            "group": "left_arm",
+            "index": 5,
+            "name": "left_arm[6]",
+            "unit": "deg",
+            "value": 50.83
+          },
+          {
+            "group": "left_arm",
+            "index": 6,
+            "name": "left_arm[7]",
+            "unit": "deg",
+            "value": -6.38
+          },
+          {
+            "group": "right_arm",
+            "index": 0,
+            "name": "right_arm[1]",
+            "unit": "deg",
+            "value": -69.07
+          },
+          {
+            "group": "right_arm",
+            "index": 1,
+            "name": "right_arm[2]",
+            "unit": "deg",
+            "value": -4.51
+          },
+          {
+            "group": "right_arm",
+            "index": 2,
+            "name": "right_arm[3]",
+            "unit": "deg",
+            "value": 3.72
+          },
+          {
+            "group": "right_arm",
+            "index": 3,
+            "name": "right_arm[4]",
+            "unit": "deg",
+            "value": 0.06
+          },
+          {
+            "group": "right_arm",
+            "index": 4,
+            "name": "right_arm[5]",
+            "unit": "deg",
+            "value": 1.61
+          },
+          {
+            "group": "right_arm",
+            "index": 5,
+            "name": "right_arm[6]",
+            "unit": "deg",
+            "value": 49.1
+          },
+          {
+            "group": "right_arm",
+            "index": 6,
+            "name": "right_arm[7]",
+            "unit": "deg",
+            "value": 5.86
+          }
+        ],
+        "timeout_s": 15.0,
+        "target_ramp_s": 3.0,
+        "wait_for_feedback": true,
+        "stable_s": 0.5,
+        "joint_stable_velocity_deg_s": 3.0
+      },
+      "source_page": "joints",
+      "type": "joint_targets",
+      "updated_at": "2026-10-09T07:10:51.453533+00:00"
+    },
+    {
+      "created_at": "2026-09-30T04:41:04.200006Z",
+      "description": "中文备注：夹取抬起后驶离工作区域，便于带载导航到放置点；开始时自动切换到导航控制，到达后自动切回手动控制。",
+      "id": "8cf53cda4b994ef1",
+      "name": "退出点",
+      "params": {
+        "position_tolerance_m": 0.1,
+        "stable_s": 0.5,
+        "timeout_s": 120,
+        "x_m": -1.49489,
+        "y_m": -10.021963,
+        "yaw_deg": -85.296,
+        "yaw_tolerance_deg": 10
+      },
+      "source_page": "navigation",
+      "type": "navigate_to_pose",
+      "updated_at": "2026-09-30T04:41:04.200006Z"
+    },
+    {
+      "created_at": "2026-09-29T09:51:53.590355Z",
+      "description": "中文备注：开始时自动切换到导航控制，到达目标位姿后自动切回手动控制；失败、超时或停止也会尝试恢复手动控制。",
+      "id": "d28251ccf0356922",
+      "name": "抓取点",
+      "params": {
+        "position_tolerance_m": 0.1,
+        "stable_s": 0.5,
+        "timeout_s": 120,
+        "x_m": -1.45,
+        "y_m": -10.69,
+        "yaw_deg": -84.1,
+        "yaw_tolerance_deg": 10
+      },
+      "source_page": "navigation",
+      "type": "navigate_to_pose",
+      "updated_at": "2026-09-30T04:41:04.200006Z"
+    },
+    {
+      "created_at": "2026-09-29T09:52:29.598836Z",
+      "description": "中文备注：开始时自动切换到导航控制，到达目标位姿后自动切回手动控制；失败、超时或停止也会尝试恢复手动控制。",
+      "id": "fffa91cb0a536d01",
+      "name": "放置点",
+      "params": {
+        "position_tolerance_m": 0.1,
+        "stable_s": 0.5,
+        "timeout_s": 120,
+        "x_m": -5.931476,
+        "y_m": -11.517275,
+        "yaw_deg": 0.07,
+        "yaw_tolerance_deg": 10
+      },
+      "source_page": "navigation",
+      "type": "navigate_to_pose",
+      "updated_at": "2026-09-30T06:17:10.696134Z"
+    },
+    {
+      "id": "hook_disable_continuous_fine",
+      "name": "钩子流程关闭连续微调",
+      "type": "aruco_fine_disable",
+      "params": {},
+      "source_page": "workflow",
+      "description": "防止连续微调控制器和导航或遥控同时输出。",
+      "created_at": "2026-10-09T07:10:51.453533+00:00",
+      "updated_at": "2026-10-09T07:10:51.453533+00:00"
     }
   ],
   "version": 2

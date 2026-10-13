@@ -1460,6 +1460,7 @@ function recognitionStatusIsError(value) {
 function recognitionBackendError() {
   const workflow = state.recognition_workflow || {};
   const yoloOnly = yoloDetectionRunning() && !workflow.active && !workflow.busy;
+  if (workflow.recovering) return "";
   if (!yoloOnly && workflow.error) return String(workflow.error);
   const visionStatus = String(state.vision?.status || "");
   if (!/^click\b/i.test(visionStatus) && recognitionStatusIsError(visionStatus)) {
@@ -1556,6 +1557,7 @@ function recognitionPhaseLabel(phase) {
     loading_foundation: "加载 FoundationPose",
     registering: "FoundationPose 首次注册",
     tracking: "FoundationPose 实时跟踪",
+    retrying: "跟踪丢失，自动重试",
     error: "识别失败"
   })[phase] || phase || "未启动";
 }
@@ -1569,9 +1571,11 @@ function renderRecognitionPose() {
   const cameraTab = $("recognitionCameraPoseTab");
   baseTab?.classList.toggle("active", recognitionPoseFrame === "base");
   cameraTab?.classList.toggle("active", recognitionPoseFrame === "camera");
-  if (!Array.isArray(pose.position) || pose.position.length < 3) {
+  if (state.recognition_workflow?.recovering || !Array.isArray(pose.position) || pose.position.length < 3) {
     if (values) values.textContent = "暂无有效位姿";
-    if (meta) meta.textContent = recognitionPoseFrame === "base" ? "等待 base_link TF 与实时跟踪结果" : "等待相机坐标位姿";
+    if (meta) meta.textContent = state.recognition_workflow?.recovering
+      ? "跟踪丢失，旧位姿无效；等待重新注册"
+      : recognitionPoseFrame === "base" ? "等待 base_link TF 与实时跟踪结果" : "等待相机坐标位姿";
     return;
   }
   const xyz = pose.position.slice(0, 3);
@@ -1597,9 +1601,10 @@ function renderRecognitionWorkflow() {
   const appearance = workflow.latched_asset_match_score
     ?? (appearanceScores.length ? Math.max(...appearanceScores) : undefined);
   const stage = $("recognitionStage");
+  const retryRemaining = workflow.recovery_remaining_s;
   if (stage) stage.textContent = yoloOnly
     ? `YOLO 单独运行 · ${state.vision?.status || "running"}`
-    : workflow.status || recognitionPhaseLabel(phase);
+    : `${workflow.status || recognitionPhaseLabel(phase)}${workflow.recovering && retryRemaining !== null && retryRemaining !== undefined ? ` · 剩余 ${number(retryRemaining, 1)} 秒` : ""}`;
   const dot = $("recognitionStateDot");
   if (dot) dot.className = `recognition-state-dot ${yoloOnly || phase === "tracking" ? "ready" : phase === "error" ? "error" : (workflow.busy ? "busy" : "")}`;
   const perf = $("recognitionPerformance");
@@ -1890,6 +1895,21 @@ function populateStreamSelects() {
   syncVisionStreams();
 }
 
+function connectCameraImageStream(img, key) {
+  if (!img || !key) return;
+  clearTimeout(img._cameraStreamRetry);
+  const source = `/stream/${key}?t=${Date.now()}`;
+  img.onerror = () => {
+    clearTimeout(img._cameraStreamRetry);
+    img._cameraStreamRetry = setTimeout(() => {
+      if (img.getAttribute("src") === source && img.isConnected) {
+        connectCameraImageStream(img, key);
+      }
+    }, 2000);
+  };
+  img.src = source;
+}
+
 function setVisionStream(slot, key) {
   const img = $(`streamImage${slot}`);
   const empty = $(`streamEmpty${slot}`);
@@ -1907,7 +1927,7 @@ function setVisionStream(slot, key) {
   if (current === key) return;
   img.dataset.streamKey = key;
   img.style.display = "block";
-  img.src = `/stream/${key}?t=${Date.now()}`;
+  connectCameraImageStream(img, key);
   if (empty) empty.style.display = "none";
 }
 
@@ -2074,7 +2094,7 @@ function setDerivedStream(imgId, emptyId, key, enabled, emptyText) {
   if (img.dataset.streamKey !== key) {
     img.dataset.streamKey = key;
     img.style.display = "block";
-    img.src = `/stream/${key}?t=${Date.now()}`;
+    connectCameraImageStream(img, key);
   }
   if (empty) empty.style.display = "none";
 }
@@ -2085,8 +2105,11 @@ function syncDerivedVisionStreams() {
   setDerivedStream(
     "recognitionMainImage",
     "recognitionMainEmpty",
-    foundationRunning ? "foundation" : "yolo",
-    foundationRunning || yoloRunning,
+    state.recognition_workflow?.recovering
+      ? (yoloRunning ? "yolo" : (state.recognition_workflow.camera_key === "head_left"
+        ? "head_left_raw_rgb" : `${state.recognition_workflow.camera_key || "wrist_right"}_rgb`))
+      : foundationRunning ? "foundation" : "yolo",
+    foundationRunning || yoloRunning || Boolean(state.recognition_workflow?.recovering),
     state.recognition_workflow?.busy ? "识别启动中，等待实时画面" : "识别未启动"
   );
   setDerivedStream(
@@ -3128,7 +3151,7 @@ function setVlaLiveImage(imgId, emptyId, streamKey) {
   }
   if (img.dataset.streamKey !== streamKey) {
     img.dataset.streamKey = streamKey;
-    img.src = `/stream/${streamKey}?t=${Date.now()}`;
+    connectCameraImageStream(img, streamKey);
   }
   img.style.display = "block";
   if (empty) empty.style.display = "none";
@@ -4456,7 +4479,7 @@ function setStreamImage(img, key, selectionKey) {
   if (!img) return selectionKey;
   if (key !== selectionKey) {
     selectionKey = key;
-    if (key) img.src = `/stream/${key}?t=${Date.now()}`;
+    if (key) connectCameraImageStream(img, key);
     else img.removeAttribute("src");
   }
   img.hidden = !key;
@@ -4530,6 +4553,7 @@ function renderWorkflowRuntime() {
   if (!hasCodeRuntime && codeLog.length) {
     lines.push("", ...codeLog.slice(-12));
   }
+  $("continueSequence").disabled = !(runtime.running && runtime.message === "waiting_operator");
   $("workflowRuntimeLog").textContent = lines.join("\n");
 }
 
@@ -5653,6 +5677,14 @@ function setupWorkflowEvents() {
     selectedSequence = null;
     refreshState();
   }).catch(alert);
+  $("continueSequence").onclick = () => {
+    if (!requireUnlocked("workflow")) return;
+    const runtime = state.sequence_runtime || {};
+    if (!runtime.running || runtime.message !== "waiting_operator") return;
+    if (!confirm("确认遥控器已回中、底盘已停稳，然后继续双臂动作？")) return;
+    post("/api/sequences/continue", {step_index: runtime.step_index})
+      .then(refreshState).catch(alert);
+  };
   $("stopSequence").onclick = stopWorkflowStack;
 }
 
@@ -5712,6 +5744,13 @@ async function refreshState() {
 
 function connectEvents() {
   const events = new EventSource("/api/events");
+  events.onopen = () => {
+    document.querySelectorAll('img[src^="/stream/"]').forEach((img) => {
+      const source = img.getAttribute("src") || "";
+      const key = source.slice("/stream/".length).split("?")[0];
+      if (key) connectCameraImageStream(img, key);
+    });
+  };
   events.onmessage = (event) => {
     try {
       state = JSON.parse(event.data);

@@ -857,6 +857,225 @@
         }
       ],
       "updated_at": "2026-09-30T07:42:43.785746Z"
+    },
+    {
+      "id": "hook_tray_atomic_with_nav",
+      "name": "双臂钩子料盆抓取放置（带导航）",
+      "description": "姿态为待调整模板。沿用夹爪退出点/抓取点/放置点；没有单独预备放置点，先直接导航至原放置点。微调目标必须按料盆实测调整。",
+      "created_at": "2026-10-09T07:10:51.453533+00:00",
+      "updated_at": "2026-10-09T07:10:51.453533+00:00",
+      "steps": [
+        {
+          "id": "hook_step_1",
+          "actions": [
+            "钩子流程关闭连续微调"
+          ],
+          "trigger": "after_end",
+          "delay_s": 0,
+          "overrides": {}
+        },
+        {
+          "id": "hook_step_2",
+          "actions": [
+            "钩子准备抱夹"
+          ],
+          "trigger": "after_end",
+          "delay_s": 0,
+          "overrides": {}
+        },
+        {
+          "id": "hook_step_3",
+          "actions": [
+            "退出点"
+          ],
+          "trigger": "after_end",
+          "delay_s": 0,
+          "overrides": {}
+        },
+        {
+          "id": "hook_step_4",
+          "actions": [
+            "抓取点"
+          ],
+          "trigger": "after_end",
+          "delay_s": 0,
+          "overrides": {}
+        },
+        {
+          "id": "hook_step_5",
+          "actions": [
+            "ArUco id1 底盘离散微调"
+          ],
+          "trigger": "after_end",
+          "delay_s": 0,
+          "overrides": {
+            "ArUco id1 底盘离散微调": {
+              "workflow_id": "aruco_id1_chassis_fine_adjust",
+              "dry_run": false,
+              "disable_continuous_fine": true
+            }
+          }
+        },
+        {
+          "id": "hook_step_6",
+          "actions": [
+            "钩子收拢挂入"
+          ],
+          "trigger": "after_end",
+          "delay_s": 0,
+          "overrides": {}
+        },
+        {
+          "id": "hook_step_7",
+          "actions": [
+            "钩子抱夹完成"
+          ],
+          "trigger": "after_end",
+          "delay_s": 0,
+          "overrides": {}
+        },
+        {
+          "id": "hook_step_8",
+          "actions": [
+            "退出点"
+          ],
+          "trigger": "after_end",
+          "delay_s": 0,
+          "overrides": {}
+        },
+        {
+          "id": "hook_step_9",
+          "actions": [
+            "放置点"
+          ],
+          "trigger": "after_end",
+          "delay_s": 0,
+          "overrides": {}
+        },
+        {
+          "id": "hook_step_10",
+          "actions": [
+            "钩子放置下降"
+          ],
+          "trigger": "after_end",
+          "delay_s": 0,
+          "overrides": {}
+        },
+        {
+          "id": "hook_step_11",
+          "actions": [
+            "钩子脱钩"
+          ],
+          "trigger": "after_end",
+          "delay_s": 0,
+          "overrides": {}
+        },
+        {
+          "id": "hook_step_12",
+          "actions": [
+            "钩子准备抱夹"
+          ],
+          "trigger": "after_end",
+          "delay_s": 0,
+          "overrides": {}
+        },
+        {
+          "id": "hook_step_13",
+          "actions": [
+            "退出点"
+          ],
+          "trigger": "after_end",
+          "delay_s": 0,
+          "overrides": {}
+        }
+      ]
+    },
+    {
+      "id": "hook_tray_atomic_remote",
+      "name": "双臂钩子料盆抓取放置（遥控无导航）",
+      "description": "姿态为待调整模板。无 Nav2 或视觉底盘速度动作；抓取、放置、返回三个阶段由遥控器移动，停稳后点击“遥控到位后继续”。运行前关闭导航输出。",
+      "created_at": "2026-10-09T07:10:51.453533+00:00",
+      "updated_at": "2026-10-09T07:10:51.453533+00:00",
+      "steps": [
+        {
+          "id": "hook_step_1",
+          "actions": [
+            "钩子流程关闭连续微调"
+          ],
+          "trigger": "after_end",
+          "delay_s": 0,
+          "overrides": {}
+        },
+        {
+          "id": "hook_step_2",
+          "actions": [
+            "钩子准备抱夹"
+          ],
+          "trigger": "after_end",
+          "delay_s": 0,
+          "overrides": {}
+        },
+        {
+          "id": "hook_step_3",
+          "actions": [
+            "钩子收拢挂入"
+          ],
+          "trigger": "after_end",
+          "delay_s": 0,
+          "overrides": {},
+          "manual_confirmation": true,
+          "manual_message": "请遥控到抓取位置，回中停稳后点击继续"
+        },
+        {
+          "id": "hook_step_4",
+          "actions": [
+            "钩子抱夹完成"
+          ],
+          "trigger": "after_end",
+          "delay_s": 0,
+          "overrides": {}
+        },
+        {
+          "id": "hook_step_5",
+          "actions": [
+            "钩子放置下降"
+          ],
+          "trigger": "after_end",
+          "delay_s": 0,
+          "overrides": {},
+          "manual_confirmation": true,
+          "manual_message": "请保持抱夹姿态，遥控到放置位置，回中停稳后点击继续"
+        },
+        {
+          "id": "hook_step_6",
+          "actions": [
+            "钩子脱钩"
+          ],
+          "trigger": "after_end",
+          "delay_s": 0,
+          "overrides": {}
+        },
+        {
+          "id": "hook_step_7",
+          "actions": [
+            "钩子准备抱夹"
+          ],
+          "trigger": "after_end",
+          "delay_s": 0,
+          "overrides": {}
+        },
+        {
+          "id": "hook_step_8",
+          "actions": [
+            "钩子流程关闭连续微调"
+          ],
+          "trigger": "after_end",
+          "delay_s": 0,
+          "overrides": {},
+          "manual_confirmation": true,
+          "manual_message": "请保持准备抱夹姿态，遥控返回预夹取点，回中停稳后点击继续"
+        }
+      ]
     }
   ],
   "version": 2

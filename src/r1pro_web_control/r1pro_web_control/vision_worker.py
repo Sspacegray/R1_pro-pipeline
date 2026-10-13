@@ -903,6 +903,26 @@ class CameraYoloWorker(Node):
                 candidates,
                 key=lambda index: float(detections[index].get("confidence", 0.0)),
             )
+        if asset_id == "bluelz":
+            # This bin requires a complete silhouette for 6D registration.
+            # A partial blue cabinet at the image edge previously passed the
+            # texture score and was handed to FoundationPose as the target.
+            height, width = image_bgr.shape[:2]
+            complete = []
+            for index in candidates:
+                box = detections[index].get("bbox_xyxy") or []
+                if len(box) != 4 or (
+                    float(box[0]) <= 2 or float(box[1]) <= 2
+                    or float(box[2]) >= width - 2
+                    or float(box[3]) >= height - 2
+                ):
+                    detections[index]["asset_id"] = asset_id
+                    detections[index]["asset_match_status"] = "rejected_clipped_target"
+                    continue
+                complete.append(index)
+            candidates = complete
+            if not candidates:
+                return None
         reference = self._asset_reference_descriptor(texture_file)
         if reference is None:
             for index in candidates:

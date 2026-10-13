@@ -262,6 +262,9 @@ def build_depth_image(
     return message
 
 
+from r1pro_web_control.resident_control import ResidentControl
+
+
 class HeadDepthWorker(Node):
     def __init__(
         self,
@@ -282,6 +285,8 @@ class HeadDepthWorker(Node):
         self._stop_event = threading.Event()
         self._runner: FastFoundationRunner | None = None
         self._fatal_error = ""
+        self.resident_control = ResidentControl()
+        self.resident_paused = False
         self._phase = "starting"
         self._ready = False
         self._last_error = ""
@@ -354,8 +359,9 @@ class HeadDepthWorker(Node):
                 fps = 0.0
             return {
                 "running": not self._stop_event.is_set() and not bool(self._fatal_error),
+                "paused": self.resident_paused,
                 "ready": bool(
-                    self._ready
+                    not self.resident_paused and self._ready
                     and output_age is not None
                     and output_age <= self.input_timeout_s
                 ),
@@ -426,8 +432,9 @@ class HeadDepthWorker(Node):
             self.get_logger().warning("Parent web process disappeared; stopping head depth worker")
             self._stop_event.set()
             self.pairs.close()
-            if rclpy.ok():
-                rclpy.shutdown()
+            # No supervisor remains to enforce a stop timeout.  Exit directly
+            # so ROS shutdown cannot leave an orphan holding GPU memory/topics.
+            os._exit(0)
 
     def _publish_static_transform(self, calibration: StereoCalibration) -> None:
         transform = TransformStamped()
@@ -503,6 +510,22 @@ class HeadDepthWorker(Node):
             self._set_phase("waiting_input", ready=False)
 
             while not self._stop_event.is_set() and rclpy.ok():
+                command = self.resident_control.poll()
+                if command is not None:
+                    action = command['action']
+                    if action in ('pause', 'resume'):
+                        self.resident_paused = action == 'pause'
+                        self._set_phase('paused_for_foundation_registration' if self.resident_paused else 'waiting_input', ready=False)
+                        if not self.resident_paused:
+                            with self._state_lock:
+                                self._last_output_monotonic = 0.0
+                                self._output_times.clear()
+                        self.resident_control.ack(command, ok=True, paused=self.resident_paused)
+                    else:
+                        self.resident_control.ack(command, ok=False, error='unsupported action')
+                if self.resident_paused:
+                    self._stop_event.wait(0.05)
+                    continue
                 pair = self.pairs.get(timeout_s=0.25)
                 if pair is None:
                     continue
